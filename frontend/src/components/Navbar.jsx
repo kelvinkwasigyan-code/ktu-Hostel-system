@@ -37,9 +37,12 @@ export default function Navbar() {
   const fetchNotifications = async () => {
     try {
       const res = await api.get('/notifications');
-      setNotifications(res.data.notifications);
-      setUnreadCount(res.data.unread_count);
-    } catch { /* silent */ }
+      setNotifications(res.data?.notifications || []);
+      setUnreadCount(res.data?.unread_count || 0);
+    } catch { 
+      setNotifications([]);
+      setUnreadCount(0);
+    }
   };
 
   const handleMarkAllRead = async () => {

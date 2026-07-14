@@ -51,15 +51,15 @@ export default function StudentDashboard() {
       setLoading(true);
       // Fetch student bookings
       const bookingsRes = await api.get('/bookings/student/mine');
-      const bookings = bookingsRes.data.bookings || [];
+      const bookings = bookingsRes.data?.bookings || [];
 
       // Fetch reviews
       const reviewsRes = await api.get('/reviews/mine');
-      const reviews = reviewsRes.data.reviews || [];
+      const reviews = reviewsRes.data?.reviews || [];
 
       // Fetch notifications
       const notifRes = await api.get('/notifications');
-      const notifs = notifRes.data.notifications || [];
+      const notifs = notifRes.data?.notifications || [];
 
       // Calculate stats
       const approved = bookings.filter(b => b.status === 'Approved').length;

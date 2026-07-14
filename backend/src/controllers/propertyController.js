@@ -311,35 +311,64 @@ export const getLandlordDashboard = async (req, res) => {
   try {
     const landlordId = req.user.user_id;
 
-    const [propertiesRes, bookingsRes, reviewsRes] = await Promise.all([
-      supabaseAdmin.from('properties').select('*').eq('landlord_id', landlordId),
-      supabaseAdmin.from('bookings')
-        .select('*, properties!property_id (title, landlord_id)')
-        .eq('properties.landlord_id', landlordId),
-      supabaseAdmin.from('reviews')
-        .select('rating, property_id, properties!property_id (landlord_id)')
-        .eq('properties.landlord_id', landlordId)
-        .eq('is_flagged', false)
-    ]);
+    // 1. Fetch properties owned by this landlord
+    const { data: properties, error: propertiesError } = await supabaseAdmin
+      .from('properties')
+      .select('*')
+      .eq('landlord_id', landlordId);
 
-    const properties = propertiesRes.data || [];
-    const bookings = bookingsRes.data || [];
-    const reviews = reviewsRes.data || [];
+    if (propertiesError) {
+      console.error('getLandlordDashboard propertiesError:', propertiesError);
+      return res.status(500).json({ error: 'Failed to fetch properties.' });
+    }
+
+    const propertyList = properties || [];
+    const propertyIds = propertyList.map(p => p.property_id);
+
+    let bookingsList = [];
+    let reviewsList = [];
+
+    if (propertyIds.length > 0) {
+      // 2. Fetch bookings for these properties
+      const { data: bookings, error: bookingsError } = await supabaseAdmin
+        .from('bookings')
+        .select('*, properties!property_id (title, landlord_id)')
+        .in('property_id', propertyIds);
+
+      if (bookingsError) {
+        console.error('getLandlordDashboard bookingsError:', bookingsError);
+      } else {
+        bookingsList = bookings || [];
+      }
+
+      // 3. Fetch reviews for these properties
+      const { data: reviews, error: reviewsError } = await supabaseAdmin
+        .from('reviews')
+        .select('rating, property_id')
+        .in('property_id', propertyIds)
+        .eq('is_flagged', false);
+
+      if (reviewsError) {
+        console.error('getLandlordDashboard reviewsError:', reviewsError);
+      } else {
+        reviewsList = reviews || [];
+      }
+    }
 
     const stats = {
-      total_listings: properties.length,
-      approved_listings: properties.filter(p => p.verification_status === 'Approved').length,
-      pending_listings: properties.filter(p => p.verification_status === 'Pending').length,
-      available_rooms: properties.filter(p => p.availability_status === 'Available').length,
-      occupied_rooms: properties.filter(p => p.availability_status === 'Occupied').length,
-      pending_bookings: bookings.filter(b => b.status === 'Pending').length,
-      total_reviews: reviews.length,
-      avg_rating: reviews.length
-        ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
+      total_listings: propertyList.length,
+      approved_listings: propertyList.filter(p => p.verification_status === 'Approved').length,
+      pending_listings: propertyList.filter(p => p.verification_status === 'Pending').length,
+      available_rooms: propertyList.filter(p => p.availability_status === 'Available').length,
+      occupied_rooms: propertyList.filter(p => p.availability_status === 'Occupied').length,
+      pending_bookings: bookingsList.filter(b => b.status === 'Pending').length,
+      total_reviews: reviewsList.length,
+      avg_rating: reviewsList.length
+        ? (reviewsList.reduce((a, r) => a + r.rating, 0) / reviewsList.length).toFixed(1)
         : null
     };
 
-    res.json({ stats, properties, recent_bookings: bookings.slice(0, 10) });
+    res.json({ stats, properties: propertyList, recent_bookings: bookingsList.slice(0, 10) });
   } catch (err) {
     console.error('getLandlordDashboard error:', err);
     res.status(500).json({ error: 'Server error.' });

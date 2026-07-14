@@ -33,9 +33,9 @@ export default function LandlordDashboard() {
     try {
       setLoading(true);
       const res = await api.get('/properties/landlord/dashboard');
-      setStats(res.data.stats || {});
-      setProperties(res.data.properties || []);
-      setRecentBookings(res.data.recent_bookings || []);
+      setStats(res.data?.stats || {});
+      setProperties(res.data?.properties || []);
+      setRecentBookings(res.data?.recent_bookings || []);
     } catch (err) {
       console.error('Error fetching landlord dashboard:', err);
     } finally {

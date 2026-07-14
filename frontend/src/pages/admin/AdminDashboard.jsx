@@ -24,19 +24,19 @@ export default function AdminDashboard() {
       setLoading(true);
       // Fetch analytics
       const analyticRes = await api.get('/admin/analytics');
-      setAnalytics(analyticRes.data.analytics);
+      setAnalytics(analyticRes.data?.analytics || null);
 
       // Fetch landlord verification queue
       const landlordRes = await api.get('/admin/landlords');
-      setPendingLandlords(landlordRes.data.landlords?.filter(l => l.verification_status === 'Pending') || []);
+      setPendingLandlords(landlordRes.data?.landlords?.filter(l => l.verification_status === 'Pending') || []);
 
       // Fetch pending listings queue
       const listingRes = await api.get('/admin/listings');
-      setPendingListings(listingRes.data.listings?.filter(l => l.verification_status === 'Pending') || []);
+      setPendingListings(listingRes.data?.listings?.filter(l => l.verification_status === 'Pending') || []);
 
       // Fetch flagged reviews (or all reviews, filtering by flagged)
       const reviewRes = await api.get('/admin/reviews');
-      setFlaggedReviews(reviewRes.data.reviews?.filter(r => r.is_flagged) || []);
+      setFlaggedReviews(reviewRes.data?.reviews?.filter(r => r.is_flagged) || []);
 
     } catch (err) {
       console.error('Error fetching admin dashboard:', err);
