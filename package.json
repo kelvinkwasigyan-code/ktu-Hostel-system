@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Root scripts for KTU Student Hostel Portal",
   "private": true,
+  "type": "module",
   "workspaces": [
     "frontend",
     "backend"
