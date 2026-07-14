@@ -9,25 +9,37 @@ const __dirname = path.dirname(__filename);
 const dbFilePath = path.join(__dirname, 'mock_db.json');
 
 // Synchronously load or create the JSON database file
+let inMemoryDb = null;
+
 function loadDb() {
+  if (inMemoryDb) return inMemoryDb;
+
   if (!fs.existsSync(dbFilePath)) {
-    fs.writeFileSync(dbFilePath, JSON.stringify(INITIAL_DB_STATE, null, 2), 'utf-8');
-    return INITIAL_DB_STATE;
+    try {
+      fs.writeFileSync(dbFilePath, JSON.stringify(INITIAL_DB_STATE, null, 2), 'utf-8');
+    } catch (e) {
+      console.warn('⚠️ Writable filesystem not available (Vercel/Read-only), using in-memory database fallback.');
+    }
+    inMemoryDb = JSON.parse(JSON.stringify(INITIAL_DB_STATE));
+    return inMemoryDb;
   }
   try {
     const content = fs.readFileSync(dbFilePath, 'utf-8');
-    return JSON.parse(content);
+    inMemoryDb = JSON.parse(content);
+    return inMemoryDb;
   } catch (err) {
     console.error('Error reading mock DB file, resetting to initial state:', err);
-    return INITIAL_DB_STATE;
+    inMemoryDb = JSON.parse(JSON.stringify(INITIAL_DB_STATE));
+    return inMemoryDb;
   }
 }
 
 function saveDb(data) {
+  inMemoryDb = data;
   try {
     fs.writeFileSync(dbFilePath, JSON.stringify(data, null, 2), 'utf-8');
   } catch (err) {
-    console.error('Error writing to mock DB file:', err);
+    console.warn('⚠️ Error writing to mock DB file (read-only filesystem):', err.message);
   }
 }
 

@@ -15,7 +15,7 @@ const JWT_EXPIRY = '7d';
 const generateToken = (user) => {
   return jwt.sign(
     { user_id: user.user_id, email: user.email, role: user.role, full_name: user.full_name },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'fallback_development_secret_key_12345',
     { expiresIn: JWT_EXPIRY }
   );
 };

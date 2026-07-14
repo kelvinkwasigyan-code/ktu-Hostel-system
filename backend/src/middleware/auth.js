@@ -18,7 +18,7 @@ export const authenticate = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_development_secret_key_12345');
     req.user = decoded; // { user_id, email, role, full_name }
     next();
   } catch (err) {
@@ -61,7 +61,7 @@ export const optionalAuthenticate = (req, res, next) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_development_secret_key_12345');
       req.user = decoded;
     } catch (err) {
       // Ignore token errors for optional authentication (e.g. expired or invalid)
