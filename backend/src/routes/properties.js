@@ -9,10 +9,11 @@ import { authenticate, optionalAuthenticate, requireLandlord, requireStudent } f
 
 const router = express.Router();
 
+// ── Specific named routes MUST come before /:id wildcard ──────────────────────
+
 // Public routes
 router.get('/search', searchProperties);                      // UC-S03
 router.get('/map', getMapProperties);                         // UC-S05
-router.get('/:id', optionalAuthenticate, getPropertyDetail);          // UC-S04 (auth optional for gate check)
 
 // Student vacancy alert routes
 router.post('/alerts', authenticate, requireStudent, createVacancyAlert);      // UC-S08
@@ -24,6 +25,9 @@ router.post('/', authenticate, requireLandlord, createProperty);                
 router.get('/landlord/mine', authenticate, requireLandlord, getMyProperties);
 router.get('/landlord/dashboard', authenticate, requireLandlord, getLandlordDashboard); // UC-L05
 router.patch('/:id/availability', authenticate, requireLandlord, updateAvailability);  // UC-L03
+
+// ── Wildcard route LAST — must not shadow specific routes above ───────────────
+router.get('/:id', optionalAuthenticate, getPropertyDetail);          // UC-S04
 
 export default router;
 

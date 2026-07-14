@@ -92,9 +92,9 @@ function matchesFilters(row, filters, db) {
     }
 
     if (type === 'eq') {
-      if (actualVal !== val) return false;
+      if (actualVal != val) return false;
     } else if (type === 'in') {
-      if (!Array.isArray(val) || !val.includes(actualVal)) return false;
+      if (!Array.isArray(val) || !val.some(v => v == actualVal)) return false;
     } else if (type === 'lt') {
       if (!(actualVal < val)) return false;
     } else if (type === 'lte') {
@@ -242,7 +242,9 @@ class MockQueryBuilder {
   }
   
   select(fields = '*') {
-    this.method = 'select';
+    if (this.method !== 'insert' && this.method !== 'update' && this.method !== 'delete') {
+      this.method = 'select';
+    }
     return this;
   }
   

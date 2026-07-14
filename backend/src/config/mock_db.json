@@ -5,108 +5,108 @@
       "full_name": "System Administrator",
       "email": "admin@hostelportal.edu.gh",
       "phone": "+233241000000",
-      "password_hash": "$2a$12$ZWRFO0Sm4Tu22P27ZjKhfumg0ny970SH9ywyaJjus0bTZ8huyoto2",
+      "password_hash": "$2a$12$oPZWvvrP3jktZtLruO1Stu0gxpJ9QYLovWohSmu4eSMVdfaLDowWS",
       "role": "Admin",
       "verification_status": "Approved",
       "id_document_path": null,
       "is_active": true,
-      "created_at": "2026-06-07T11:49:12.123Z"
+      "created_at": "2026-06-14T14:49:26.887Z"
     },
     {
       "user_id": 2,
       "full_name": "Kwame Asante Boateng",
       "email": "kwame.asante@gmail.com",
       "phone": "+233244123456",
-      "password_hash": "$2a$12$Dwt6ACQDQj3uaHjUa97cD.IeB9YiQI1YXA/yFZYaJ5n3IYAAa5J1y",
+      "password_hash": "$2a$12$zH1Uu0gd34ocH2RaEiAw/u6ZwXf6ynVVCBdyfEj/65oNrbNLR5Gbm",
       "role": "Landlord",
       "verification_status": "Approved",
       "id_document_path": "https://placeholder-url.supabase.co/storage/v1/object/public/ids/kwame.jpg",
       "is_active": true,
-      "created_at": "2026-06-12T11:49:12.127Z"
+      "created_at": "2026-06-19T14:49:26.890Z"
     },
     {
       "user_id": 3,
       "full_name": "Abena Mensah Osei",
       "email": "abena.mensah@gmail.com",
       "phone": "+233205678901",
-      "password_hash": "$2a$12$Dwt6ACQDQj3uaHjUa97cD.IeB9YiQI1YXA/yFZYaJ5n3IYAAa5J1y",
+      "password_hash": "$2a$12$zH1Uu0gd34ocH2RaEiAw/u6ZwXf6ynVVCBdyfEj/65oNrbNLR5Gbm",
       "role": "Landlord",
       "verification_status": "Approved",
       "id_document_path": "https://placeholder-url.supabase.co/storage/v1/object/public/ids/abena.jpg",
       "is_active": true,
-      "created_at": "2026-06-15T11:49:12.127Z"
+      "created_at": "2026-06-22T14:49:26.890Z"
     },
     {
       "user_id": 4,
       "full_name": "Kofi Darko Amponsah",
       "email": "kofi.darko@gmail.com",
       "phone": "+233209876543",
-      "password_hash": "$2a$12$Dwt6ACQDQj3uaHjUa97cD.IeB9YiQI1YXA/yFZYaJ5n3IYAAa5J1y",
+      "password_hash": "$2a$12$zH1Uu0gd34ocH2RaEiAw/u6ZwXf6ynVVCBdyfEj/65oNrbNLR5Gbm",
       "role": "Landlord",
       "verification_status": "Approved",
       "id_document_path": "https://placeholder-url.supabase.co/storage/v1/object/public/ids/kofi.jpg",
       "is_active": true,
-      "created_at": "2026-06-17T11:49:12.127Z"
+      "created_at": "2026-06-24T14:49:26.890Z"
     },
     {
       "user_id": 5,
       "full_name": "Ama Serwaa Asante",
       "email": "ama.serwaa@gmail.com",
       "phone": "+233244567890",
-      "password_hash": "$2a$12$Dwt6ACQDQj3uaHjUa97cD.IeB9YiQI1YXA/yFZYaJ5n3IYAAa5J1y",
+      "password_hash": "$2a$12$zH1Uu0gd34ocH2RaEiAw/u6ZwXf6ynVVCBdyfEj/65oNrbNLR5Gbm",
       "role": "Landlord",
       "verification_status": "Approved",
       "id_document_path": "https://placeholder-url.supabase.co/storage/v1/object/public/ids/ama.jpg",
       "is_active": true,
-      "created_at": "2026-06-19T11:49:12.127Z"
+      "created_at": "2026-06-26T14:49:26.890Z"
     },
     {
       "user_id": 6,
       "full_name": "Yaw Frimpong Boahen",
       "email": "yaw.frimpong@gmail.com",
       "phone": "+233200112233",
-      "password_hash": "$2a$12$Dwt6ACQDQj3uaHjUa97cD.IeB9YiQI1YXA/yFZYaJ5n3IYAAa5J1y",
+      "password_hash": "$2a$12$zH1Uu0gd34ocH2RaEiAw/u6ZwXf6ynVVCBdyfEj/65oNrbNLR5Gbm",
       "role": "Landlord",
       "verification_status": "Pending",
       "id_document_path": "https://placeholder-url.supabase.co/storage/v1/object/public/ids/yaw.jpg",
       "is_active": true,
-      "created_at": "2026-07-06T11:49:12.127Z"
+      "created_at": "2026-07-13T14:49:26.890Z"
     },
     {
       "user_id": 7,
       "full_name": "Esi Adjoa Quaye",
       "email": "esi.quaye@ktu.edu.gh",
       "phone": "+233554321098",
-      "password_hash": "$2a$12$6bRal0l/UfYDJnooLMRY4.0HAvqCymBdSx0yKrmomhmJ4Jsfj/v1S",
+      "password_hash": "$2a$12$5BctSn6/LWyq2H1WCh5TueSV7aqfJ288SJo8Y6367vrWy5tWHj37u",
       "role": "Student",
       "verification_status": "Approved",
       "id_document_path": null,
       "is_active": true,
-      "created_at": "2026-06-22T11:49:12.127Z"
+      "created_at": "2026-06-29T14:49:26.890Z"
     },
     {
       "user_id": 8,
       "full_name": "Emmanuel Owusu Ansah",
       "email": "emmanuel.owusu@ktu.edu.gh",
       "phone": "+233503456789",
-      "password_hash": "$2a$12$6bRal0l/UfYDJnooLMRY4.0HAvqCymBdSx0yKrmomhmJ4Jsfj/v1S",
+      "password_hash": "$2a$12$5BctSn6/LWyq2H1WCh5TueSV7aqfJ288SJo8Y6367vrWy5tWHj37u",
       "role": "Student",
       "verification_status": "Approved",
       "id_document_path": null,
       "is_active": true,
-      "created_at": "2026-06-25T11:49:12.127Z"
+      "created_at": "2026-07-02T14:49:26.890Z"
     },
     {
       "user_id": 9,
       "full_name": "Akosua Agyemang",
       "email": "akosua.agyemang@ktu.edu.gh",
       "phone": "+233244987654",
-      "password_hash": "$2a$12$6bRal0l/UfYDJnooLMRY4.0HAvqCymBdSx0yKrmomhmJ4Jsfj/v1S",
+      "password_hash": "$2a$12$5BctSn6/LWyq2H1WCh5TueSV7aqfJ288SJo8Y6367vrWy5tWHj37u",
       "role": "Student",
       "verification_status": "Approved",
       "id_document_path": null,
       "is_active": true,
-      "created_at": "2026-06-27T11:49:12.127Z"
+      "created_at": "2026-07-04T14:49:26.890Z"
     }
   ],
   "properties": [
@@ -124,9 +124,10 @@
       "amenities": "[\"Water Flow\", \"Electricity (Prepaid)\"]",
       "neighborhood": "Adweso",
       "distance_from_campus_km": 0.8,
-      "availability_status": "Available",
+      "availability_status": "Occupied",
       "verification_status": "Approved",
-      "created_at": "2026-06-27T11:49:12.127Z"
+      "created_at": "2026-07-04T14:49:26.890Z",
+      "updated_at": "2026-07-14T15:16:37.025Z"
     },
     {
       "property_id": 2,
@@ -142,9 +143,10 @@
       "amenities": "[\"Water Flow\", \"WiFi Internet\"]",
       "neighborhood": "Nsukwao",
       "distance_from_campus_km": 1.2,
-      "availability_status": "Available",
+      "availability_status": "Pending",
       "verification_status": "Approved",
-      "created_at": "2026-06-29T11:49:12.127Z"
+      "created_at": "2026-07-06T14:49:26.890Z",
+      "updated_at": "2026-07-14T15:27:53.878Z"
     },
     {
       "property_id": 3,
@@ -162,7 +164,7 @@
       "distance_from_campus_km": 1.9,
       "availability_status": "Available",
       "verification_status": "Approved",
-      "created_at": "2026-07-02T11:49:12.127Z"
+      "created_at": "2026-07-09T14:49:26.890Z"
     },
     {
       "property_id": 4,
@@ -180,7 +182,7 @@
       "distance_from_campus_km": 2.5,
       "availability_status": "Available",
       "verification_status": "Approved",
-      "created_at": "2026-07-05T11:49:12.127Z"
+      "created_at": "2026-07-12T14:49:26.890Z"
     }
   ],
   "property_images": [
@@ -209,8 +211,105 @@
       "display_order": 0
     }
   ],
-  "bookings": [],
-  "reviews": [],
-  "notifications": [],
+  "bookings": [
+    {
+      "student_id": 7,
+      "property_id": 1,
+      "status": "Approved",
+      "created_at": "2026-07-14T15:11:42.395Z",
+      "expires_at": "2026-07-15T15:11:42.395Z",
+      "booking_id": 1,
+      "resolved_at": "2026-07-14T15:16:37.014Z",
+      "updated_at": "2026-07-14T15:16:37.021Z"
+    },
+    {
+      "student_id": 7,
+      "property_id": 2,
+      "status": "Pending",
+      "created_at": "2026-07-14T15:27:53.866Z",
+      "expires_at": "2026-07-15T15:27:53.866Z",
+      "booking_id": 2
+    },
+    {
+      "student_id": 8,
+      "property_id": 1,
+      "status": "Approved",
+      "created_at": "2026-07-14T16:04:37.740Z",
+      "expires_at": "2026-07-15T16:04:37.740Z",
+      "booking_id": 3
+    }
+  ],
+  "reviews": [
+    {
+      "student_id": 7,
+      "property_id": 1,
+      "booking_id": 1,
+      "rating": 5,
+      "comment": "tyryhdtqe q tq4yq qy qyq yqqyq yq yq qwyq",
+      "review_id": 1,
+      "created_at": "2026-07-14T15:37:07.091Z"
+    },
+    {
+      "student_id": 8,
+      "property_id": 1,
+      "booking_id": 3,
+      "rating": 4,
+      "comment": "Nice place! The landlord is very friendly and supportive.",
+      "review_id": 2,
+      "created_at": "2026-07-14T16:04:37.775Z"
+    }
+  ],
+  "notifications": [
+    {
+      "recipient_id": 2,
+      "type": "BookingRequest",
+      "message": "A student has placed a 24-hour hold on \"Asante Villa — Single Room\". Accept or decline within 24 hours.",
+      "related_property_id": 1,
+      "related_booking_id": 1,
+      "delivery_channel": "InApp",
+      "notification_id": 1,
+      "created_at": "2026-07-14T15:11:42.495Z"
+    },
+    {
+      "recipient_id": 7,
+      "type": "System",
+      "message": "Your reservation hold for \"Asante Villa — Single Room\" is active. The landlord has 24 hours to respond. Hold expires: 15/07/2026, 16:11:42.",
+      "related_property_id": 1,
+      "related_booking_id": 1,
+      "delivery_channel": "InApp",
+      "notification_id": 2,
+      "created_at": "2026-07-14T15:11:42.992Z"
+    },
+    {
+      "recipient_id": 7,
+      "type": "BookingAccepted",
+      "message": "🎉 Your reservation hold for \"Asante Villa — Single Room\" has been accepted! Landlord contact: Kwame Asante Boateng — +233244123456 (kwame.asante@gmail.com). Please arrange payment directly with the landlord.",
+      "related_property_id": 1,
+      "related_booking_id": 1,
+      "delivery_channel": "InApp",
+      "notification_id": 3,
+      "created_at": "2026-07-14T15:16:37.030Z"
+    },
+    {
+      "recipient_id": 3,
+      "type": "BookingRequest",
+      "message": "A student has placed a 24-hour hold on \"Mensah Hall — Shared Room\". Accept or decline within 24 hours.",
+      "related_property_id": 2,
+      "related_booking_id": 2,
+      "delivery_channel": "InApp",
+      "notification_id": 4,
+      "created_at": "2026-07-14T15:27:53.882Z"
+    },
+    {
+      "recipient_id": 7,
+      "type": "System",
+      "message": "Your reservation hold for \"Mensah Hall — Shared Room\" is active. The landlord has 24 hours to respond. Hold expires: 15/07/2026, 16:27:53.",
+      "related_property_id": 2,
+      "related_booking_id": 2,
+      "delivery_channel": "InApp",
+      "notification_id": 5,
+      "created_at": "2026-07-14T15:27:53.979Z"
+    }
+  ],
   "vacancy_alerts": []
 }

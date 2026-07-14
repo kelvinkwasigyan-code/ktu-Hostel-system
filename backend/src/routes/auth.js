@@ -18,7 +18,7 @@ const validate = (req, res, next) => {
 // UC-S01 / UC-L01: Register
 router.post('/register', [
   body('full_name').trim().notEmpty().withMessage('Full name is required.'),
-  body('email').isEmail().normalizeEmail().withMessage('Valid email is required.'),
+  body('email').isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage('Valid email is required.'),
   body('phone').trim().notEmpty().withMessage('Phone number is required.'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters.'),
   body('role').isIn(['Student', 'Landlord']).withMessage('Role must be Student or Landlord.')
@@ -26,7 +26,7 @@ router.post('/register', [
 
 // UC-S02: Login
 router.post('/login', [
-  body('email').isEmail().normalizeEmail().withMessage('Valid email is required.'),
+  body('email').isEmail().normalizeEmail({ gmail_remove_dots: false }).withMessage('Valid email is required.'),
   body('password').notEmpty().withMessage('Password is required.')
 ], validate, login);
 

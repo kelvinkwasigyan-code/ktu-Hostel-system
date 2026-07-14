@@ -1,12 +1,12 @@
 // routes/reviews.js
 import express from 'express';
 import { submitReview, getPropertyReviews, getMyReviews } from '../controllers/reviewController.js';
-import { authenticate, requireStudent } from '../middleware/auth.js';
+import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/', authenticate, requireStudent, submitReview);         // UC-S07 (gated)
-router.get('/mine', authenticate, requireStudent, getMyReviews);
+router.post('/', authenticate, submitReview);         // UC-S07 (any authenticated user)
+router.get('/mine', authenticate, getMyReviews);
 router.get('/property/:property_id', getPropertyReviews);
 
 export default router;

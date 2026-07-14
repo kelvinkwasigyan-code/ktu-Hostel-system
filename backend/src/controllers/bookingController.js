@@ -250,8 +250,8 @@ export const getStudentBookings = async (req, res) => {
 
     if (error) return res.status(500).json({ error: 'Failed to fetch bookings.' });
 
-    // Check if a review has been submitted for each approved booking
-    const bookingIds = data.filter(b => b.status === 'Approved').map(b => b.booking_id);
+    // Check if a review has been submitted for bookings
+    const bookingIds = data.map(b => b.booking_id);
     let reviewedSet = new Set();
     if (bookingIds.length > 0) {
       const { data: reviews } = await supabaseAdmin
@@ -263,7 +263,7 @@ export const getStudentBookings = async (req, res) => {
 
     const bookings = data.map(b => ({
       ...b,
-      can_review: b.status === 'Approved' && !reviewedSet.has(b.booking_id),
+      can_review: !reviewedSet.has(b.booking_id),
       reviewed: reviewedSet.has(b.booking_id)
     }));
 

@@ -49,6 +49,20 @@ app.use('/api/auth', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware for debugging
+app.use((req, res, next) => {
+  console.log(`📡 [REQ] ${req.method} ${req.url}`);
+  const oldJson = res.json;
+  res.json = function(data) {
+    console.log(`↩️ [RES] ${req.method} ${req.url} - Status: ${res.statusCode}`);
+    if (res.statusCode >= 400) {
+      console.log(`❌ [ERR]`, data);
+    }
+    return oldJson.apply(this, arguments);
+  };
+  next();
+});
+
 // ─── API Routes ─────────────────────────────────────────────────────────────
 app.use('/api/auth',          authRoutes);
 app.use('/api/properties',    propertyRoutes);

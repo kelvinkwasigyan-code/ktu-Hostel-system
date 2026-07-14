@@ -26,6 +26,11 @@ export default function PropertyDetailPage() {
   const [submittingHold, setSubmittingHold] = useState(false);
   const [activeImage, setActiveImage] = useState('');
 
+  // Review states
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   useEffect(() => {
     fetchPropertyDetails();
   }, [id]);
@@ -76,6 +81,33 @@ export default function PropertyDetailPage() {
       toast.error(errorMsg);
     } finally {
       setSubmittingHold(false);
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error('You must sign in to submit a review.');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      const res = await api.post('/reviews', {
+        property_id: property.property_id,
+        rating: newRating,
+        comment: newComment
+      });
+      toast.success(res.data.message || 'Review submitted successfully!');
+      setNewComment('');
+      setNewRating(5);
+      fetchPropertyDetails();
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || 'Failed to submit review.';
+      toast.error(errorMsg);
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -213,6 +245,53 @@ export default function PropertyDetailPage() {
               <h5 className="mb-3 d-flex align-items-center gap-2" style={{ fontFamily: 'Outfit,sans-serif' }}>
                 <Star size={18} className="text-gold" /> Verified Student Reviews
               </h5>
+              
+              {user ? (
+                <form onSubmit={handleSubmitReview} className="mb-4 p-3 bg-surface-2 border-custom rounded-custom">
+                  <h6 className="mb-2" style={{ fontWeight: 600, fontSize: '0.92rem' }}>Write a Review</h6>
+                  <div className="mb-2">
+                    <div className="stars-interactive d-flex gap-1 mb-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          className={`star-btn ${star <= newRating ? 'filled' : ''}`}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: star <= newRating ? 'var(--brand-gold)' : 'var(--text-muted)',
+                            fontSize: '1.4rem',
+                            padding: 0,
+                            cursor: 'pointer',
+                            outline: 'none'
+                          }}
+                          onClick={() => setNewRating(star)}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <textarea
+                      className="form-control"
+                      rows="3"
+                      placeholder="Share your stay experience about this hostel..."
+                      required
+                      value={newComment}
+                      onChange={e => setNewComment(e.target.value)}
+                    ></textarea>
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-sm px-4" disabled={submittingReview}>
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </form>
+              ) : (
+                <div className="alert alert-info py-2 px-3 mb-4" style={{ fontSize: '0.85rem' }}>
+                  Please <Link to="/login" className="text-decoration-none" style={{ color: 'var(--brand-orange)', fontWeight: 600 }}>log in</Link> to submit a review.
+                </div>
+              )}
+
               <hr className="border-custom my-2" />
               {reviews.length === 0 ? (
                 <div className="text-center py-4 text-muted-custom" style={{ fontSize: '0.9rem' }}>

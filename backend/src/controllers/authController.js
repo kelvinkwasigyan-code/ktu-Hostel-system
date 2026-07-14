@@ -114,7 +114,7 @@ export const login = async (req, res) => {
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active')
-      .eq('email', email.toLowerCase().trim())
+      .eq('email', (email || '').toLowerCase().trim())
       .single();
 
     if (error || !user) {
