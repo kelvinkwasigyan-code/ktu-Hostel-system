@@ -1,5 +1,16 @@
 {
   "outputDirectory": "frontend/dist",
+  "env": {
+    "SUPABASE_URL": "https://xteemblxrqvqgdtmtovs.supabase.co",
+    "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZWVtYmx4cnF2cWdkdG10b3ZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDMwNDksImV4cCI6MjEwMDIxOTA0OX0.ylIQVlZm4j_1yxwVF_mFZynMgJFgfNaTibtljPkBaZo",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0ZWVtYmx4cnF2cWdkdG10b3ZzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDY0MzA0OSwiZXhwIjoyMTAwMjE5MDQ5fQ.y6T0sLCEuwskDO6QBhpKh6fpVvkrbNfWJRFrMJeq5IQ",
+    "JWT_SECRET": "ktu_hostel_portal_secret_2026_production",
+    "NODE_ENV": "production",
+    "FRONTEND_URL": "https://hostel-liard.vercel.app",
+    "KTU_LAT": "6.0900",
+    "KTU_LNG": "-0.2573",
+    "SMS_PROVIDER": "log"
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
