@@ -1,25 +1,17 @@
 // src/pages/landlord/CreateListingPage.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { PlusSquare, MapPin, Upload, X, ShieldAlert, Sparkles } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import LandlordSidebar from '../../components/LandlordSidebar';
+import MapboxLocationPicker from '../../components/MapboxLocationPicker';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum'];
 const ROOM_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
 const AMENITIES_LIST = ['Water Flow', 'Electricity (Prepaid)', 'WiFi Internet', 'Generator Backup', 'Study Room', 'Fenced Yard', 'Security Guard', 'Air Conditioner'];
-
-const KTU_CENTER = { lat: 6.0900, lng: -0.2573 };
-
-const MAP_OPTIONS = {
-  disableDefaultUI: true,
-  zoomControl: true,
-  streetViewControl: false
-};
 
 const MOCK_PHOTOS = [
   'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600',
@@ -45,34 +37,14 @@ export default function CreateListingPage() {
   // Coordinate states
   const [lat, setLat] = useState('6.0900');
   const [lng, setLng] = useState('-0.2573');
-  const [markerPos, setMarkerPos] = useState(KTU_CENTER);
 
   // Amenities and images states
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [uploadedUrls, setUploadedUrls] = useState([]);
 
-  // Load Google Maps API
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-  });
-
-  const handleMapClick = (e) => {
-    const clickLat = e.latLng.lat().toFixed(6);
-    const clickLng = e.latLng.lng().toFixed(6);
-    setLat(clickLat);
-    setLng(clickLng);
-    setMarkerPos({ lat: parseFloat(clickLat), lng: parseFloat(clickLng) });
-  };
-
-  const handleManualCoords = (latitude, longitude) => {
-    setLat(latitude);
-    setLng(longitude);
-    const parsedLat = parseFloat(latitude);
-    const parsedLng = parseFloat(longitude);
-    if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-      setMarkerPos({ lat: parsedLat, lng: parsedLng });
-    }
+  const handleCoordsChange = (newLat, newLng) => {
+    setLat(newLat);
+    setLng(newLng);
   };
 
   const handleAmenityChange = (amenity) => {
@@ -92,7 +64,6 @@ export default function CreateListingPage() {
       return;
     }
 
-    // Mock upload: grab random images from our mock catalog and append them
     const newUrls = [];
     for (let i = 0; i < files.length; i++) {
       const idx = (uploadedUrls.length + i) % MOCK_PHOTOS.length;
@@ -259,43 +230,30 @@ export default function CreateListingPage() {
                   </div>
                 </div>
 
-                {/* Google Map coordinates picker */}
+                {/* Mapbox coordinates picker */}
                 <div className="card p-4 border-custom bg-surface rounded-custom">
                   <h5 className="mb-2 d-flex align-items-center gap-2" style={{ fontFamily: 'Outfit,sans-serif' }}>
-                    <MapPin size={18} className="text-gold" /> Pin Location
+                    <MapPin size={18} className="text-gold" /> Mapbox Location Pin
                   </h5>
-                  <p className="text-muted-custom mb-3" style={{ fontSize: '0.8rem' }}>Click on the map below to pinpoint the hostel location.</p>
+                  <p className="text-muted-custom mb-3" style={{ fontSize: '0.8rem' }}>Click or drag pin on the map to pinpoint hostel location.</p>
                   
-                  <div style={{ height: '200px', borderRadius: '10px', overflow: 'hidden' }} className="mb-3 border-custom">
-                    {loadError ? (
-                      <div className="d-flex align-items-center justify-content-center h-100 bg-surface-2 text-danger text-center p-2" style={{ fontSize: '0.75rem' }}>
-                        Failed to load Google Map picker. Manual values allowed.
-                      </div>
-                    ) : !isLoaded ? (
-                      <div className="d-flex align-items-center justify-content-center h-100 bg-surface-2">
-                        <div className="spinner-ring" style={{ width: '30px', height: '30px' }}></div>
-                      </div>
-                    ) : (
-                      <GoogleMap
-                        mapContainerStyle={{ width: '100%', height: '100%' }}
-                        center={markerPos}
-                        zoom={14}
-                        options={MAP_OPTIONS}
-                        onClick={handleMapClick}
-                      >
-                        <Marker position={markerPos} />
-                      </GoogleMap>
-                    )}
+                  <div className="mb-3">
+                    <MapboxLocationPicker
+                      lat={lat}
+                      lng={lng}
+                      onChangeCoords={handleCoordsChange}
+                      height="210px"
+                    />
                   </div>
 
                   <div className="row g-2">
                     <div className="col-6">
                       <label className="form-label" style={{ fontSize: '0.8rem' }}>Latitude</label>
-                      <input type="number" step="0.000001" className="form-control form-control-sm" required value={lat} onChange={e => handleManualCoords(e.target.value, lng)} />
+                      <input type="number" step="0.000001" className="form-control form-control-sm" required value={lat} onChange={e => handleCoordsChange(e.target.value, lng)} />
                     </div>
                     <div className="col-6">
                       <label className="form-label" style={{ fontSize: '0.8rem' }}>Longitude</label>
-                      <input type="number" step="0.000001" className="form-control form-control-sm" required value={lng} onChange={e => handleManualCoords(lat, e.target.value)} />
+                      <input type="number" step="0.000001" className="form-control form-control-sm" required value={lng} onChange={e => handleCoordsChange(lat, e.target.value)} />
                     </div>
                   </div>
                 </div>

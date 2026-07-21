@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { MapPin, Users, BedDouble, Calendar, Clock, Star, ShieldCheck, Heart, User } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import MapboxSingleLocation from '../../components/MapboxSingleLocation';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -227,7 +228,7 @@ export default function PropertyDetailPage() {
               </p>
 
               <h5 className="mb-2 mt-4" style={{ fontFamily: 'Outfit,sans-serif' }}>Amenities</h5>
-              <div className="d-flex flex-wrap gap-2">
+              <div className="d-flex flex-wrap gap-2 mb-4">
                 {parsedAmenities.length === 0 ? (
                   <span className="text-muted-custom" style={{ fontSize: '0.85rem' }}>No amenities listed.</span>
                 ) : (
@@ -238,6 +239,19 @@ export default function PropertyDetailPage() {
                   ))
                 )}
               </div>
+
+              <h5 className="mb-2 mt-4" style={{ fontFamily: 'Outfit,sans-serif' }}>Location & Campus Proximity</h5>
+              <p className="text-muted-custom mb-3" style={{ fontSize: '0.88rem' }}>
+                📍 {property.address}, {property.neighborhood}
+              </p>
+              <MapboxSingleLocation
+                latitude={property.latitude}
+                longitude={property.longitude}
+                title={property.title}
+                address={property.address}
+                neighborhood={property.neighborhood}
+                distanceKm={property.distance_from_campus_km}
+              />
             </div>
 
             {/* Reviews Section */}
