@@ -18,10 +18,13 @@ export default function MapboxHostelMap({
   const popupRef = useRef(null);
   const [tokenMissing, setTokenMissing] = useState(false);
 
-  const token = import.meta.env.VITE_MAPBOX_TOKEN;
+  // Strip any surrounding quotes or whitespace that may come from .env parsing
+  const token = (import.meta.env.VITE_MAPBOX_TOKEN || '').replace(/^["']|["']$/g, '').trim();
 
   useEffect(() => {
-    if (!token || token.trim() === '' || token.includes('YOUR_MAPBOX')) {
+    const invalid = !token || token === '' || token.includes('YOUR_MAPBOX') || !token.startsWith('pk.');
+    if (invalid) {
+      console.warn('[MapboxHostelMap] Token missing or invalid:', token || '(empty)');
       setTokenMissing(true);
       return;
     }
