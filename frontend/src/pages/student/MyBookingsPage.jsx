@@ -142,17 +142,28 @@ export default function MyBookingsPage() {
                             </small>
                           </td>
                           <td className="p-3">{getStatusBadge(b.status)}</td>
-                          <td className="p-3" style={{ fontSize: '0.85rem' }}>
-                            {b.status === 'Approved' ? (
-                              <div>
-                                <div className="d-flex align-items-center gap-1 mb-1">
+                          <td className="p-3" style={{ fontSize: '0.82rem' }}>
+                            {b.status === 'Approved' || b.status === 'Pending' ? (
+                              <div className="d-flex flex-column gap-1" style={{ maxWidth: '240px' }}>
+                                <div className="fw-semibold text-warning d-flex align-items-center gap-1">
                                   <Phone size={12} className="text-orange" />
-                                  <span>{b.properties?.phone || '+233244123456'}</span>
+                                  <span>{b.landlord_contact?.phone || '+233 24 412 3456'}</span>
                                 </div>
-                                <div className="d-flex align-items-center gap-1 text-muted-custom">
-                                  <Mail size={12} />
-                                  <span>Landlord Contact Released</span>
-                                </div>
+                                {b.landlord_contact?.momo_number && (
+                                  <div className="text-success small d-flex align-items-center gap-1">
+                                    <span>📱 MoMo: <strong>{b.landlord_contact.momo_number}</strong> ({b.landlord_contact.momo_name || 'Account Name'})</span>
+                                  </div>
+                                )}
+                                {b.landlord_contact?.email && (
+                                  <div className="text-muted-custom small d-flex align-items-center gap-1">
+                                    <Mail size={11} /> {b.landlord_contact.email}
+                                  </div>
+                                )}
+                                {b.landlord_contact?.payment_instructions && (
+                                  <div className="badge bg-secondary text-wrap text-start mt-1 p-1.5 fw-normal" style={{ fontSize: '0.72rem', border: '1px solid var(--border)' }}>
+                                    💡 {b.landlord_contact.payment_instructions}
+                                  </div>
+                                )}
                               </div>
                             ) : (
                               <span className="text-muted-custom" style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>

@@ -7,6 +7,47 @@ import { supabaseAdmin } from '../config/supabase.js';
 import { notifyUser } from './notificationController.js';
 import { getDistanceFromCampus } from '../services/googleMapsService.js';
 
+// Helper to parse or construct room rates array
+export const parseRoomRates = (room_rates, fallbackRoomType, fallbackPrice, fallbackOccupancy) => {
+  if (room_rates) {
+    if (typeof room_rates === 'string') {
+      try {
+        const parsed = JSON.parse(room_rates);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    } else if (Array.isArray(room_rates) && room_rates.length > 0) {
+      return room_rates;
+    }
+  }
+  return [
+    {
+      room_type: fallbackRoomType || 'Single',
+      price_per_semester: parseFloat(fallbackPrice || 0),
+      max_occupancy: parseInt(fallbackOccupancy || 1)
+    }
+  ];
+};
+
+// Helper to parse or construct payment contact object
+export const parsePaymentContact = (payment_contact_info, fallbackPhone) => {
+  if (payment_contact_info) {
+    if (typeof payment_contact_info === 'string') {
+      try {
+        const parsed = JSON.parse(payment_contact_info);
+        if (parsed && typeof parsed === 'object') return parsed;
+      } catch (e) {}
+    } else if (typeof payment_contact_info === 'object') {
+      return payment_contact_info;
+    }
+  }
+  return {
+    phone: fallbackPhone || '',
+    momo_number: '',
+    momo_name: '',
+    payment_instructions: ''
+  };
+};
+
 // ─── UC-L02: Create Property Listing ─────────────────────────────────────────
 export const createProperty = async (req, res) => {
   try {
@@ -17,7 +58,7 @@ export const createProperty = async (req, res) => {
 
     const { data: landlord } = await supabaseAdmin
       .from('users')
-      .select('verification_status')
+      .select('verification_status, phone, full_name')
       .eq('user_id', req.user.user_id)
       .single();
 
@@ -29,8 +70,25 @@ export const createProperty = async (req, res) => {
 
     const {
       title, address, latitude, longitude, description,
-      price_per_semester, room_type, max_occupancy, amenities, neighborhood
+      price_per_semester, room_type, max_occupancy, amenities, neighborhood, room_rates,
+      payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info
     } = req.body;
+
+    const formattedRates = parseRoomRates(room_rates, room_type, price_per_semester, max_occupancy);
+    const minPrice = Math.min(...formattedRates.map(r => r.price_per_semester || 0));
+    const maxOcc = Math.max(...formattedRates.map(r => r.max_occupancy || 1));
+    
+    // Ensure primaryRoomType strictly matches DB CHECK constraint ('Single', 'Shared', 'Self-contained', 'Apartment')
+    const ALLOWED_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
+    const primaryRoomType = ALLOWED_TYPES.includes(formattedRates[0]?.room_type)
+      ? formattedRates[0]?.room_type
+      : (ALLOWED_TYPES.includes(room_type) ? room_type : 'Single');
+
+    const paymentContactObj = parsePaymentContact(payment_contact_info, landlord?.phone);
+    if (payment_phone) paymentContactObj.phone = payment_phone;
+    if (momo_number) paymentContactObj.momo_number = momo_number;
+    if (momo_name) paymentContactObj.momo_name = momo_name || landlord?.full_name || '';
+    if (payment_instructions) paymentContactObj.payment_instructions = payment_instructions;
 
     // Calculate distance from KTU campus using Distance Matrix API (UC-L02)
     let distance_from_campus_km = null;
@@ -42,42 +100,68 @@ export const createProperty = async (req, res) => {
       console.warn('Distance API unavailable, skipping:', e.message);
     }
 
-    const { data: property, error } = await supabaseAdmin
+    const insertPayload = {
+      landlord_id: req.user.user_id,
+      title, address,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      description,
+      price_per_semester: minPrice || parseFloat(price_per_semester),
+      room_type: primaryRoomType,
+      max_occupancy: maxOcc || parseInt(max_occupancy),
+      room_rates: JSON.stringify(formattedRates),
+      payment_contact_info: JSON.stringify(paymentContactObj),
+      amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
+      neighborhood,
+      distance_from_campus_km,
+      availability_status: 'Available',
+      verification_status: 'Pending' // admin must approve before it's visible
+    };
+
+    let { data: property, error } = await supabaseAdmin
       .from('properties')
-      .insert({
-        landlord_id: req.user.user_id,
-        title, address,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        description,
-        price_per_semester: parseFloat(price_per_semester),
-        room_type,
-        max_occupancy: parseInt(max_occupancy),
-        amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
-        neighborhood,
-        distance_from_campus_km,
-        availability_status: 'Available',
-        verification_status: 'Pending' // admin must approve before it's visible
-      })
+      .insert(insertPayload)
       .select()
       .single();
 
+    // Fallback if remote Supabase schema does not have room_rates or payment_contact_info columns
     if (error) {
-      console.error('Create property error:', error);
-      return res.status(500).json({ error: 'Failed to create listing.' });
+      console.warn('Property creation note, retrying insert without new JSON columns:', error.message || error);
+      const fallbackPayload = { ...insertPayload };
+      delete fallbackPayload.room_rates;
+      delete fallbackPayload.payment_contact_info;
+      const fallbackRes = await supabaseAdmin
+        .from('properties')
+        .insert(fallbackPayload)
+        .select()
+        .single();
+      property = fallbackRes.data;
+      error = fallbackRes.error;
+    }
+
+    if (error || !property) {
+      console.error('Create property error details:', error);
+      return res.status(500).json({ error: error?.message || 'Failed to create listing.' });
     }
 
     // Save property images (Supabase Storage URLs from frontend)
-    if (req.body.image_urls && Array.isArray(req.body.image_urls)) {
-      const images = req.body.image_urls
-        .slice(0, 5) // max 5 images
-        .map((url, idx) => ({
-          property_id: property.property_id,
-          image_path: url,
-          display_order: idx
-        }));
+    const allImageUrls = [
+      ...(req.body.image_urls || []),
+      ...(req.body.image_data_urls || [])
+    ].slice(0, 5); // max 5 images
 
-      await supabaseAdmin.from('property_images').insert(images);
+    if (allImageUrls.length > 0) {
+      const images = allImageUrls.map((url, idx) => ({
+        property_id: property.property_id,
+        image_path: url,
+        display_order: idx
+      }));
+
+      const { error: imgError } = await supabaseAdmin.from('property_images').insert(images);
+      if (imgError) {
+        // If inserting fails (e.g. VARCHAR too small for base64), log and continue
+        console.warn('property_images insert warning:', imgError.message || imgError);
+      }
     }
 
     // Notify all admins of new listing requiring approval (UC-A02)
@@ -95,6 +179,139 @@ export const createProperty = async (req, res) => {
     });
   } catch (err) {
     console.error('createProperty error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+};
+
+// ─── UC-L02b: Update / Edit Property Listing ─────────────────────────────────
+export const updateProperty = async (req, res) => {
+  try {
+    const propertyId = req.params.id;
+
+    // Verify ownership
+    const { data: existing, error: fetchErr } = await supabaseAdmin
+      .from('properties')
+      .select('property_id, landlord_id, verification_status')
+      .eq('property_id', propertyId)
+      .single();
+
+    if (fetchErr || !existing) {
+      return res.status(404).json({ error: 'Property not found.' });
+    }
+    if (existing.landlord_id !== req.user.user_id) {
+      return res.status(403).json({ error: 'You can only edit your own listings.' });
+    }
+
+    const {
+      title, address, latitude, longitude, description,
+      price_per_semester, room_type, max_occupancy, amenities, neighborhood, room_rates,
+      payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info,
+      image_urls, image_data_urls
+    } = req.body;
+
+    const formattedRates = parseRoomRates(room_rates, room_type, price_per_semester, max_occupancy);
+    const minPrice = Math.min(...formattedRates.map(r => r.price_per_semester || 0));
+    const maxOcc   = Math.max(...formattedRates.map(r => r.max_occupancy || 1));
+    const ALLOWED  = ['Single', 'Shared', 'Self-contained', 'Apartment'];
+    const primaryRoomType = ALLOWED.includes(formattedRates[0]?.room_type)
+      ? formattedRates[0].room_type
+      : (ALLOWED.includes(room_type) ? room_type : 'Single');
+
+    const { data: landlord } = await supabaseAdmin
+      .from('users')
+      .select('phone, full_name')
+      .eq('user_id', req.user.user_id)
+      .single();
+
+    const paymentContactObj = parsePaymentContact(payment_contact_info, landlord?.phone);
+    if (payment_phone) paymentContactObj.phone = payment_phone;
+    if (momo_number) paymentContactObj.momo_number = momo_number;
+    if (momo_name) paymentContactObj.momo_name = momo_name || landlord?.full_name || '';
+    if (payment_instructions) paymentContactObj.payment_instructions = payment_instructions;
+
+    // Recalculate distance if coords changed
+    let distance_from_campus_km = null;
+    try {
+      const { getDistanceFromCampus } = await import('../services/googleMapsService.js');
+      distance_from_campus_km = await getDistanceFromCampus(
+        parseFloat(latitude), parseFloat(longitude)
+      );
+    } catch (e) {
+      console.warn('Distance API unavailable:', e.message);
+    }
+
+    // Build update payload — always include core fields
+    const corePayload = {
+      title, address,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      description,
+      price_per_semester: minPrice || parseFloat(price_per_semester),
+      room_type: primaryRoomType,
+      max_occupancy: maxOcc || parseInt(max_occupancy),
+      amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
+      neighborhood,
+      distance_from_campus_km,
+      verification_status: 'Pending'
+    };
+
+    // Optional columns — only include if they exist in DB (added via migration)
+    const fullPayload = {
+      ...corePayload,
+      room_rates: JSON.stringify(formattedRates),
+      payment_contact_info: JSON.stringify(paymentContactObj)
+    };
+
+    // Try full payload first; if schema cache error (PGRST204), fall back to core only
+    let { data: updated, error: updateErr } = await supabaseAdmin
+      .from('properties')
+      .update(fullPayload)
+      .eq('property_id', propertyId)
+      .select()
+      .single();
+
+    if (updateErr && updateErr.code === 'PGRST204') {
+      console.warn('Optional columns not in schema cache — retrying with core fields only.');
+      const fallback = await supabaseAdmin
+        .from('properties')
+        .update(corePayload)
+        .eq('property_id', propertyId)
+        .select()
+        .single();
+      updated = fallback.data;
+      updateErr = fallback.error;
+    }
+
+    if (updateErr) {
+      console.error('Update property error:', updateErr);
+      return res.status(500).json({ error: updateErr.message || 'Failed to update listing.' });
+    }
+
+    // Replace images if provided
+    const allNewImages = [...(image_urls || []), ...(image_data_urls || [])].slice(0, 5);
+    if (allNewImages.length > 0) {
+      // Delete old images first
+      await supabaseAdmin.from('property_images').delete().eq('property_id', propertyId);
+      const newImages = allNewImages.map((url, idx) => ({
+        property_id: propertyId,
+        image_path: url,
+        display_order: idx
+      }));
+      const { error: imgErr } = await supabaseAdmin.from('property_images').insert(newImages);
+      if (imgErr) console.warn('Image update warning:', imgErr.message);
+    }
+
+    // Notify admins of the update
+    const { data: admins } = await supabaseAdmin.from('users').select('user_id').eq('role', 'Admin');
+    for (const admin of admins || []) {
+      await notifyUser(admin.user_id, 'System',
+        `Listing updated and requires re-approval: "${title}" by ${req.user.full_name}`,
+        parseInt(propertyId), null, 'InApp');
+    }
+
+    res.json({ message: 'Listing updated and re-submitted for admin review.', property: updated });
+  } catch (err) {
+    console.error('updateProperty error:', err);
     res.status(500).json({ error: 'Server error.' });
   }
 };
@@ -155,6 +372,8 @@ export const searchProperties = async (req, res) => {
 
     const properties = data.map(p => ({
       ...p,
+      room_rates: parseRoomRates(p.room_rates, p.room_type, p.price_per_semester, p.max_occupancy),
+      payment_contact_info: parsePaymentContact(p.payment_contact_info, null),
       avg_rating: ratingsMap[p.property_id]?.length
         ? (ratingsMap[p.property_id].reduce((a, b) => a + b, 0) / ratingsMap[p.property_id].length).toFixed(1)
         : null,
@@ -223,9 +442,14 @@ export const getPropertyDetail = async (req, res) => {
     const { ...safeProperty } = property;
     delete safeProperty.users; // strip full landlord object
 
+    const parsedRates = parseRoomRates(property.room_rates, property.room_type, property.price_per_semester, property.max_occupancy);
+    const parsedPaymentContact = parsePaymentContact(property.payment_contact_info, null);
+
     res.json({
       property: {
         ...safeProperty,
+        room_rates: parsedRates,
+        payment_contact_info: parsedPaymentContact,
         landlord_name: property.users?.full_name,
         avg_rating: avgRating,
         review_count: reviews?.length || 0

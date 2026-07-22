@@ -26,6 +26,7 @@ export default function PropertyDetailPage() {
   const [loading, setLoading] = useState(true);
   const [submittingHold, setSubmittingHold] = useState(false);
   const [activeImage, setActiveImage] = useState('');
+  const [selectedRoomRate, setSelectedRoomRate] = useState(null);
 
   // Review states
   const [newRating, setNewRating] = useState(5);
@@ -40,10 +41,15 @@ export default function PropertyDetailPage() {
     try {
       setLoading(true);
       const res = await api.get(`/properties/${id}`);
-      setProperty(res.data.property);
+      const propData = res.data.property;
+      setProperty(propData);
       setReviews(res.data.reviews || []);
+
+      if (propData?.room_rates?.length > 0) {
+        setSelectedRoomRate(propData.room_rates[0]);
+      }
       
-      const images = res.data.property?.property_images || [];
+      const images = propData?.property_images || [];
       if (images.length > 0) {
         // Sort by display order
         const sorted = [...images].sort((a, b) => a.display_order - b.display_order);
@@ -74,7 +80,11 @@ export default function PropertyDetailPage() {
 
     try {
       setSubmittingHold(true);
-      const res = await api.post('/bookings', { property_id: property.property_id });
+      const res = await api.post('/bookings', { 
+        property_id: property.property_id,
+        room_type: selectedRoomRate?.room_type || property.room_type,
+        price_per_semester: selectedRoomRate?.price_per_semester || property.price_per_semester
+      });
       toast.success(res.data.message || 'Hold placed successfully! Check dashboard.');
       navigate('/student');
     } catch (err) {
@@ -222,6 +232,58 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
 
+              {/* Room Options & Rates Breakdown */}
+              {property.room_rates?.length > 0 && (
+                <div className="mb-4">
+                  <h5 className="mb-2 mt-4" style={{ fontFamily: 'Outfit,sans-serif' }}>Available Room Options & Pricing</h5>
+                  <p className="text-muted-custom mb-3" style={{ fontSize: '0.85rem' }}>Select a room option to view its rate and place a hold request.</p>
+                  <div className="d-flex flex-column gap-2">
+                    {property.room_rates.map((rate, idx) => {
+                      const isSelected = selectedRoomRate?.room_type === rate.room_type && Number(selectedRoomRate?.price_per_semester) === Number(rate.price_per_semester);
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`p-3 rounded-custom border-custom transition-all d-flex justify-content-between align-items-center flex-wrap gap-2 ${isSelected ? 'bg-surface-2' : 'bg-surface'}`}
+                          style={{ 
+                            border: isSelected ? '2px solid var(--brand-orange)' : '1px solid var(--border)',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setSelectedRoomRate(rate)}
+                        >
+                          <div className="d-flex align-items-center gap-3">
+                            <div style={{ fontSize: '1.6rem' }}>{ROOM_ICONS[rate.room_type] || '🛏️'}</div>
+                            <div>
+                              <h6 className="mb-0 fw-bold" style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                                {rate.room_type} Room
+                              </h6>
+                              <small className="text-muted-custom" style={{ fontSize: '0.78rem' }}>
+                                Max occupancy: {rate.max_occupancy} student{rate.max_occupancy > 1 ? 's' : ''}
+                              </small>
+                            </div>
+                          </div>
+                          <div className="d-flex align-items-center gap-3">
+                            <div className="text-end">
+                              <div style={{ fontWeight: 800, color: 'var(--brand-orange)', fontSize: '1.1rem' }}>
+                                GHS {Number(rate.price_per_semester).toLocaleString()}
+                              </div>
+                              <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>per semester</small>
+                            </div>
+                            <input 
+                              type="radio" 
+                              name="selectedRoomOption" 
+                              checked={isSelected} 
+                              onChange={() => setSelectedRoomRate(rate)} 
+                              className="form-check-input mt-0"
+                              style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <h5 className="mb-2 mt-4" style={{ fontFamily: 'Outfit,sans-serif' }}>Description</h5>
               <p className="text-muted-custom" style={{ fontSize: '0.92rem', lineHeight: '1.6' }}>
                 {property.description || 'No description provided for this hostel.'}
@@ -368,10 +430,18 @@ export default function PropertyDetailPage() {
               </div>
 
               <div className="mb-4">
-                <h4 className="mb-1" style={{ color: 'var(--brand-orange)', fontFamily: 'Outfit,sans-serif', fontWeight: 800 }}>
-                  GHS {Number(property.price_per_semester).toLocaleString()}
-                </h4>
-                <small className="text-muted-custom">Rent is paid directly to the landlord per semester.</small>
+                <div className="d-flex align-items-baseline gap-1">
+                  <h4 className="mb-0" style={{ color: 'var(--brand-orange)', fontFamily: 'Outfit,sans-serif', fontWeight: 800 }}>
+                    GHS {Number(selectedRoomRate?.price_per_semester || property.price_per_semester).toLocaleString()}
+                  </h4>
+                  <span className="text-muted-custom" style={{ fontSize: '0.85rem' }}>/ sem</span>
+                </div>
+                {selectedRoomRate && (
+                  <div className="badge bg-secondary border-custom text-warning mt-1" style={{ fontSize: '0.78rem' }}>
+                    Selected Option: {selectedRoomRate.room_type} Room
+                  </div>
+                )}
+                <div className="text-muted-custom mt-1" style={{ fontSize: '0.78rem' }}>Rent is paid directly to the landlord per semester.</div>
               </div>
 
               {/* Key Features Callout */}

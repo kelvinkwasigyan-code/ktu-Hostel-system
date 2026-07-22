@@ -65,7 +65,7 @@ CREATE INDEX IF NOT EXISTS idx_properties_search
 CREATE TABLE IF NOT EXISTS property_images (
     image_id      SERIAL PRIMARY KEY,
     property_id   INT NOT NULL REFERENCES properties(property_id) ON DELETE CASCADE,
-    image_path    VARCHAR(255) NOT NULL,    -- Supabase Storage public URL
+    image_path    TEXT NOT NULL,            -- Supabase Storage URL or base64 data URL
     display_order SMALLINT DEFAULT 0        -- 0 = primary/hero image
 );
 
@@ -79,15 +79,24 @@ CREATE TABLE IF NOT EXISTS property_images (
 --   3. expires_at = created_at + 24 hours (set on INSERT).
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS bookings (
-    booking_id  SERIAL PRIMARY KEY,
-    student_id  INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    property_id INT NOT NULL REFERENCES properties(property_id) ON DELETE CASCADE,
-    status      VARCHAR(20) DEFAULT 'Pending'
-                CHECK (status IN ('Pending', 'Approved', 'Declined', 'Expired')),
-    created_at  TIMESTAMPTZ DEFAULT NOW(),
-    expires_at  TIMESTAMPTZ NULL,       -- set to created_at + INTERVAL '24 hours' on insert
-    resolved_at TIMESTAMPTZ NULL
+    booking_id         SERIAL PRIMARY KEY,
+    student_id         INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    property_id        INT NOT NULL REFERENCES properties(property_id) ON DELETE CASCADE,
+    selected_room_type VARCHAR(50) NULL,
+    agreed_price       DECIMAL(10, 2) NULL,
+    status             VARCHAR(20) DEFAULT 'Pending'
+                       CHECK (status IN ('Pending', 'Approved', 'Declined', 'Expired')),
+    created_at         TIMESTAMPTZ DEFAULT NOW(),
+    expires_at         TIMESTAMPTZ NULL,       -- set to created_at + INTERVAL '24 hours' on insert
+    resolved_at        TIMESTAMPTZ NULL
 );
+
+ALTER TABLE properties ADD COLUMN IF NOT EXISTS room_rates TEXT;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS selected_room_type VARCHAR(50);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS agreed_price DECIMAL(10, 2);
+-- Widen image_path to TEXT (handles both Supabase Storage URLs and base64 data URLs)
+ALTER TABLE property_images ALTER COLUMN image_path TYPE TEXT;
+ALTER TABLE properties ADD COLUMN IF NOT EXISTS payment_contact_info TEXT;
 
 -- =============================================================================
 -- TABLE: reviews

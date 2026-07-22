@@ -61,6 +61,8 @@ export const placeHold = async (req, res) => {
       return res.status(403).json({ error: 'This property is not approved for booking.' });
     }
 
+    const { room_type, price_per_semester } = req.body;
+
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24 hours
 
@@ -70,6 +72,8 @@ export const placeHold = async (req, res) => {
       .insert({
         student_id: studentId,
         property_id,
+        selected_room_type: room_type || null,
+        agreed_price: price_per_semester ? parseFloat(price_per_semester) : null,
         status: 'Pending',
         created_at: now.toISOString(),
         expires_at: expiresAt.toISOString()
@@ -89,10 +93,11 @@ export const placeHold = async (req, res) => {
       .eq('property_id', property_id);
 
     // Notify the landlord of the booking request (UC-L04)
+    const roomInfo = room_type ? ` (${room_type} Room - GHS ${price_per_semester})` : '';
     await notifyUser(
       property.landlord_id,
       'BookingRequest',
-      `A student has placed a 24-hour hold on "${property.title}". Accept or decline within 24 hours.`,
+      `A student has placed a 24-hour hold on "${property.title}"${roomInfo}. Accept or decline within 24 hours.`,
       property_id,
       booking.booking_id,
       'InApp'
@@ -241,7 +246,8 @@ export const getStudentBookings = async (req, res) => {
       .select(`
         *,
         properties!property_id (
-          property_id, title, address, neighborhood, price_per_semester, room_type,
+          property_id, title, address, neighborhood, price_per_semester, room_type, payment_contact_info, landlord_id,
+          users!landlord_id (full_name, phone, email),
           property_images (image_path, display_order)
         )
       `)
@@ -261,14 +267,37 @@ export const getStudentBookings = async (req, res) => {
       reviews?.forEach(r => reviewedSet.add(r.booking_id));
     }
 
-    const bookings = data.map(b => ({
-      ...b,
-      can_review: !reviewedSet.has(b.booking_id),
-      reviewed: reviewedSet.has(b.booking_id)
-    }));
+    const bookings = data.map(b => {
+      let paymentContact = null;
+      if (b.properties?.payment_contact_info) {
+        try {
+          paymentContact = typeof b.properties.payment_contact_info === 'string'
+            ? JSON.parse(b.properties.payment_contact_info)
+            : b.properties.payment_contact_info;
+        } catch (e) {}
+      }
+
+      const landlordUser = b.properties?.users || {};
+      const landlordContact = {
+        full_name: landlordUser.full_name || 'Landlord',
+        phone: paymentContact?.phone || landlordUser.phone || '+233244123456',
+        email: landlordUser.email || '',
+        momo_number: paymentContact?.momo_number || landlordUser.phone || '',
+        momo_name: paymentContact?.momo_name || landlordUser.full_name || '',
+        payment_instructions: paymentContact?.payment_instructions || 'Contact landlord to complete room allocation and payment.'
+      };
+
+      return {
+        ...b,
+        landlord_contact: landlordContact,
+        can_review: !reviewedSet.has(b.booking_id),
+        reviewed: reviewedSet.has(b.booking_id)
+      };
+    });
 
     res.json({ bookings });
   } catch (err) {
+    console.error('getStudentBookings error:', err);
     res.status(500).json({ error: 'Server error.' });
   }
 };

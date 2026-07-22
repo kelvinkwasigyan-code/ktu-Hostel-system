@@ -1,7 +1,7 @@
 // src/pages/landlord/ManageListingsPage.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ToggleLeft, ToggleRight, ShieldCheck, Clock, PlusSquare, MapPin } from 'lucide-react';
+import { List, ToggleLeft, ToggleRight, ShieldCheck, Clock, PlusSquare, MapPin, Pencil } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import LandlordSidebar from '../../components/LandlordSidebar';
@@ -146,25 +146,29 @@ export default function ManageListingsPage() {
                             </span>
                           </div>
 
-                          {/* Toggle Action */}
-                          <div className="col-md-2 text-md-end">
+                          {/* Actions: Edit + Toggle */}
+                          <div className="col-md-2 d-flex flex-column align-items-md-end gap-2">
+                            {/* Edit button */}
+                            <Link
+                              to={`/landlord/listings/${p.property_id}/edit`}
+                              className="btn btn-sm d-flex align-items-center gap-1 border-custom bg-surface-2"
+                              style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}
+                            >
+                              <Pencil size={14} className="text-orange" /> Edit
+                            </Link>
+
+                            {/* Availability toggle */}
                             {p.availability_status !== 'Pending' ? (
-                              <button 
+                              <button
                                 type="button"
-                                className="btn btn-sm d-flex align-items-center gap-1 ms-md-auto bg-surface-2 border-custom" 
-                                style={{ color: p.availability_status === 'Available' ? 'var(--success)' : 'var(--text-muted)' }}
+                                className="btn btn-sm d-flex align-items-center gap-1 bg-surface-2 border-custom"
+                                style={{ color: p.availability_status === 'Available' ? 'var(--success)' : 'var(--text-muted)', fontSize: '0.8rem' }}
                                 onClick={() => handleToggleAvailability(p.property_id, p.availability_status)}
                               >
                                 {p.availability_status === 'Available' ? (
-                                  <>
-                                    <ToggleRight size={22} className="text-success" />
-                                    <span style={{ fontSize: '0.8rem' }}>Available</span>
-                                  </>
+                                  <><ToggleRight size={22} className="text-success" /><span>Available</span></>
                                 ) : (
-                                  <>
-                                    <ToggleLeft size={22} className="text-muted-custom" />
-                                    <span style={{ fontSize: '0.8rem' }}>Occupied</span>
-                                  </>
+                                  <><ToggleLeft size={22} className="text-muted-custom" /><span>Occupied</span></>
                                 )}
                               </button>
                             ) : (

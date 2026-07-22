@@ -1,7 +1,7 @@
 // routes/properties.js
 import express from 'express';
 import {
-  createProperty, searchProperties, getPropertyDetail,
+  createProperty, updateProperty, searchProperties, getPropertyDetail,
   updateAvailability, getLandlordDashboard, getMapProperties, getMyProperties,
   createVacancyAlert, getMyVacancyAlerts, deleteVacancyAlert
 } from '../controllers/propertyController.js';
@@ -22,6 +22,7 @@ router.delete('/alerts/:id', authenticate, requireStudent, deleteVacancyAlert); 
 
 // Landlord protected routes
 router.post('/', authenticate, requireLandlord, createProperty);                    // UC-L02
+router.put('/:id', authenticate, requireLandlord, updateProperty);                  // UC-L02b: Edit
 router.get('/landlord/mine', authenticate, requireLandlord, getMyProperties);
 router.get('/landlord/dashboard', authenticate, requireLandlord, getLandlordDashboard); // UC-L05
 router.patch('/:id/availability', authenticate, requireLandlord, updateAvailability);  // UC-L03

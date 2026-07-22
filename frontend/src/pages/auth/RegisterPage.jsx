@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import api from '../../services/api';
 import { UserPlus, Eye, EyeOff, Upload } from 'lucide-react';
 
+import { processAndUploadFile } from '../../utils/fileUpload';
+
 export default function RegisterPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -15,6 +17,28 @@ export default function RegisterPage() {
   });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+
+  const handleIdDocUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingDoc(true);
+    const loadingToast = toast.loading('Uploading document...');
+    try {
+      const url = await processAndUploadFile(file, 'documents');
+      setForm(f => ({ ...f, id_document_path: url }));
+      toast.dismiss(loadingToast);
+      toast.success('ID document attached successfully!');
+    } catch (err) {
+      console.error('Doc upload error:', err);
+      toast.dismiss(loadingToast);
+      toast.error('Failed to upload document.');
+    } finally {
+      setUploadingDoc(false);
+      e.target.value = '';
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -111,18 +135,30 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Landlord ID Document (note: in production, upload via Supabase Storage) */}
+                {/* Landlord ID Document */}
                 {form.role === 'Landlord' && (
                   <div className="mb-3">
                     <label className="form-label">
-                      ID Document URL <span style={{ color:'var(--text-muted)',fontSize:'0.8rem' }}>(paste Supabase Storage URL)</span>
+                      ID Document (Ghana Card / Voter ID)
                     </label>
-                    <input type="text" className="form-control" id="reg-id-doc"
-                           placeholder="https://... (Ghana Card / Voter ID scan)"
-                           value={form.id_document_path}
-                           onChange={e => setForm(f => ({ ...f, id_document_path: e.target.value }))} />
+                    <div className="d-flex gap-2">
+                      <input type="text" className="form-control" id="reg-id-doc"
+                             placeholder="Upload scan or paste document URL"
+                             value={form.id_document_path}
+                             onChange={e => setForm(f => ({ ...f, id_document_path: e.target.value }))} />
+                      <label className="btn btn-outline-secondary d-flex align-items-center gap-1 cursor-pointer" style={{ minWidth: '110px' }}>
+                        {uploadingDoc ? (
+                          <span className="spinner-border spinner-border-sm" role="status" />
+                        ) : (
+                          <>
+                            <Upload size={14} /> Upload
+                          </>
+                        )}
+                        <input type="file" accept="image/*,.pdf" className="d-none" disabled={uploadingDoc} onChange={handleIdDocUpload} />
+                      </label>
+                    </div>
                     <small style={{ color:'var(--text-muted)',fontSize:'0.78rem' }}>
-                      Your account will be reviewed by an admin before you can list properties.
+                      Upload an image or document scan of your identity card for admin verification.
                     </small>
                   </div>
                 )}

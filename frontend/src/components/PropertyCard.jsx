@@ -47,7 +47,9 @@ export default function PropertyCard({ property }) {
 
           {/* Room Type + Occupancy */}
           <div className="d-flex align-items-center gap-3 mb-3 property-meta">
-            <span>{ROOM_ICONS[property.room_type]} {property.room_type}</span>
+            <span className="text-truncate" style={{ maxWidth: '160px' }}>
+              {ROOM_ICONS[property.room_type?.split(',')[0]?.trim()] || '🛏️'} {property.room_type}
+            </span>
             <span><Users size={13} /> Max {property.max_occupancy}</span>
           </div>
 
@@ -66,7 +68,7 @@ export default function PropertyCard({ property }) {
           <div className="d-flex justify-content-between align-items-end mt-2">
             <div>
               <span className="property-price">
-                GHS {Number(property.price_per_semester).toLocaleString()}
+                {property.room_rates?.length > 1 ? 'From ' : ''}GHS {Number(property.price_per_semester).toLocaleString()}
               </span>
               <br />
               <span className="property-price-label">per semester</span>

@@ -111,8 +111,14 @@ export default function ReservationRequestsPage() {
                           </td>
                           <td className="p-3">
                             <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{b.properties?.title}</span>
-                            <br />
-                            <small className="text-muted-custom">📍 {b.properties?.neighborhood}</small>
+                            {b.selected_room_type && (
+                              <div>
+                                <span className="badge bg-secondary border-custom text-warning mt-1" style={{ fontSize: '0.74rem' }}>
+                                  Option: {b.selected_room_type} ({b.agreed_price ? `GHS ${b.agreed_price}` : ''})
+                                </span>
+                              </div>
+                            )}
+                            <small className="text-muted-custom d-block mt-0.5">📍 {b.properties?.neighborhood}</small>
                           </td>
                           <td className="p-3" style={{ fontSize: '0.82rem' }}>
                             <div className="d-flex align-items-center gap-1 mb-1">

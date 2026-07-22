@@ -26,6 +26,7 @@ export default function LoginPage() {
       else navigate('/student');
     } catch (err) {
       toast.error(err.response?.data?.error || 'Login failed. Please try again.');
+      setForm(f => ({ ...f, password: '' }));
     } finally {
       setLoading(false);
     }
@@ -51,10 +52,21 @@ export default function LoginPage() {
 
               {/* Demo Credentials */}
               <div className="alert alert-info mb-4" style={{ fontSize:'0.82rem' }}>
-                <strong>Demo logins:</strong><br />
-                Admin: admin@hostelportal.edu.gh / Admin@1234<br />
-                Student: esi.quaye@ktu.edu.gh / Student@1<br />
-                Landlord: kwame.asante@gmail.com / Landlord@1
+                <div className="fw-bold mb-1">Demo Quick Logins:</div>
+                <div className="d-flex flex-wrap gap-1 mt-2">
+                  <button type="button" className="btn btn-sm btn-outline-info py-0 px-2" style={{ fontSize: '0.75rem' }}
+                          onClick={() => setForm({ email: 'admin@hostelportal.edu.gh', password: 'Admin@1234' })}>
+                    👑 Fill Admin
+                  </button>
+                  <button type="button" className="btn btn-sm btn-outline-info py-0 px-2" style={{ fontSize: '0.75rem' }}
+                          onClick={() => setForm({ email: 'esi.quaye@ktu.edu.gh', password: 'Student@1' })}>
+                    🎓 Fill Student
+                  </button>
+                  <button type="button" className="btn btn-sm btn-outline-info py-0 px-2" style={{ fontSize: '0.75rem' }}
+                          onClick={() => setForm({ email: 'kwame.asante@gmail.com', password: 'Landlord@1' })}>
+                    🏠 Fill Landlord
+                  </button>
+                </div>
               </div>
 
               <form onSubmit={handleSubmit}>
