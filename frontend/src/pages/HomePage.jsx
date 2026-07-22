@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Shield, Star, Clock, ArrowRight, Map } from 'lucide-react';
 import Navbar from '../components/Navbar';
@@ -19,25 +19,12 @@ const STATS = [
   { value: '50+', label: 'Verified Landlords' },
   { value: '4.8★', label: 'Average Rating' },
 ];
-
-const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1600', // Modern residence exterior
-  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1600', // Cozy student study space
-  'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1600', // Comfort hostel room layout
-  'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1600'  // Bright single room
-];
+// Background image served from /public folder
+const hostelBg = '/hostel-bg.jpg';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState({ neighborhood: '', room_type: '', max_price: '' });
-  const [heroIndex, setHeroIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHeroIndex(idx => (idx + 1) % HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -53,62 +40,67 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section className="hero-section">
-        {/* Background Image Slides (Smooth Cross-fade) */}
-        {HERO_IMAGES.map((img, idx) => (
-          <div
-            key={idx}
-            style={{
-              backgroundImage: `url(${img})`,
-              position: 'absolute',
-              top: 0, left: 0, right: 0, bottom: 0,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              opacity: idx === heroIndex ? 0.28 : 0,
-              transition: 'opacity 1.5s ease-in-out',
-              zIndex: 0
-            }}
-          />
-        ))}
-        {/* Color overlay to merge image with the white portal color scheme */}
+      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Full-bleed hostel background image */}
+        <div style={{
+          backgroundImage: `url(${hostelBg})`,
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          backgroundAttachment: 'fixed',
+          zIndex: 0,
+          transform: 'scale(1.03)',
+          transition: 'transform 8s ease-out',
+        }} />
+        {/* Multi-layer gradient overlay for premium dark look */}
         <div style={{
           position: 'absolute',
           top: 0, left: 0, right: 0, bottom: 0,
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(245, 245, 247, 0.78) 100%)',
-          zIndex: 0
+          background: 'linear-gradient(135deg, rgba(10,14,26,0.82) 0%, rgba(20,20,50,0.70) 50%, rgba(255,107,53,0.18) 100%)',
+          zIndex: 1
+        }} />
+        {/* Bottom fade to blend into the page */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0,
+          height: '120px',
+          background: 'linear-gradient(to bottom, transparent, var(--dark-navy, #0a0e1a))',
+          zIndex: 2
         }} />
 
-        <div className="container position-relative" style={{ zIndex: 1 }}>
+        <div className="container position-relative" style={{ zIndex: 3 }}>
           <div className="row align-items-center">
             <div className="col-lg-7">
               <div className="d-flex align-items-center gap-2 mb-3">
                 <span style={{
-                  background: 'rgba(255,107,53,0.12)',
-                  color: 'var(--brand-orange)',
+                  background: 'rgba(255,107,53,0.25)',
+                  color: '#FFB26B',
                   borderRadius: '20px',
                   padding: '4px 14px',
                   fontSize: '0.8rem',
                   fontWeight: 600,
-                  border: '1px solid rgba(255,107,53,0.2)'
+                  border: '1px solid rgba(255,107,53,0.4)',
+                  backdropFilter: 'blur(4px)'
                 }}>
                   🎓 KTU Official Student Housing Platform
                 </span>
               </div>
-              <h1 className="hero-title">
+              <h1 className="hero-title" style={{ color: '#ffffff', textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>
                 Find Your Perfect
                 <br />
-                <span className="highlight">Student Home</span>
+                <span className="highlight" style={{ color: 'var(--brand-orange)', textShadow: '0 0 30px rgba(255,107,53,0.5)' }}>Student Home</span>
                 <br />
                 Near KTU Campus
               </h1>
-              <p className="hero-subtitle">
+              <p className="hero-subtitle" style={{ color: 'rgba(255,255,255,0.85)', textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>
                 Safe, verified, and affordable off-campus accommodation for Koforidua Technical University students. No scams. No fake listings.
               </p>
               <div className="d-flex gap-3 flex-wrap mb-4">
                 <button className="btn btn-primary px-4" onClick={() => navigate('/search')}>
                   <Search size={16} className="me-2" /> Browse Listings
                 </button>
-                <button className="btn btn-outline-primary px-4" onClick={() => navigate('/map')}>
+                <button className="btn px-4" style={{ border: '2px solid rgba(255,255,255,0.7)', color: '#fff', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', borderRadius: '8px', fontWeight: 600 }} onClick={() => navigate('/map')}>
                   <Map size={16} className="me-2" /> View on Map
                 </button>
               </div>
