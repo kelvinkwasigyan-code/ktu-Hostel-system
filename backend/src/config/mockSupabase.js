@@ -37,7 +37,16 @@ function loadDb() {
 function saveDb(data) {
   inMemoryDb = data;
   try {
-    fs.writeFileSync(dbFilePath, JSON.stringify(data, null, 2), 'utf-8');
+    // Strip large base64 data URLs before writing to disk
+    // (they can be MB-sized and bloat/crash the JSON file write)
+    const sanitized = JSON.parse(JSON.stringify(data));
+    if (Array.isArray(sanitized.property_images)) {
+      sanitized.property_images = sanitized.property_images.map(img => ({
+        ...img,
+        image_path: img.image_path?.startsWith('data:') ? '[base64-omitted]' : img.image_path
+      }));
+    }
+    fs.writeFileSync(dbFilePath, JSON.stringify(sanitized, null, 2), 'utf-8');
   } catch (err) {
     console.warn('⚠️ Error writing to mock DB file (read-only filesystem):', err.message);
   }

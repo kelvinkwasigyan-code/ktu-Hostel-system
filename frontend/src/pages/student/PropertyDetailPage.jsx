@@ -208,26 +208,35 @@ export default function PropertyDetailPage() {
               <hr className="border-custom my-3" />
 
               {/* Quick Specs */}
-              <div className="row g-3 text-center mb-3">
-                <div className="col-4">
-                  <div className="p-3 bg-surface-2 rounded-custom border-custom">
+              <div className="row g-2 text-center mb-3">
+                <div className="col-3">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
                     <div style={{ fontSize: '1.2rem' }}>{ROOM_ICONS[property.room_type] || '🛏️'}</div>
-                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{property.room_type}</div>
-                    <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>Room Type</small>
+                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.room_type}</div>
+                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Room Type</small>
                   </div>
                 </div>
-                <div className="col-4">
-                  <div className="p-3 bg-surface-2 rounded-custom border-custom">
+                <div className="col-3">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
+                    <div style={{ fontSize: '1.2rem' }}>
+                      {property.gender_policy === 'Boys only' ? '🚹' : property.gender_policy === 'Girls only' ? '🚺' : '🚻'}
+                    </div>
+                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.gender_policy || 'Mixed'}</div>
+                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Gender Policy</small>
+                  </div>
+                </div>
+                <div className="col-3">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
                     <div className="text-orange"><Users size={20} className="mx-auto" /></div>
-                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>Max {property.max_occupancy}</div>
-                    <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>Occupancy</small>
+                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>Max {property.max_occupancy}</div>
+                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Occupancy</small>
                   </div>
                 </div>
-                <div className="col-4">
-                  <div className="p-3 bg-surface-2 rounded-custom border-custom">
+                <div className="col-3">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
                     <div className="text-gold"><MapPin size={20} className="mx-auto" /></div>
-                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{property.distance_from_campus_km ? `${property.distance_from_campus_km} km` : 'Near Campus'}</div>
-                    <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>Distance from KTU</small>
+                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.distance_from_campus_km ? `${property.distance_from_campus_km} km` : 'Near Campus'}</div>
+                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Distance</small>
                   </div>
                 </div>
               </div>

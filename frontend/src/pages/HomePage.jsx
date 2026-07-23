@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Shield, Star, Clock, ArrowRight, Map } from 'lucide-react';
+import { Search, MapPin, Shield, Star, Clock, ArrowRight, Map, Home, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import PropertyCard from '../components/PropertyCard';
+import api from '../services/api';
 
 const FEATURES = [
   { icon: <Shield size={28} />, color: '#2ECC71', title: 'Verified Landlords', desc: 'Every landlord is identity-verified by our admin team before their listings appear.' },
@@ -11,7 +13,7 @@ const FEATURES = [
   { icon: <Star size={28} />, color: '#F5A623', title: 'Verified Reviews', desc: 'Only students who actually stayed can review — no fake ratings.' },
 ];
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum'];
+const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase'];
 
 const STATS = [
   { value: '200+', label: 'Listed Properties' },
@@ -25,6 +27,37 @@ const hostelBg = '/hostel-bg.jpg';
 export default function HomePage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState({ neighborhood: '', room_type: '', max_price: '' });
+
+  // ── Browse Listings state ──────────────────────────────────────────
+  const [listings, setListings] = useState([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('all');
+  const listingsSectionRef = useRef(null);
+
+  const LISTING_TABS = [
+    { key: 'all',            label: '🏘️ All' },
+    { key: 'Single',         label: '🛏️ Single' },
+    { key: 'Shared',         label: '👥 Shared' },
+    { key: 'Self-contained', label: '🚿 Self-contained' },
+    { key: 'Apartment',      label: '🏠 Apartment' },
+  ];
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        setListingsLoading(true);
+        const params = { limit: 6, page: 1 };
+        if (activeTab !== 'all') params.room_type = activeTab;
+        const res = await api.get('/properties/search', { params });
+        setListings(res.data.properties || []);
+      } catch (err) {
+        console.error('Failed to load featured listings', err);
+      } finally {
+        setListingsLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, [activeTab]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -227,6 +260,104 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Browse Listings ────────────────────────────────────────────── */}
+      <section id="browse-listings" ref={listingsSectionRef} className="py-5" style={{ background: 'var(--dark-navy-2)' }}>
+        <div className="container">
+          {/* Header */}
+          <div className="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+            <div>
+              <h2 className="section-title mb-1">
+                <Home size={26} className="me-2 text-orange" style={{ verticalAlign: 'middle' }} />
+                Browse <span className="text-orange">Listings</span>
+              </h2>
+              <div className="section-divider" />
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                Explore verified, available hostels near KTU campus.
+              </p>
+            </div>
+            <button
+              className="btn btn-outline-primary d-flex align-items-center gap-1"
+              onClick={() => navigate('/search')}
+              style={{ fontWeight: 600, fontSize: '0.88rem', whiteSpace: 'nowrap' }}
+            >
+              View All <ChevronRight size={16} />
+            </button>
+          </div>
+
+          {/* Room-type Filter Tabs */}
+          <div className="d-flex flex-wrap gap-2 mb-4">
+            {LISTING_TABS.map(tab => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className="btn btn-sm"
+                style={{
+                  borderRadius: '20px',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  transition: 'all 0.2s',
+                  background: activeTab === tab.key
+                    ? 'var(--brand-orange)'
+                    : 'var(--surface)',
+                  color: activeTab === tab.key ? '#fff' : 'var(--text-secondary)',
+                  border: activeTab === tab.key
+                    ? '1px solid var(--brand-orange)'
+                    : '1px solid var(--border)',
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Listings Grid */}
+          {listingsLoading ? (
+            <div className="row g-3">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="col-md-6 col-lg-4">
+                  <div className="card h-100" style={{ background: 'var(--surface)', border: '1px solid var(--border)', overflow: 'hidden', borderRadius: 'var(--radius-lg)' }}>
+                    <div style={{ height: '180px', background: 'linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                    <div className="p-3">
+                      <div style={{ height: '16px', borderRadius: '6px', background: 'var(--surface-2)', marginBottom: '8px', width: '70%' }} />
+                      <div style={{ height: '12px', borderRadius: '6px', background: 'var(--surface-2)', width: '45%' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : listings.length === 0 ? (
+            <div className="text-center py-5" style={{ color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏚️</div>
+              <h5>No listings found for this category</h5>
+              <p style={{ fontSize: '0.9rem' }}>Try a different room type or <button className="btn btn-link p-0" style={{ color: 'var(--brand-orange)' }} onClick={() => { setActiveTab('all'); }}>view all</button>.</p>
+            </div>
+          ) : (
+            <div className="row g-3">
+              {listings.map(p => (
+                <div key={p.property_id} className="col-md-6 col-lg-4">
+                  <PropertyCard property={p} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* See More */}
+          {!listingsLoading && listings.length > 0 && (
+            <div className="text-center mt-5">
+              <button
+                className="btn btn-primary px-5 py-2"
+                onClick={() => navigate('/search' + (activeTab !== 'all' ? `?room_type=${activeTab}` : ''))}
+                style={{ borderRadius: '10px', fontWeight: 700, fontSize: '1rem' }}
+              >
+                <Search size={16} className="me-2" />
+                See All Available Hostels
+              </button>
+            </div>
+          )}
         </div>
       </section>
 

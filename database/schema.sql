@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS users (
     verification_status VARCHAR(20) DEFAULT 'Approved'
                         CHECK (verification_status IN ('Pending', 'Approved', 'Rejected')),
     id_document_path    VARCHAR(255) NULL,   -- landlord identity document path (Supabase Storage)
+    profile_picture     TEXT NULL,           -- profile avatar photo URL or base64
+    bio                 TEXT NULL,           -- landlord biography / intro
     is_active           BOOLEAN DEFAULT TRUE,
     created_at          TIMESTAMPTZ DEFAULT NOW()
 );
@@ -46,6 +48,8 @@ CREATE TABLE IF NOT EXISTS properties (
     amenities                TEXT,         -- stored as JSON string (parsed in app layer)
     neighborhood             VARCHAR(100),
     distance_from_campus_km  DECIMAL(5, 2),  -- cached via Distance Matrix API on creation (UC-L02)
+    gender_policy            VARCHAR(20) DEFAULT 'Mixed'
+                             CHECK (gender_policy IN ('Mixed', 'Boys only', 'Girls only')),
     availability_status      VARCHAR(20) DEFAULT 'Available'
                              CHECK (availability_status IN ('Available', 'Pending', 'Occupied')),
     verification_status      VARCHAR(20) DEFAULT 'Pending'
@@ -97,6 +101,8 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS agreed_price DECIMAL(10, 2);
 -- Widen image_path to TEXT (handles both Supabase Storage URLs and base64 data URLs)
 ALTER TABLE property_images ALTER COLUMN image_path TYPE TEXT;
 ALTER TABLE properties ADD COLUMN IF NOT EXISTS payment_contact_info TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;
 
 -- =============================================================================
 -- TABLE: reviews
@@ -156,3 +162,6 @@ CREATE TABLE IF NOT EXISTS vacancy_alerts (
     is_active      BOOLEAN DEFAULT TRUE,
     created_at     TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE properties ADD COLUMN IF NOT EXISTS gender_policy VARCHAR(20) DEFAULT 'Mixed';
+

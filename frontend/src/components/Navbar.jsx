@@ -1,9 +1,9 @@
-// src/components/Navbar.jsx
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Bell, Home, Search, Map, LogOut, User, Settings, PlusSquare } from 'lucide-react';
 import api from '../services/api';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -99,8 +99,9 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Right: Auth + Notifications */}
+          {/* Right: Auth + Notifications + Theme Toggle */}
           <div className="d-flex align-items-center gap-2">
+            <ThemeToggle />
             {user ? (
               <>
                 {/* Notification Bell */}

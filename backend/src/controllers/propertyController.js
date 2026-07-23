@@ -71,6 +71,7 @@ export const createProperty = async (req, res) => {
     const {
       title, address, latitude, longitude, description,
       price_per_semester, room_type, max_occupancy, amenities, neighborhood, room_rates,
+      gender_policy,
       payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info
     } = req.body;
 
@@ -83,6 +84,9 @@ export const createProperty = async (req, res) => {
     const primaryRoomType = ALLOWED_TYPES.includes(formattedRates[0]?.room_type)
       ? formattedRates[0]?.room_type
       : (ALLOWED_TYPES.includes(room_type) ? room_type : 'Single');
+
+    const ALLOWED_GENDER_POLICIES = ['Mixed', 'Boys only', 'Girls only'];
+    const safeGenderPolicy = ALLOWED_GENDER_POLICIES.includes(gender_policy) ? gender_policy : 'Mixed';
 
     const paymentContactObj = parsePaymentContact(payment_contact_info, landlord?.phone);
     if (payment_phone) paymentContactObj.phone = payment_phone;
@@ -113,6 +117,7 @@ export const createProperty = async (req, res) => {
       payment_contact_info: JSON.stringify(paymentContactObj),
       amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
       neighborhood,
+      gender_policy: safeGenderPolicy,
       distance_from_campus_km,
       availability_status: 'Available',
       verification_status: 'Pending' // admin must approve before it's visible
@@ -205,6 +210,7 @@ export const updateProperty = async (req, res) => {
     const {
       title, address, latitude, longitude, description,
       price_per_semester, room_type, max_occupancy, amenities, neighborhood, room_rates,
+      gender_policy,
       payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info,
       image_urls, image_data_urls
     } = req.body;
@@ -216,6 +222,9 @@ export const updateProperty = async (req, res) => {
     const primaryRoomType = ALLOWED.includes(formattedRates[0]?.room_type)
       ? formattedRates[0].room_type
       : (ALLOWED.includes(room_type) ? room_type : 'Single');
+
+    const ALLOWED_GENDER_POLICIES = ['Mixed', 'Boys only', 'Girls only'];
+    const safeGenderPolicy = ALLOWED_GENDER_POLICIES.includes(gender_policy) ? gender_policy : 'Mixed';
 
     const { data: landlord } = await supabaseAdmin
       .from('users')
@@ -251,6 +260,7 @@ export const updateProperty = async (req, res) => {
       max_occupancy: maxOcc || parseInt(max_occupancy),
       amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
       neighborhood,
+      gender_policy: safeGenderPolicy,
       distance_from_campus_km,
       verification_status: 'Pending'
     };
@@ -270,8 +280,8 @@ export const updateProperty = async (req, res) => {
       .select()
       .single();
 
-    if (updateErr && updateErr.code === 'PGRST204') {
-      console.warn('Optional columns not in schema cache — retrying with core fields only.');
+    if (updateErr) {
+      console.warn('Optional columns not in schema cache or database — retrying with core fields only:', updateErr.message || updateErr);
       const fallback = await supabaseAdmin
         .from('properties')
         .update(corePayload)
@@ -320,7 +330,7 @@ export const updateProperty = async (req, res) => {
 export const searchProperties = async (req, res) => {
   try {
     const {
-      neighborhood, room_type,
+      neighborhood, room_type, gender_policy,
       min_price, max_price,
       max_distance, page = 1, limit = 12
     } = req.query;
@@ -339,11 +349,12 @@ export const searchProperties = async (req, res) => {
       .eq('users.verification_status', 'Approved') // UC-7.5: verified landlord only
       .eq('users.is_active', true);
 
-    if (neighborhood) query = query.ilike('neighborhood', `%${neighborhood}%`);
-    if (room_type)    query = query.eq('room_type', room_type);
-    if (min_price)    query = query.gte('price_per_semester', parseFloat(min_price));
-    if (max_price)    query = query.lte('price_per_semester', parseFloat(max_price));
-    if (max_distance) query = query.lte('distance_from_campus_km', parseFloat(max_distance));
+    if (neighborhood)  query = query.ilike('neighborhood', `%${neighborhood}%`);
+    if (room_type)     query = query.eq('room_type', room_type);
+    if (gender_policy) query = query.eq('gender_policy', gender_policy);
+    if (min_price)     query = query.gte('price_per_semester', parseFloat(min_price));
+    if (max_price)     query = query.lte('price_per_semester', parseFloat(max_price));
+    if (max_distance)  query = query.lte('distance_from_campus_km', parseFloat(max_distance));
 
     const { data, error, count } = await query
       .order('created_at', { ascending: false })

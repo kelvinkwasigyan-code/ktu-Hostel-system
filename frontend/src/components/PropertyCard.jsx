@@ -27,9 +27,16 @@ export default function PropertyCard({ property }) {
         {/* Image */}
         <div className="property-card-img-wrapper">
           <img src={heroImage} alt={property.title} className="property-card-img" />
-          <span className={`property-badge ${statusClass}`}>
-            {property.availability_status}
-          </span>
+          <div className="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1">
+            <span className={`property-badge ${statusClass}`}>
+              {property.availability_status}
+            </span>
+            {property.gender_policy && (
+              <span className="badge bg-dark bg-opacity-75 text-white" style={{ fontSize: '0.7rem', backdropFilter: 'blur(4px)' }}>
+                {property.gender_policy === 'Boys only' ? '🚹 Boys only' : property.gender_policy === 'Girls only' ? '🚺 Girls only' : '🚻 Mixed'}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Body */}

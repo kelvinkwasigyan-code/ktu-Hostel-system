@@ -1,6 +1,6 @@
 // src/components/LandlordSidebar.jsx
 import { Link, useLocation } from 'react-router-dom';
-import { Home, PlusSquare, List, Inbox } from 'lucide-react';
+import { Home, PlusSquare, List, Inbox, User } from 'lucide-react';
 
 export default function LandlordSidebar() {
   const location = useLocation();
@@ -9,7 +9,8 @@ export default function LandlordSidebar() {
     { name: 'Dashboard', path: '/landlord', icon: <Home size={18} /> },
     { name: 'Add Listing', path: '/landlord/create', icon: <PlusSquare size={18} /> },
     { name: 'Manage Listings', path: '/landlord/listings', icon: <List size={18} /> },
-    { name: 'Hold Requests', path: '/landlord/requests', icon: <Inbox size={18} /> }
+    { name: 'Hold Requests', path: '/landlord/requests', icon: <Inbox size={18} /> },
+    { name: 'Profile Settings', path: '/landlord/profile', icon: <User size={18} /> }
   ];
 
   return (

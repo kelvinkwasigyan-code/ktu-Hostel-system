@@ -1,6 +1,6 @@
 // controllers/authController.js
 // Handles user registration and login for all roles.
-// UC-S01: Student Register, UC-S02: Student Login, UC-L01: Landlord Register
+// UC-S01: Student Register, UC-S02: Student Login, UC-L01: Landlord Register, UC-S03: Google OAuth
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -232,7 +232,7 @@ export const getProfile = async (req, res) => {
   try {
     const { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('user_id, full_name, email, phone, role, verification_status, is_active, created_at')
+      .select('user_id, full_name, email, phone, role, verification_status, id_document_path, profile_picture, bio, is_active, created_at')
       .eq('user_id', req.user.user_id)
       .single();
 
@@ -243,5 +243,129 @@ export const getProfile = async (req, res) => {
     res.json({ user });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch profile.' });
+  }
+};
+
+// ─── Update Basic Profile Info (Non-sensitive fields only) ───────────────────
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { phone, profile_picture, bio } = req.body;
+
+    // Strict validation: phone is required
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ error: 'Phone number cannot be empty.' });
+    }
+
+    if (bio && bio.length > 500) {
+      return res.status(400).json({ error: 'Bio cannot exceed 500 characters.' });
+    }
+
+    // Explicitly lock primary identity fields (full_name, email, verification_status, id_document_path, role)
+    // Only non-sensitive profile info (phone, profile_picture, bio) is allowed to be updated.
+    const updatePayload = {
+      phone: phone.trim(),
+      profile_picture: profile_picture ? profile_picture.trim() : null,
+      bio: bio ? bio.trim() : null
+    };
+
+    const { data: updatedUser, error } = await supabaseAdmin
+      .from('users')
+      .update(updatePayload)
+      .eq('user_id', userId)
+      .select('user_id, full_name, email, phone, role, verification_status, id_document_path, profile_picture, bio, is_active, created_at')
+      .single();
+
+    if (error || !updatedUser) {
+      console.error('Update profile error:', error);
+      return res.status(500).json({ error: 'Failed to update profile. Please try again.' });
+    }
+
+    return res.json({
+      message: 'Profile updated successfully.',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('updateProfile error:', err);
+    res.status(500).json({ error: 'Server error while updating profile.' });
+  }
+};
+
+
+// ─── UC-S03: Google OAuth Sign-In / Sign-Up ──────────────────────────────────
+export const googleAuth = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required.' });
+    }
+
+    // Verify the Google ID token using Google's public tokeninfo endpoint
+    const googleRes = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`
+    );
+    const payload = await googleRes.json();
+
+    if (!googleRes.ok || payload.error) {
+      return res.status(401).json({ error: 'Invalid Google token. Please try again.' });
+    }
+
+    const { sub, email, name, picture } = payload;
+    if (!email || !sub) {
+      return res.status(400).json({ error: 'Could not extract user info from Google token.' });
+    }
+
+    // Upsert user — create if not exists, return existing if already registered
+    let { data: user } = await supabaseAdmin
+      .from('users')
+      .select('user_id, full_name, email, role, verification_status, is_active')
+      .eq('email', email.toLowerCase())
+      .single();
+
+    if (!user) {
+      // New user — register as Student
+      const { data: newUser, error: insertError } = await supabaseAdmin
+        .from('users')
+        .insert({
+          full_name: name,
+          email: email.toLowerCase(),
+          phone: '',
+          password_hash: null,       // Google users have no password
+          role: 'Student',
+          verification_status: 'Approved',
+          profile_picture: picture || null,
+          is_active: true
+        })
+        .select('user_id, full_name, email, role, verification_status, is_active')
+        .single();
+
+      if (insertError || !newUser) {
+        console.error('Google auth insert error:', insertError);
+        return res.status(500).json({ error: 'Failed to create account. Please try again.' });
+      }
+      user = newUser;
+    }
+
+    if (user.is_active === false) {
+      return res.status(403).json({ error: 'Your account has been deactivated. Contact the administrator.' });
+    }
+
+    const token = generateToken(user);
+
+    return res.json({
+      message: 'Google sign-in successful.',
+      token,
+      user: {
+        user_id: user.user_id,
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+        verification_status: user.verification_status,
+        profile_picture: picture || null,
+      }
+    });
+  } catch (err) {
+    console.error('Google auth error:', err);
+    res.status(500).json({ error: 'Server error during Google sign-in.' });
   }
 };

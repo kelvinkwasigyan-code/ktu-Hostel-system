@@ -25,6 +25,8 @@ export const INITIAL_DB_STATE = {
       role: "Landlord",
       verification_status: "Approved",
       id_document_path: null,
+      profile_picture: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400",
+      bio: "Experienced student housing provider near KTU campus. Committed to providing clean, safe, and comfortable off-campus accommodations for over 6 years.",
       is_active: true,
       created_at: new Date(Date.now() - 32 * 24 * 60 * 60 * 1000).toISOString()
     },

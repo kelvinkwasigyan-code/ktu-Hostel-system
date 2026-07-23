@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 import { processAndUploadFile, compressImageFile } from '../../utils/fileUpload';
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum'];
+const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase'];
 const ROOM_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
 const AMENITIES_LIST = ['Water Flow', 'Electricity (Prepaid)', 'WiFi Internet', 'Generator Backup', 'Study Room', 'Fenced Yard', 'Security Guard', 'Air Conditioner'];
 
@@ -24,6 +24,7 @@ export default function CreateListingPage() {
   const [title, setTitle] = useState('');
   const [address, setAddress] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
+  const [genderPolicy, setGenderPolicy] = useState('Mixed');
   const [description, setDescription] = useState('');
 
   // Landlord Contact & Payment Details states
@@ -127,6 +128,7 @@ export default function CreateListingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!address.trim()) return toast.error('Please enter the physical address.');
     if (!neighborhood) return toast.error('Please select a neighborhood.');
     if (roomRates.length === 0) return toast.error('Please add at least one room option.');
     for (let i = 0; i < roomRates.length; i++) {
@@ -150,8 +152,7 @@ export default function CreateListingPage() {
       const finalPhotos = await Promise.all(
         photos.map(async (p) => {
           if (p.storedUrl) return p.storedUrl; // already on cloud ✅
-
-          if (!p.file) return p.previewUrl || null;
+          if (!p.file) return null;
 
           // Retry Supabase Storage upload
           try {
@@ -159,27 +160,35 @@ export default function CreateListingPage() {
             if (stored && stored.startsWith('http')) return stored;
           } catch (_) {}
 
-          // Dev-mode fallback: compress to ~60KB JPEG and use as data URL
-          // (works with mock DB and with Supabase once image_path column is TEXT)
+          // Cloud upload failed — use a small compressed data URL only if it fits
           try {
-            const base64 = await compressImageFile(p.file, 800, 800, 0.6);
-            return base64;
+            const base64 = await compressImageFile(p.file, 600, 600, 0.5);
+            // Only include if reasonably sized (< 200KB base64 ≈ ~150KB image)
+            if (base64.length < 200000) return base64;
           } catch (_) {}
 
-          return null;
+          return null; // skip this photo rather than bloating the request
         })
       );
       toast.dismiss(retryToast);
 
       const imageUrls = finalPhotos.filter(Boolean);
-      // Split: real cloud URLs go to image_urls, small base64 go to image_data_urls
       const cloudUrls = imageUrls.filter(u => u.startsWith('http'));
       const dataUrls  = imageUrls.filter(u => u.startsWith('data:'));
 
-      await api.post('/properties', {
+      // Safety check: warn if payload is large
+      const dataUrlSize = dataUrls.reduce((sum, u) => sum + u.length, 0);
+      if (dataUrlSize > 3_000_000) {
+        toast.error('Photos are too large to submit. Please use smaller images or try again — some photos may not have uploaded to cloud yet.');
+        setLoading(false);
+        return;
+      }
+
+      const res = await api.post('/properties', {
         title,
         address,
         neighborhood,
+        gender_policy: genderPolicy,
         room_type: primaryRoomType,
         price_per_semester: minPrice,
         max_occupancy: maxOcc,
@@ -203,9 +212,14 @@ export default function CreateListingPage() {
       toast.success('Listing submitted for admin review!');
       navigate('/landlord/listings');
     } catch (err) {
-      console.error('Listing submit error:', err.response?.data || err.message);
-      const msg = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to submit listing.';
-      toast.error(msg);
+      console.error('Listing submit error:', err);
+      // Surface the real error — network error means the server is unreachable or the request body is too large
+      if (!err.response) {
+        toast.error('Network error: Could not reach the server. Check your connection or try reducing photo sizes.');
+      } else {
+        const msg = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to submit listing.';
+        toast.error(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -250,6 +264,28 @@ export default function CreateListingPage() {
                       <option value="">Select Neighborhood</option>
                       {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="form-label d-block fw-semibold mb-1">Gender Policy</label>
+                    <small className="text-muted-custom d-block mb-2" style={{ fontSize: '0.78rem' }}>Specify who is allowed to stay at this property</small>
+                    <div className="d-flex gap-2">
+                      {[
+                        { value: 'Mixed', label: '🚻 Mixed (Co-ed)' },
+                        { value: 'Boys only', label: '🚹 Boys only' },
+                        { value: 'Girls only', label: '🚺 Girls only' }
+                      ].map(g => (
+                        <button
+                          key={g.value}
+                          type="button"
+                          className={`btn btn-sm flex-grow-1 ${genderPolicy === g.value ? 'btn-primary' : 'btn-outline-secondary'}`}
+                          style={{ fontSize: '0.82rem', fontWeight: 600 }}
+                          onClick={() => setGenderPolicy(g.value)}
+                        >
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Room Options & Rates */}

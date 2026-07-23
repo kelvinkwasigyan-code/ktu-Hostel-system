@@ -9,7 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum'];
+const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase'];
 const ROOM_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
 
 export default function SearchPage() {
@@ -19,6 +19,7 @@ export default function SearchPage() {
   // Filter states initialized from URL params if present
   const [neighborhood, setNeighborhood] = useState(searchParams.get('neighborhood') || '');
   const [roomType, setRoomType] = useState(searchParams.get('room_type') || '');
+  const [genderPolicy, setGenderPolicy] = useState(searchParams.get('gender_policy') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '');
   const [maxDistance, setMaxDistance] = useState(searchParams.get('max_distance') || '');
   const [page, setPage] = useState(parseInt(searchParams.get('page') || '1'));
@@ -49,6 +50,7 @@ export default function SearchPage() {
       const params = {};
       if (neighborhood) params.neighborhood = neighborhood;
       if (roomType)     params.room_type = roomType;
+      if (genderPolicy) params.gender_policy = genderPolicy;
       if (maxPrice)     params.max_price = maxPrice;
       if (maxDistance)  params.max_distance = maxDistance;
       params.page = page;
@@ -83,6 +85,7 @@ export default function SearchPage() {
     const newParams = {};
     if (neighborhood) newParams.neighborhood = neighborhood;
     if (roomType)     newParams.room_type = roomType;
+    if (genderPolicy) newParams.gender_policy = genderPolicy;
     if (maxPrice)     newParams.max_price = maxPrice;
     if (maxDistance)  newParams.max_distance = maxDistance;
     newParams.page = '1';
@@ -93,6 +96,7 @@ export default function SearchPage() {
   const handleClearFilters = () => {
     setNeighborhood('');
     setRoomType('');
+    setGenderPolicy('');
     setMaxPrice('');
     setMaxDistance('');
     setPage(1);
@@ -169,6 +173,15 @@ export default function SearchPage() {
                   <select className="form-select" value={roomType} onChange={e => setRoomType(e.target.value)}>
                     <option value="">Any Room Type</option>
                     {ROOM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Gender Policy</label>
+                  <select className="form-select" value={genderPolicy} onChange={e => setGenderPolicy(e.target.value)}>
+                    <option value="">All Policies</option>
+                    <option value="Mixed">🚻 Mixed (Co-ed)</option>
+                    <option value="Boys only">🚹 Boys only</option>
+                    <option value="Girls only">🚺 Girls only</option>
                   </select>
                 </div>
                 <div className="mb-3">

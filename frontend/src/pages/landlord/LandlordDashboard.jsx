@@ -1,7 +1,6 @@
-// src/pages/landlord/LandlordDashboard.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, List, Inbox, AlertTriangle, ShieldCheck, Star, Users, PlusSquare, ArrowRight } from 'lucide-react';
+import { Home, List, Inbox, AlertTriangle, ShieldCheck, Star, Users, PlusSquare, ArrowRight, User } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import LandlordSidebar from '../../components/LandlordSidebar';
@@ -70,9 +69,14 @@ export default function LandlordDashboard() {
                 <h2 className="mb-1">Landlord Dashboard</h2>
                 <p className="text-muted-custom mb-0">Manage listings, monitor student reservation holds, and check ratings.</p>
               </div>
-              <span className="text-muted-custom" style={{ fontSize: '0.85rem' }}>
-                {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </span>
+              <div className="d-flex align-items-center gap-3">
+                <Link to="/landlord/profile" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
+                  <User size={15} /> Edit Profile
+                </Link>
+                <span className="text-muted-custom d-none d-md-inline" style={{ fontSize: '0.85rem' }}>
+                  {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </span>
+              </div>
             </div>
 
             {/* Verification Alert Banner */}

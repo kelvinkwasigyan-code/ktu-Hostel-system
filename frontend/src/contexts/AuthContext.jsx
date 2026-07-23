@@ -24,15 +24,22 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+  const updateUser = (updatedUserData) => {
+    const newUserData = { ...user, ...updatedUserData };
+    localStorage.setItem('hostel_user', JSON.stringify(newUserData));
+    setUser(newUserData);
+  };
+
   const logout = () => {
     localStorage.removeItem('hostel_token');
     localStorage.removeItem('hostel_user');
+    sessionStorage.clear();
     setUser(null);
-    window.location.href = '/';
+    window.location.href = '/login';
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, updateUser, logout, loading, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

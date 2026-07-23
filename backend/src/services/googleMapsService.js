@@ -31,7 +31,7 @@ export const getDistanceFromCampus = (propertyLat, propertyLng) => {
     const destination = `${propertyLat},${propertyLng}`;
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&mode=driving&key=${apiKey}`;
 
-    https.get(url, (resp) => {
+    const req = https.get(url, (resp) => {
       let data = '';
       resp.on('data', chunk => { data += chunk; });
       resp.on('end', () => {
@@ -50,6 +50,11 @@ export const getDistanceFromCampus = (propertyLat, propertyLng) => {
       });
     }).on('error', (err) => {
       console.error('Distance Matrix API error:', err.message);
+      resolve(null);
+    });
+    // 5-second timeout — don't block listing creation
+    req.setTimeout(5000, () => {
+      req.destroy();
       resolve(null);
     });
   });

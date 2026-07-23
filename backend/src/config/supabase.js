@@ -36,6 +36,12 @@ if (!isPlaceholder && supabaseUrl && supabaseServiceKey) {
 
 mockAdmin = createMockSupabase();
 
+const isFallbackError = (err) => {
+  if (!err) return false;
+  const code = err.code || err.statusCode;
+  return code === 'PGRST205' || code === 'PGRST204' || code === 'PGRST100' || code === '42703' || code === '42P01';
+};
+
 export const supabaseAdmin = new Proxy({}, {
   get(target, prop) {
     if (prop === 'from') {
@@ -52,7 +58,7 @@ export const supabaseAdmin = new Proxy({}, {
             if (qProp === 'then') {
               return (onFulfilled, onRejected) => {
                 return remoteQuery.then(res => {
-                  if (res && res.error && res.error.code === 'PGRST205') {
+                  if (res && res.error && isFallbackError(res.error)) {
                     return mockQuery.then(onFulfilled, onRejected);
                   }
                   return onFulfilled(res);
@@ -71,7 +77,7 @@ export const supabaseAdmin = new Proxy({}, {
                       if (rProp === 'then') {
                         return (onF, onR) => {
                           return rTarget.then(resData => {
-                            if (resData && resData.error && resData.error.code === 'PGRST205') {
+                            if (resData && resData.error && isFallbackError(resData.error)) {
                               return mockQuery[qProp](...args).then(onF, onR);
                             }
                             return onF(resData);

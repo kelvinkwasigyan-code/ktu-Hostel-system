@@ -23,6 +23,7 @@ import CreateListingPage from './pages/landlord/CreateListingPage';
 import EditListingPage from './pages/landlord/EditListingPage';
 import ManageListingsPage from './pages/landlord/ManageListingsPage';
 import ReservationRequestsPage from './pages/landlord/ReservationRequestsPage';
+import LandlordProfilePage from './pages/landlord/LandlordProfilePage';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -77,6 +78,7 @@ export default function App() {
           <Route path="/landlord/listings" element={<PrivateRoute roles={['Landlord']}><ManageListingsPage /></PrivateRoute>} />
           <Route path="/landlord/listings/:id/edit" element={<PrivateRoute roles={['Landlord']}><EditListingPage /></PrivateRoute>} />
           <Route path="/landlord/requests" element={<PrivateRoute roles={['Landlord']}><ReservationRequestsPage /></PrivateRoute>} />
+          <Route path="/landlord/profile" element={<PrivateRoute roles={['Landlord']}><LandlordProfilePage /></PrivateRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<PrivateRoute roles={['Admin']}><AdminDashboard /></PrivateRoute>} />
