@@ -77,6 +77,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'KTU Hostel Portal API' });
 });
 
+app.get('/', (req, res) => {
+  res.json({ message: "KTU Hostel System API is running 🚀" });
+});
+
 // Serve frontend static files
 const frontendDistPath = path.join(__dirname, '../../frontend/dist');
 app.use(express.static(frontendDistPath));
