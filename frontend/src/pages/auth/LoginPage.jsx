@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { Eye, EyeOff, LogIn, X, ArrowLeft } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -67,6 +67,62 @@ export default function LoginPage() {
       }} />
 
       <div className="container position-relative" style={{ zIndex: 1 }}>
+        {/* Top Header Controls */}
+        <div className="d-flex align-items-center justify-content-between mx-auto mb-3" style={{ maxWidth: '380px' }}>
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="btn d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill text-white"
+            style={{
+              background: 'rgba(10, 34, 64, 0.75)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(0, 139, 206, 0.25)',
+              fontSize: '0.82rem',
+              fontWeight: 600,
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(10, 34, 64, 0.9)';
+              e.currentTarget.style.borderColor = 'var(--brand-orange)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(10, 34, 64, 0.75)';
+              e.currentTarget.style.borderColor = 'rgba(0, 139, 206, 0.25)';
+            }}
+          >
+            <ArrowLeft size={15} />
+            <span>Back</span>
+          </button>
+
+          {/* Close Button */}
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="btn d-flex align-items-center justify-content-center rounded-circle text-white"
+            style={{
+              width: '32px',
+              height: '32px',
+              padding: 0,
+              background: 'rgba(10, 34, 64, 0.75)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(0, 139, 206, 0.25)',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(10, 34, 64, 0.9)';
+              e.currentTarget.style.borderColor = 'var(--brand-orange)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(10, 34, 64, 0.75)';
+              e.currentTarget.style.borderColor = 'rgba(0, 139, 206, 0.25)';
+            }}
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
         <div className="row justify-content-center">
           <div className="col-md-5 col-lg-4">
 
