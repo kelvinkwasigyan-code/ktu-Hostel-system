@@ -16,4 +16,21 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Group heavy packages into separate chunks
+            if (id.includes('mapbox-gl')) return 'mapbox';
+            if (id.includes('supabase')) return 'supabase';
+            if (id.includes('lucide-react') || id.includes('react-icons')) return 'icons';
+            
+            // Put all other third-party dependencies into a vendor chunk
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
 });
