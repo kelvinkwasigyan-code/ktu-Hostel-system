@@ -130,7 +130,13 @@ export default function HomePage() {
                 Safe, verified, and affordable off-campus accommodation for Koforidua Technical University students. No scams. No fake listings.
               </p>
               <div className="d-flex gap-3 flex-wrap mb-4">
-                <button className="btn btn-primary px-4" onClick={() => navigate('/search')}>
+                <button className="btn btn-primary px-4" onClick={() => {
+                  if (listingsSectionRef.current) {
+                    listingsSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    navigate('/search');
+                  }
+                }}>
                   <Search size={16} className="me-2" /> Browse Listings
                 </button>
                 <button className="btn px-4" style={{ border: '2px solid rgba(255,255,255,0.7)', color: '#fff', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', borderRadius: '8px', fontWeight: 600 }} onClick={() => navigate('/map')}>
@@ -181,84 +187,6 @@ export default function HomePage() {
                 </form>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats Bar ─────────────────────────────────────────────────── */}
-      <section style={{ background: 'var(--dark-navy-2)', borderBottom: '1px solid var(--border)' }}>
-        <div className="container py-3">
-          <div className="row g-3 text-center">
-            {STATS.map((s, i) => (
-              <div key={i} className="col-6 col-md-3">
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, fontFamily: 'Outfit,sans-serif', color: 'var(--brand-orange)' }}>
-                  {s.value}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Features ──────────────────────────────────────────────────── */}
-      <section className="py-5">
-        <div className="container">
-          <div className="text-center mb-5">
-            <h2 className="section-title">Why Choose <span className="text-orange">KTU Hostel Portal</span>?</h2>
-            <div className="section-divider mx-auto"></div>
-            <p style={{ color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto' }}>
-              Built specifically to solve the housing problems faced by KTU students — verified, safe, and transparent.
-            </p>
-          </div>
-          <div className="row g-4">
-            {FEATURES.map((f, i) => (
-              <div key={i} className="col-md-6 col-lg-3">
-                <div className="card h-100 p-4" style={{ border: '1px solid var(--border)' }}>
-                  <div style={{
-                    width: 56, height: 56, borderRadius: '14px',
-                    background: `${f.color}18`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: f.color, marginBottom: '1rem'
-                  }}>
-                    {f.icon}
-                  </div>
-                  <h5 style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 700, fontSize: '1rem' }}>{f.title}</h5>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.87rem' }}>{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ──────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: 'var(--dark-navy-2)' }}>
-        <div className="container">
-          <div className="text-center mb-5">
-            <h2 className="section-title">How It Works</h2>
-            <div className="section-divider mx-auto"></div>
-          </div>
-          <div className="row g-4">
-            {[
-              { step: '01', title: 'Search Listings', desc: 'Filter by price, room type, neighborhood, and distance from KTU campus.' },
-              { step: '02', title: 'Place a 24-Hour Hold', desc: 'Reserve your preferred property. The landlord has 24 hours to respond — no payment needed.' },
-              { step: '03', title: 'Get Landlord Contact', desc: 'Once accepted, you\'ll receive the landlord\'s phone number to arrange payment in person.' },
-              { step: '04', title: 'Leave a Review', desc: 'After your stay, share your honest experience to help future KTU students.' },
-            ].map((s, i) => (
-              <div key={i} className="col-md-6 col-lg-3 text-center">
-                <div style={{
-                  width: 64, height: 64,
-                  background: 'linear-gradient(135deg, var(--brand-orange), var(--brand-gold))',
-                  borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit,sans-serif',
-                  margin: '0 auto 1rem', color: '#fff'
-                }}>{s.step}</div>
-                <h5 style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 700 }}>{s.title}</h5>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.87rem' }}>{s.desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -358,6 +286,84 @@ export default function HomePage() {
               </button>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ── Stats Bar ─────────────────────────────────────────────────── */}
+      <section style={{ background: 'var(--dark-navy)', borderBottom: '1px solid var(--border)' }}>
+        <div className="container py-3">
+          <div className="row g-3 text-center">
+            {STATS.map((s, i) => (
+              <div key={i} className="col-6 col-md-3">
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, fontFamily: 'Outfit,sans-serif', color: 'var(--brand-orange)' }}>
+                  {s.value}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Features ──────────────────────────────────────────────────── */}
+      <section className="py-5">
+        <div className="container">
+          <div className="text-center mb-5">
+            <h2 className="section-title">Why Choose <span className="text-orange">KTU Hostel Portal</span>?</h2>
+            <div className="section-divider mx-auto"></div>
+            <p style={{ color: 'var(--text-secondary)', maxWidth: 560, margin: '0 auto' }}>
+              Built specifically to solve the housing problems faced by KTU students — verified, safe, and transparent.
+            </p>
+          </div>
+          <div className="row g-4">
+            {FEATURES.map((f, i) => (
+              <div key={i} className="col-md-6 col-lg-3">
+                <div className="card h-100 p-4" style={{ border: '1px solid var(--border)' }}>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: '14px',
+                    background: `${f.color}18`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: f.color, marginBottom: '1rem'
+                  }}>
+                    {f.icon}
+                  </div>
+                  <h5 style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 700, fontSize: '1rem' }}>{f.title}</h5>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.87rem' }}>{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ──────────────────────────────────────────────── */}
+      <section className="py-5" style={{ background: 'var(--dark-navy-2)' }}>
+        <div className="container">
+          <div className="text-center mb-5">
+            <h2 className="section-title">How It Works</h2>
+            <div className="section-divider mx-auto"></div>
+          </div>
+          <div className="row g-4">
+            {[
+              { step: '01', title: 'Search Listings', desc: 'Filter by price, room type, neighborhood, and distance from KTU campus.' },
+              { step: '02', title: 'Place a 24-Hour Hold', desc: 'Reserve your preferred property. The landlord has 24 hours to respond — no payment needed.' },
+              { step: '03', title: 'Get Landlord Contact', desc: 'Once accepted, you\'ll receive the landlord\'s phone number to arrange payment in person.' },
+              { step: '04', title: 'Leave a Review', desc: 'After your stay, share your honest experience to help future KTU students.' },
+            ].map((s, i) => (
+              <div key={i} className="col-md-6 col-lg-3 text-center">
+                <div style={{
+                  width: 64, height: 64,
+                  background: 'linear-gradient(135deg, var(--brand-orange), var(--brand-gold))',
+                  borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1.2rem', fontWeight: 800, fontFamily: 'Outfit,sans-serif',
+                  margin: '0 auto 1rem', color: '#fff'
+                }}>{s.step}</div>
+                <h5 style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 700 }}>{s.title}</h5>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.87rem' }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
