@@ -5,6 +5,8 @@
 
 import { supabaseAdmin } from '../config/supabase.js';
 import { notifyUser } from './notificationController.js';
+import logAuditEvent from '../services/auditLogger.js';
+
 
 // ─── UC-A01: Verify Landlord Identity ────────────────────────────────────────
 export const verifyLandlord = async (req, res) => {
@@ -36,6 +38,16 @@ export const verifyLandlord = async (req, res) => {
       : `❌ Your landlord verification was rejected. ${reason ? `Reason: ${reason}` : 'Please contact support for assistance.'}`;
 
     await notifyUser(parseInt(user_id), 'VerificationResult', message, null, null, 'InApp');
+
+    await logAuditEvent({
+      userId: req.user?.user_id,
+      action: action === 'approve' ? 'LANDLORD_VERIFIED' : 'LANDLORD_REJECTED',
+      targetResource: 'users',
+      targetId: user_id,
+      details: { newStatus, reason, landlord_name: landlord.full_name },
+      ipAddress: req.ip,
+      userAgent: req.headers?.['user-agent']
+    });
 
     res.json({
       message: `Landlord "${landlord.full_name}" has been ${newStatus.toLowerCase()}.`
@@ -75,6 +87,16 @@ export const moderateListing = async (req, res) => {
       : `❌ Your property listing "${property.title}" was rejected. ${reason ? `Reason: ${reason}` : 'Please review and resubmit.'}`;
 
     await notifyUser(property.landlord_id, 'VerificationResult', message, parseInt(property_id), null, 'InApp');
+
+    await logAuditEvent({
+      userId: req.user?.user_id,
+      action: action === 'approve' ? 'LISTING_APPROVED' : 'LISTING_REJECTED',
+      targetResource: 'properties',
+      targetId: property_id,
+      details: { newStatus, reason, title: property.title },
+      ipAddress: req.ip,
+      userAgent: req.headers?.['user-agent']
+    });
 
     res.json({ message: `Listing "${property.title}" has been ${newStatus.toLowerCase()}.` });
   } catch (err) {
@@ -439,3 +461,26 @@ export const deleteReview = async (req, res) => {
     res.status(500).json({ error: 'Server error.' });
   }
 };
+
+// ─── GET Audit Logs ──────────────────────────────────────────────────────────
+export const getAuditLogs = async (req, res) => {
+  try {
+    const { action, user_id, limit = 50 } = req.query;
+    let query = supabaseAdmin
+      .from('audit_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(parseInt(limit));
+
+    if (action) query = query.eq('action', action);
+    if (user_id) query = query.eq('user_id', user_id);
+
+    const { data, error } = await query;
+    if (error) return res.status(500).json({ error: 'Failed to fetch audit logs.' });
+    res.json(data || []);
+  } catch (err) {
+    console.error('getAuditLogs error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+};
+

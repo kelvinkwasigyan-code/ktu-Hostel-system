@@ -651,5 +651,7 @@ export const INITIAL_DB_STATE = {
       created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
     }
   ],
-  vacancy_alerts: []
+  vacancy_alerts: [],
+  audit_logs: []
 };
+

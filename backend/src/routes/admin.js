@@ -4,7 +4,8 @@ import {
   verifyLandlord, moderateListing, moderateReview,
   deactivateAccount, getPendingLandlords, getPendingListings,
   getFlaggedReviews, getAnalytics, getAllUsers,
-  updateUserStatus, deleteUser, dismissReviewFlag, deleteReview
+  updateUserStatus, deleteUser, dismissReviewFlag, deleteReview,
+  getAuditLogs
 } from '../controllers/adminController.js';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 
@@ -26,5 +27,6 @@ router.patch('/reviews/:review_id/moderate', moderateReview);        // UC-A03 (
 router.patch('/reviews/:review_id/flag', dismissReviewFlag);         // UC-A03 (dismiss flag)
 router.delete('/reviews/:review_id', deleteReview);                  // UC-A03 (delete)
 router.get('/analytics', getAnalytics);                              // UC-A05
+router.get('/audit-logs', getAuditLogs);                             // Audit trail
 
 export default router;

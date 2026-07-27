@@ -165,3 +165,23 @@ CREATE TABLE IF NOT EXISTS vacancy_alerts (
 
 ALTER TABLE properties ADD COLUMN IF NOT EXISTS gender_policy VARCHAR(20) DEFAULT 'Mixed';
 
+-- =============================================================================
+-- TABLE: audit_logs
+-- Audit trail logging for administrative, authorization, and sensitive operations.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,            -- e.g., 'RESERVATION_CANCELLED', 'ROLE_CHANGED'
+    target_resource VARCHAR(100) NOT NULL,   -- e.g., 'reservations', 'users'
+    target_id VARCHAR(255),                  -- ID of the modified record
+    details JSONB,                           -- Additional contextual metadata
+    ip_address VARCHAR(45),                  -- Client IP address
+    user_agent TEXT,                         -- Browser / Device details
+    created_at TIMESTAMP WITH TIMEZONE DEFAULT NOW()
+);
+
+-- Index for fast searching by user or action type
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
+
