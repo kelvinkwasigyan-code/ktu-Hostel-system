@@ -137,7 +137,7 @@ export default function HomePage() {
                     navigate('/search');
                   }
                 }}>
-                  <Search size={16} className="me-2" /> Browse Listings
+                  <Search size={16} className="me-2" /> All Available Hostel
                 </button>
                 <button className="btn px-4" style={{ border: '2px solid rgba(255,255,255,0.7)', color: '#fff', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', borderRadius: '8px', fontWeight: 600 }} onClick={() => navigate('/map')}>
                   <Map size={16} className="me-2" /> View on Map
