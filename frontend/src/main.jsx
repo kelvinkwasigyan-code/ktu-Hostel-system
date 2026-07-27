@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './index.css';
@@ -28,6 +29,7 @@ createRoot(document.getElementById('root')).render(
           error:   { iconTheme: { primary: '#E74C3C', secondary: '#fff' } },
         }}
       />
+      <Analytics />
     </GoogleOAuthProvider>
   </StrictMode>
 );
