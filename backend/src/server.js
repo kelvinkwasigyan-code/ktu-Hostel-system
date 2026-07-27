@@ -32,8 +32,26 @@ const PORT = process.env.PORT || 5000;
 
 // ─── Security Middleware ────────────────────────────────────────────────────
 app.use(helmet());
+const allowedOrigins = [
+  'https://ktu-hostel-system-frontend-psi.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps, curl, or Postman)
+    if (!origin) return callback(null, true);
+
+    // strip trailing slash if present
+    const cleanOrigin = origin.replace(/\/$/, "");
+
+    if (allowedOrigins.some(o => o.replace(/\/$/, "") === cleanOrigin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
