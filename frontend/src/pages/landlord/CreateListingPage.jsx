@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 import { processAndUploadFile, compressImageFile } from '../../utils/fileUpload';
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase'];
+const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase', 'Apenkwa', 'Mile 50'];
 const ROOM_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
 const AMENITIES_LIST = ['Water Flow', 'Electricity (Prepaid)', 'WiFi Internet', 'Generator Backup', 'Study Room', 'Fenced Yard', 'Security Guard', 'Air Conditioner'];
 

@@ -8,7 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 export default function LandlordDashboard() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -31,6 +31,16 @@ export default function LandlordDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
+      // Fetch latest profile first to ensure verification status is up to date
+      try {
+        const profileRes = await api.get('/auth/profile');
+        if (profileRes.data?.user && updateUser) {
+          updateUser(profileRes.data.user);
+        }
+      } catch (profileErr) {
+        console.error('Failed to sync profile status:', profileErr);
+      }
+
       const res = await api.get('/properties/landlord/dashboard');
       setStats(res.data?.stats || {});
       setProperties(res.data?.properties || []);

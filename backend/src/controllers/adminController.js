@@ -250,7 +250,7 @@ export const getPendingLandlords = async (req, res) => {
 // ─── GET: Pending listings for moderation ────────────────────────────────────
 export const getPendingListings = async (req, res) => {
   try {
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from('properties')
       .select(`
         *,
@@ -259,7 +259,27 @@ export const getPendingListings = async (req, res) => {
       `)
       .order('created_at', { ascending: false });
 
-    if (error) return res.status(500).json({ error: 'Failed to fetch listings.' });
+    // Fallback if remote DB is missing foreign key relations (PGRST200)
+    if (error && (error.code === 'PGRST200' || error.message?.includes('relationship') || error.code === 'PGRST100')) {
+      console.warn('getPendingListings relation error, falling back to manual join:', error.message);
+      const propRes = await supabaseAdmin.from('properties').select('*').order('created_at', { ascending: false });
+      if (!propRes.error && propRes.data) {
+        const imgRes = await supabaseAdmin.from('property_images').select('*');
+        const usrRes = await supabaseAdmin.from('users').select('user_id, full_name, email, verification_status');
+        
+        data = propRes.data.map(p => ({
+          ...p,
+          property_images: imgRes.data?.filter(img => img.property_id === p.property_id) || [],
+          users: usrRes.data?.find(u => u.user_id === p.landlord_id) || null
+        }));
+        error = null;
+      }
+    }
+
+    if (error) {
+      console.error('getPendingListings error:', error);
+      return res.status(500).json({ error: 'Failed to fetch pending listings' });
+    }
 
     res.json({ listings: data });
   } catch (err) {
