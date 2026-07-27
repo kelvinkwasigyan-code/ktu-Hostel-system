@@ -144,6 +144,117 @@ export default function StudentDashboard() {
               </span>
             </div>
 
+            {/* ── Hero Carousel ──────────────────────────────────────────────── */}
+            <div
+              className="position-relative mb-4 rounded-custom overflow-hidden"
+              style={{ height: '320px', cursor: 'pointer' }}
+              onMouseEnter={handleCarouselMouseEnter}
+              onMouseLeave={handleCarouselMouseLeave}
+            >
+              {featuredHostels.map((slide, idx) => (
+                <div
+                  key={slide.id}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    opacity: idx === currentSlide ? 1 : 0,
+                    transition: 'opacity 0.6s ease',
+                    zIndex: idx === currentSlide ? 1 : 0,
+                  }}
+                >
+                  {/* Background image */}
+                  <img
+                    src={slide.image}
+                    alt={slide.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                  {/* Gradient overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.25) 60%, transparent 100%)',
+                  }} />
+                  {/* Text content */}
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    padding: '1.5rem 2rem',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                  }}>
+                    <span style={{
+                      display: 'inline-block', marginBottom: '0.5rem',
+                      background: slide.accent, color: '#fff',
+                      padding: '0.2rem 0.75rem', borderRadius: '20px',
+                      fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.05em',
+                      width: 'fit-content', textTransform: 'uppercase',
+                    }}>
+                      Featured
+                    </span>
+                    <h3 style={{ color: '#fff', fontWeight: 800, marginBottom: '0.4rem', fontSize: 'clamp(1.1rem, 3vw, 1.6rem)', lineHeight: 1.2 }}>
+                      {slide.name}
+                    </h3>
+                    <p style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.88rem', marginBottom: '1rem', maxWidth: '480px' }}>
+                      {slide.tagline}
+                    </p>
+                    <Link to="/search" className="btn btn-sm" style={{
+                      background: slide.accent, color: '#fff', fontWeight: 600,
+                      borderRadius: '8px', padding: '0.45rem 1.25rem', width: 'fit-content',
+                      border: 'none', fontSize: '0.85rem',
+                    }}>
+                      {slide.cta} <ArrowRight size={14} style={{ marginLeft: '4px' }} />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+
+              {/* Prev / Next arrows */}
+              <button
+                onClick={prevSlide}
+                style={{
+                  position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
+                  zIndex: 10, background: 'rgba(0,0,0,0.45)', border: 'none', borderRadius: '50%',
+                  width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', cursor: 'pointer', transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}
+                aria-label="Previous slide"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={nextSlide}
+                style={{
+                  position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                  zIndex: 10, background: 'rgba(0,0,0,0.45)', border: 'none', borderRadius: '50%',
+                  width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', cursor: 'pointer', transition: 'background 0.2s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}
+                aria-label="Next slide"
+              >
+                <ChevronRight size={18} />
+              </button>
+
+              {/* Dot indicators */}
+              <div style={{
+                position: 'absolute', bottom: '14px', right: '18px',
+                zIndex: 10, display: 'flex', gap: '6px',
+              }}>
+                {featuredHostels.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => goToSlide(idx)}
+                    style={{
+                      width: idx === currentSlide ? 20 : 8, height: 8,
+                      borderRadius: '4px', border: 'none', cursor: 'pointer',
+                      background: idx === currentSlide ? '#fff' : 'rgba(255,255,255,0.45)',
+                      transition: 'all 0.3s ease', padding: 0,
+                    }}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
             {/* Hold Banner / No-hold placeholder */}
             {activeHold ? (
               <div className="card p-4 mb-4 border-0 rounded-custom" style={{
