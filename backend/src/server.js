@@ -94,17 +94,17 @@ app.get('/', (req, res) => {
   res.json({ message: "KTU Hostel System API is running 🚀" });
 });
 
-// Serve frontend static files
-const frontendDistPath = path.join(__dirname, '../../frontend/dist');
-app.use(express.static(frontendDistPath));
+// // Serve frontend static files (disabled — frontend runs separately)
+// const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+// app.use(express.static(frontendDistPath));
 
-// SPA catch-all
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) {
-    return next();
-  }
-  res.sendFile(path.join(frontendDistPath, 'index.html'));
-});
+// // SPA catch-all (disabled)
+// app.get('*', (req, res, next) => {
+//   if (req.path.startsWith('/api')) {
+//     return next();
+//   }
+//   res.sendFile(path.join(frontendDistPath, 'index.html'));
+// });
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((req, res) => {
