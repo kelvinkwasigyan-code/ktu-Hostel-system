@@ -84,3 +84,6 @@ export const processAndUploadFile = async (file, folder = 'properties') => {
     reader.readAsDataURL(file);
   });
 };
+
+export { uploadLandlordID, getSecureDocumentUrl } from './idUploader';
+

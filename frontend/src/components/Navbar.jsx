@@ -134,11 +134,11 @@ export default function Navbar() {
                     {showNotif && (
                       <div className="notif-dropdown">
                         <div className="d-flex justify-content-between align-items-center p-3"
-                             style={{ borderBottom: '1px solid var(--border)' }}>
+                          style={{ borderBottom: '1px solid var(--border)' }}>
                           <strong style={{ fontSize: '0.9rem' }}>Notifications</strong>
                           {unreadCount > 0 && (
                             <button className="btn btn-sm" style={{ color: 'var(--brand-orange)', fontSize: '0.8rem' }}
-                                    onClick={handleMarkAllRead}>
+                              onClick={handleMarkAllRead}>
                               Mark all read
                             </button>
                           )}
@@ -151,7 +151,7 @@ export default function Navbar() {
                           ) : (
                             notifications.slice(0, 10).map(n => (
                               <div key={n.notification_id}
-                                   className={`notif-item ${!n.is_read ? 'unread' : ''}`}>
+                                className={`notif-item ${!n.is_read ? 'unread' : ''}`}>
                                 <div className="d-flex gap-2">
                                   <span>{notifIcon(n.type)}</span>
                                   <div>
@@ -204,7 +204,7 @@ export default function Navbar() {
                         boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
                         animation: 'slideDown 0.15s ease'
                       }}
-                      onMouseLeave={() => setShowUserMenu(false)}>
+                        onMouseLeave={() => setShowUserMenu(false)}>
                         <div className="p-3" style={{ borderBottom: '1px solid var(--border)' }}>
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
                           <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{user.full_name}</div>
@@ -214,20 +214,20 @@ export default function Navbar() {
                         </div>
                         <div className="p-1">
                           <Link to={getDashboardLink()} className="d-flex align-items-center gap-2 notif-item"
-                                style={{ color: 'var(--text-secondary)', borderRadius: '8px' }}
-                                onClick={() => setShowUserMenu(false)}>
+                            style={{ color: 'var(--text-secondary)', borderRadius: '8px' }}
+                            onClick={() => setShowUserMenu(false)}>
                             <Home size={15} /> Dashboard
                           </Link>
                           {user.role === 'Landlord' && (
                             <Link to="/landlord/create" className="d-flex align-items-center gap-2 notif-item"
-                                  style={{ color: 'var(--text-secondary)', borderRadius: '8px' }}
-                                  onClick={() => setShowUserMenu(false)}>
+                              style={{ color: 'var(--text-secondary)', borderRadius: '8px' }}
+                              onClick={() => setShowUserMenu(false)}>
                               <PlusSquare size={15} /> New Listing
                             </Link>
                           )}
                           <div className="d-flex align-items-center gap-2 notif-item"
-                               style={{ color: 'var(--danger)', cursor: 'pointer', borderRadius: '8px' }}
-                               onClick={logout}>
+                            style={{ color: 'var(--danger)', cursor: 'pointer', borderRadius: '8px' }}
+                            onClick={logout}>
                             <LogOut size={15} /> Sign Out
                           </div>
                         </div>

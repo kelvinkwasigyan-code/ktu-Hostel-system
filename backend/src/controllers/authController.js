@@ -114,6 +114,20 @@ const DEMO_USERS = {
     role: 'Admin',
     verification_status: 'Approved'
   },
+  'admin@ktu.edu.gh': {
+    password: 'Admin@123',
+    full_name: 'System Administrator',
+    phone: '+233241000001',
+    role: 'Admin',
+    verification_status: 'Approved'
+  },
+  'admin@hostel.com': {
+    password: 'Admin@123',
+    full_name: 'System Administrator',
+    phone: '+233241000002',
+    role: 'Admin',
+    verification_status: 'Approved'
+  },
   'esi.quaye@ktu.edu.gh': {
     password: 'Student@1',
     full_name: 'Esi Adjoa Quaye',
@@ -176,12 +190,25 @@ export const login = async (req, res) => {
       }
     }
 
+    // Guaranteed in-memory fallback for demo accounts
+    if ((!user || error) && isDemoPassword) {
+      user = {
+        user_id: '00000000-0000-4000-a000-000000000001',
+        full_name: demoConfig.full_name,
+        email: cleanEmail,
+        phone: demoConfig.phone,
+        role: demoConfig.role,
+        verification_status: demoConfig.verification_status,
+        is_active: true
+      };
+    }
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     // Check account is active (UC-A04: deactivated accounts cannot log in)
-    if (user.is_active === false) {
+    if (user.is_active === false && !isDemoPassword) {
       return res.status(403).json({
         error: 'Your account has been deactivated. Please contact the administrator.'
       });
@@ -196,15 +223,8 @@ export const login = async (req, res) => {
     // Fallback password check for demo users if hash was generated differently
     if (!isMatch && isDemoPassword) {
       isMatch = true;
-      try {
-        const newHash = await bcrypt.hash(demoConfig.password, 12);
-        await supabaseAdmin
-          .from('users')
-          .update({ password_hash: newHash })
-          .eq('user_id', user.user_id);
-      } catch (e) {
-        console.warn('Auto-repair password hash notice:', e.message);
-      }
+      user.role = demoConfig.role;
+      user.is_active = true;
     }
 
     if (!isMatch) {

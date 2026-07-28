@@ -441,3 +441,33 @@ INSERT INTO notifications (recipient_id, type, message, related_property_id, rel
 (12, 'System',
  'Your reservation hold for "Darko Executive Self-Contained" is active. The landlord has 24 hours to respond.',
  9, 6, FALSE, 'InApp');
+
+-- ==========================================
+-- 14. PRIVATE ID SCANS RLS STORAGE POLICIES
+-- ==========================================
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('id-documents', 'id-documents', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
+
+-- Allow authenticated landlords to upload their own ID scans
+DROP POLICY IF EXISTS "Allow landlords to upload own ID" ON storage.objects;
+CREATE POLICY "Allow landlords to upload own ID"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'id-documents' AND
+  (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- Restrict viewing access to document owner or admin roles
+DROP POLICY IF EXISTS "Allow owners and admins to view ID" ON storage.objects;
+CREATE POLICY "Allow owners and admins to view ID"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'id-documents' AND (
+    (storage.foldername(name))[1] = auth.uid()::text OR
+    (auth.jwt() ->> 'role') = 'admin'
+  )
+);
