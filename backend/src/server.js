@@ -1,5 +1,6 @@
 // src/server.js
 // KTU Student Hostel Portal — Express REST API entry point
+// Reload trigger
 
 import express from 'express';
 import cors from 'cors';

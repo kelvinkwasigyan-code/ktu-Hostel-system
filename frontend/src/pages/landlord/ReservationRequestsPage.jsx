@@ -109,11 +109,13 @@ export default function ReservationRequestsPage() {
 
             <hr className="divider-orange mb-4" />
 
-            {loading ? (
+            {loading && (
               <div className="page-loader">
                 <div className="spinner-ring"></div>
               </div>
-            ) : activeTab === 'holds' ? (
+            )}
+
+            {!loading && activeTab === 'holds' && (
               bookings.length === 0 ? (
                 <div className="card p-5 border-custom bg-surface rounded-custom text-center">
                   <h5 className="mb-2">No Reservation Holds Received</h5>
@@ -122,74 +124,77 @@ export default function ReservationRequestsPage() {
                   </p>
                 </div>
               ) : (
-              <div className="card border-custom bg-surface rounded-custom overflow-hidden">
-                <div className="table-responsive">
-                  <table className="table table-hover mb-0" style={{ color: 'var(--text-primary)', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-                        <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Student Details</th>
-                        <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Property</th>
-                        <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Expiry Window</th>
-                        <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Status</th>
-                        <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem', width: '200px' }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody style={{ verticalAlign: 'middle' }}>
-                      {bookings.map(b => (
-                        <tr key={b.booking_id} style={{ borderBottom: '1px solid var(--border)' }}>
-                          <td className="p-3">
-                            <h6 className="mb-1" style={{ fontSize: '0.92rem', fontWeight: 600 }}>{b.users?.full_name}</h6>
-                            <div className="d-flex flex-column gap-1 text-muted-custom" style={{ fontSize: '0.78rem' }}>
-                              <span className="d-flex align-items-center gap-1"><Phone size={11} className="text-orange" /> {b.users?.phone}</span>
-                              <span className="d-flex align-items-center gap-1"><Mail size={11} /> {b.users?.email}</span>
-                            </div>
-                          </td>
-                          <td className="p-3">
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{b.properties?.title}</span>
-                            {b.selected_room_type && (
-                              <div>
-                                <span className="badge bg-secondary border-custom text-warning mt-1" style={{ fontSize: '0.74rem' }}>
-                                  Option: {b.selected_room_type} ({b.agreed_price ? `GHS ${b.agreed_price}` : ''})
-                                </span>
-                              </div>
-                            )}
-                            <small className="text-muted-custom d-block mt-0.5">📍 {b.properties?.neighborhood}</small>
-                          </td>
-                          <td className="p-3" style={{ fontSize: '0.82rem' }}>
-                            <div className="d-flex align-items-center gap-1 mb-1">
-                              <Clock size={12} className="text-orange" />
-                              <span>{new Date(b.expires_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</span>
-                            </div>
-                            <small className="text-muted-custom">
-                              Placed: {new Date(b.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                            </small>
-                          </td>
-                          <td className="p-3">{getStatusBadge(b.status)}</td>
-                          <td className="p-3">
-                            {b.status === 'Pending' ? (
-                              <div className="d-flex gap-2">
-                                <button className="btn btn-success btn-sm py-1 px-3" onClick={() => handleRespondToHold(b.booking_id, 'accept')}>
-                                  Accept
-                                </button>
-                                <button className="btn btn-danger btn-sm py-1 px-3" onClick={() => handleRespondToHold(b.booking_id, 'decline')}>
-                                  Decline
-                                </button>
-                              </div>
-                            ) : b.status === 'Approved' ? (
-                              <span className="text-success d-flex align-items-center gap-1" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
-                                <ShieldCheck size={14} /> Contact Released
-                              </span>
-                            ) : (
-                              <span className="text-muted-custom">—</span>
-                            )}
-                          </td>
+                <div className="card border-custom bg-surface rounded-custom overflow-hidden">
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0" style={{ color: 'var(--text-primary)', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Student Details</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Property</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Expiry Window</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Status</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem', width: '200px' }}>Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody style={{ verticalAlign: 'middle' }}>
+                        {bookings.map(b => (
+                          <tr key={b.booking_id} style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td className="p-3">
+                              <h6 className="mb-1" style={{ fontSize: '0.92rem', fontWeight: 600 }}>{b.users?.full_name}</h6>
+                              <div className="d-flex flex-column gap-1 text-muted-custom" style={{ fontSize: '0.78rem' }}>
+                                <span className="d-flex align-items-center gap-1"><Phone size={11} className="text-orange" /> {b.users?.phone}</span>
+                                <span className="d-flex align-items-center gap-1"><Mail size={11} /> {b.users?.email}</span>
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{b.properties?.title}</span>
+                              {b.selected_room_type && (
+                                <div>
+                                  <span className="badge bg-secondary border-custom text-warning mt-1" style={{ fontSize: '0.74rem' }}>
+                                    Option: {b.selected_room_type} ({b.agreed_price ? `GHS ${b.agreed_price}` : ''})
+                                  </span>
+                                </div>
+                              )}
+                              <small className="text-muted-custom d-block mt-0.5">📍 {b.properties?.neighborhood}</small>
+                            </td>
+                            <td className="p-3" style={{ fontSize: '0.82rem' }}>
+                              <div className="d-flex align-items-center gap-1 mb-1">
+                                <Clock size={12} className="text-orange" />
+                                <span>{new Date(b.expires_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}</span>
+                              </div>
+                              <small className="text-muted-custom">
+                                Placed: {new Date(b.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                              </small>
+                            </td>
+                            <td className="p-3">{getStatusBadge(b.status)}</td>
+                            <td className="p-3">
+                              {b.status === 'Pending' ? (
+                                <div className="d-flex gap-2">
+                                  <button className="btn btn-success btn-sm py-1 px-3" onClick={() => handleRespondToHold(b.booking_id, 'accept')}>
+                                    Accept
+                                  </button>
+                                  <button className="btn btn-danger btn-sm py-1 px-3" onClick={() => handleRespondToHold(b.booking_id, 'decline')}>
+                                    Decline
+                                  </button>
+                                </div>
+                              ) : b.status === 'Approved' ? (
+                                <span className="text-success d-flex align-items-center gap-1" style={{ fontSize: '0.8rem', fontWeight: 500 }}>
+                                  <ShieldCheck size={14} /> Contact Released
+                                </span>
+                              ) : (
+                                <span className="text-muted-custom">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            ) : (
+              )
+            )}
+
+            {!loading && activeTab === 'viewings' && (
               /* ── Viewings Tab ────────────────────────────────────────── */
               viewings.length === 0 ? (
                 <div className="card p-5 border-custom bg-surface rounded-custom text-center">

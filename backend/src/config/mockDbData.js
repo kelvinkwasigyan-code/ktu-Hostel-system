@@ -170,6 +170,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 0.8,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -188,6 +189,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 0.9,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 24 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -206,6 +208,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 0.7,
       availability_status: "Occupied",
       verification_status: "Approved",
+      property_type: "apartment",
       created_at: new Date(Date.now() - 23 * 24 * 60 * 60 * 1000).toISOString()
     },
     // Abena's properties (landlord_id = 3)
@@ -225,6 +228,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.2,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -243,6 +247,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.5,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "private_room",
       created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -261,6 +266,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.0,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "apartment",
       created_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
     },
     // Kofi's properties (landlord_id = 4)
@@ -280,6 +286,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.8,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "private_room",
       created_at: new Date(Date.now() - 19 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -298,6 +305,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.9,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -316,6 +324,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 2.0,
       availability_status: "Pending",
       verification_status: "Approved",
+      property_type: "apartment",
       created_at: new Date(Date.now() - 17 * 24 * 60 * 60 * 1000).toISOString()
     },
     // Ama's properties (landlord_id = 5)
@@ -335,6 +344,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 2.5,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -353,6 +363,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 2.6,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "private_room",
       created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -371,6 +382,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.4,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "apartment",
       created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -389,6 +401,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.3,
       availability_status: "Occupied",
       verification_status: "Approved",
+      property_type: "apartment",
       created_at: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -407,6 +420,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.0,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -425,6 +439,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 2.8,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "hostel",
       created_at: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -443,6 +458,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 1.4,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "private_room",
       created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
     },
     {
@@ -461,6 +477,7 @@ export const INITIAL_DB_STATE = {
       distance_from_campus_km: 3.0,
       availability_status: "Available",
       verification_status: "Approved",
+      property_type: "apartment",
       created_at: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString()
     },
     {

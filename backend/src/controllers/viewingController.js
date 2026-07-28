@@ -1,6 +1,6 @@
 // backend/src/controllers/viewingController.js
 import { supabaseAdmin } from '../config/supabase.js';
-import { notifyUser } from '../services/notificationService.js';
+import { notifyUser } from './notificationController.js';
 
 // ─── POST /api/viewings ──────────────────────────────────────────────────────
 export const createViewingRequest = async (req, res) => {

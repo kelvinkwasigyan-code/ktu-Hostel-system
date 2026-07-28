@@ -298,6 +298,45 @@ export default function Navbar() {
 
           {/* Drawer */}
           <div className="mobile-nav-drawer">
+
+            {/* Mobile Announcement Bar with Register Button */}
+            <div style={{
+              background: 'linear-gradient(135deg, var(--brand-orange), #c45b00)',
+              color: '#ffffff',
+              padding: '0.65rem 1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              boxShadow: '0 2px 8px rgba(224, 109, 6, 0.25)'
+            }}>
+              <span>📢 KTU Hostel Portal — Reserve & Inspect</span>
+              {!user ? (
+                <Link
+                  to="/register"
+                  onClick={() => setShowMobileNav(false)}
+                  style={{
+                    background: '#ffffff',
+                    color: 'var(--brand-orange-dark)',
+                    padding: '0.3rem 0.75rem',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    fontSize: '0.78rem',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  Register Free
+                </Link>
+              ) : (
+                <span className="badge bg-light text-dark" style={{ fontSize: '0.7rem' }}>
+                  {user.role} Portal
+                </span>
+              )}
+            </div>
+
             {/* Header */}
             <div className="mobile-nav-drawer-header">
               <Link to="/" onClick={() => setShowMobileNav(false)}>
@@ -342,10 +381,25 @@ export default function Navbar() {
                       <LayoutDashboard size={15} style={{ opacity: 0.7 }} /> My Dashboard
                     </Link>
                   )}
+                  {user.role === 'Student' && (
+                    <>
+                      <Link to="/student/bookings" className={`mobile-nav-drawer-link ${isNavActive('/student/bookings') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
+                        ⏱️ My Holds & Viewings
+                      </Link>
+                      <Link to="/student/reviews" className={`mobile-nav-drawer-link ${isNavActive('/student/reviews') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
+                        ⭐ My Reviews
+                      </Link>
+                    </>
+                  )}
                   {user.role === 'Landlord' && (
-                    <Link to="/landlord/create" className="mobile-nav-drawer-link" onClick={() => setShowMobileNav(false)}>
-                      <PlusSquare size={15} style={{ opacity: 0.7 }} /> New Listing
-                    </Link>
+                    <>
+                      <Link to="/landlord/requests" className={`mobile-nav-drawer-link ${isNavActive('/landlord/requests') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
+                        📅 Holds & Inspection Requests
+                      </Link>
+                      <Link to="/landlord/create" className="mobile-nav-drawer-link" onClick={() => setShowMobileNav(false)}>
+                        <PlusSquare size={15} style={{ opacity: 0.7 }} /> New Listing
+                      </Link>
+                    </>
                   )}
                   <Link to="/settings" className={`mobile-nav-drawer-link ${isNavActive('/settings') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
                     <Settings size={15} style={{ opacity: 0.7 }} /> Settings

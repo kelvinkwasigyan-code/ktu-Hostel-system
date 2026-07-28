@@ -1,6 +1,6 @@
 // backend/src/routes/viewingRoutes.js
 import express from 'express';
-import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
 import {
   createViewingRequest,
   getLandlordViewings,
@@ -11,13 +11,13 @@ import {
 const router = express.Router();
 
 // Student routes
-router.post('/', authenticateToken, requireRole('Student'), createViewingRequest);
-router.post('/request-inspection', authenticateToken, createViewingRequest);
-router.post('/request', authenticateToken, createViewingRequest);
-router.get('/student', authenticateToken, requireRole('Student'), getStudentViewings);
+router.post('/', authenticate, requireRole('Student'), createViewingRequest);
+router.post('/request-inspection', authenticate, createViewingRequest);
+router.post('/request', authenticate, createViewingRequest);
+router.get('/student', authenticate, requireRole('Student'), getStudentViewings);
 
 // Landlord routes
-router.get('/landlord', authenticateToken, requireRole('Landlord'), getLandlordViewings);
-router.put('/:id', authenticateToken, requireRole('Landlord'), updateViewingStatus);
+router.get('/landlord', authenticate, requireRole('Landlord'), getLandlordViewings);
+router.put('/:id', authenticate, requireRole('Landlord'), updateViewingStatus);
 
 export default router;

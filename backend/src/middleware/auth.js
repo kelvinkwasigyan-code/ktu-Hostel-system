@@ -45,11 +45,12 @@ export const requireRole = (...roles) => (req, res, next) => {
   next();
 };
 
-// Convenience guards for each role
 export const requireStudent  = requireRole('Student');
 export const requireLandlord = requireRole('Landlord');
 export const requireAdmin    = requireRole('Admin');
 export const requireLandlordOrAdmin = requireRole('Landlord', 'Admin');
+export const authenticateToken = authenticate;
+export const verifyToken = authenticate;
 
 /**
  * Decodes the JWT token from the Authorization header if present.

@@ -7,6 +7,9 @@ import { supabaseAdmin } from '../config/supabase.js';
 import { notifyUser } from './notificationController.js';
 import { getDistanceFromCampus } from '../services/googleMapsService.js';
 
+export const ALLOWED_PROPERTY_TYPES = ['hostel', 'apartment', 'homestay', 'private_room'];
+export const ALLOWED_GENDER_POLICIES = ['Male-Only', 'Female-Only', 'Mixed'];
+
 // Helper to parse or construct room rates array
 export const parseRoomRates = (room_rates, fallbackRoomType, fallbackPrice, fallbackOccupancy) => {
   if (room_rates) {
@@ -86,10 +89,7 @@ export const createProperty = async (req, res) => {
       ? formattedRates[0]?.room_type
       : (ALLOWED_TYPES.includes(room_type) ? room_type : 'Single');
 
-    const ALLOWED_GENDER_POLICIES = ['Mixed', 'Boys only', 'Girls only'];
     const safeGenderPolicy = ALLOWED_GENDER_POLICIES.includes(gender_policy) ? gender_policy : 'Mixed';
-
-    const ALLOWED_PROPERTY_TYPES = ['hostel', 'apartment', 'homestay', 'private_room'];
     const safePropertyType = ALLOWED_PROPERTY_TYPES.includes(property_type) ? property_type : 'hostel';
 
     const paymentContactObj = parsePaymentContact(payment_contact_info, landlord?.phone);
@@ -366,8 +366,14 @@ export const searchProperties = async (req, res) => {
 
     if (neighborhood)  query = query.ilike('neighborhood', `%${neighborhood}%`);
     if (room_type)     query = query.eq('room_type', room_type);
-    if (property_type) query = query.eq('property_type', property_type);
     if (gender_policy) query = query.eq('gender_policy', gender_policy);
+    if (property_type) {
+      if (property_type === 'hostel') {
+        query = query.or(`property_type.eq.hostel,property_type.is.null`);
+      } else {
+        query = query.eq('property_type', property_type);
+      }
+    }
     if (min_price)     query = query.gte('price_per_semester', parseFloat(min_price));
     if (max_price)     query = query.lte('price_per_semester', parseFloat(max_price));
     if (max_distance)  query = query.lte('distance_from_campus_km', parseFloat(max_distance));

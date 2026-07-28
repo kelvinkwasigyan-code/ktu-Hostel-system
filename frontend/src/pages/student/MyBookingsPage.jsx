@@ -182,11 +182,12 @@ export default function MyBookingsPage() {
             <hr className="divider-orange mb-4" />
 
             {/* ── Loading ─────────────────────────────────────────────────── */}
-            {loading ? (
+            {loading && (
               <div className="page-loader"><div className="spinner-ring" /></div>
+            )}
 
-            /* ── Active Tab: Holds ─────────────────────────────────────── */
-            ) : activeTab === 'holds' ? (
+            {/* ── Active Tab: Holds ─────────────────────────────────────── */}
+            {!loading && activeTab === 'holds' && (
               bookings.length === 0 ? (
                 <div className="card p-5 border-custom bg-surface rounded-custom text-center">
                   <div className="mb-3" style={{ fontSize: '2.5rem' }}>📭</div>
@@ -196,99 +197,102 @@ export default function MyBookingsPage() {
                   </p>
                 </div>
               ) : (
-              <>
-                {/* ── Desktop Table (hidden on mobile) ───────────────────── */}
-                <div className="d-none d-md-block">
-                  <div className="card border-custom bg-surface rounded-custom overflow-hidden">
-                    <div className="table-responsive">
-                      <table className="table table-hover mb-0" style={{ color: 'var(--text-primary)', borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-                            <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Property Details</th>
-                            <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Date Requested</th>
-                            <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Status</th>
-                            <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Landlord Contact</th>
-                            <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody style={{ verticalAlign: 'middle' }}>
-                          {bookings.map(b => (
-                            <tr key={b.booking_id} style={{ borderBottom: '1px solid var(--border)' }}>
-                              <td className="p-3">
-                                <h6 className="mb-1" style={{ fontSize: '0.92rem', fontWeight: 600 }}>{b.properties?.title}</h6>
-                                <small className="text-muted-custom">
-                                  📍 {b.properties?.neighborhood} · GHS {Number(b.properties?.price_per_semester).toLocaleString()} / {((b.properties?.payment_frequency) || 'Semester').toLowerCase()}
-                                </small>
-                              </td>
-                              <td className="p-3" style={{ fontSize: '0.88rem' }}>
-                                {new Date(b.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                <br />
-                                <small className="text-muted-custom">
-                                  Expires: {new Date(b.expires_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                                </small>
-                              </td>
-                              <td className="p-3"><StatusBadge status={b.status} /></td>
-                              <td className="p-3"><LandlordContact b={b} /></td>
-                              <td className="p-3"><ActionButton b={b} /></td>
+                <>
+                  {/* ── Desktop Table (hidden on mobile) ───────────────────── */}
+                  <div className="d-none d-md-block">
+                    <div className="card border-custom bg-surface rounded-custom overflow-hidden">
+                      <div className="table-responsive">
+                        <table className="table table-hover mb-0" style={{ color: 'var(--text-primary)', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
+                              <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Property Details</th>
+                              <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Date Requested</th>
+                              <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Status</th>
+                              <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Landlord Contact</th>
+                              <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Actions</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody style={{ verticalAlign: 'middle' }}>
+                            {bookings.map(b => (
+                              <tr key={b.booking_id} style={{ borderBottom: '1px solid var(--border)' }}>
+                                <td className="p-3">
+                                  <h6 className="mb-1" style={{ fontSize: '0.92rem', fontWeight: 600 }}>{b.properties?.title}</h6>
+                                  <small className="text-muted-custom">
+                                    📍 {b.properties?.neighborhood} · GHS {Number(b.properties?.price_per_semester).toLocaleString()} / {((b.properties?.payment_frequency) || 'Semester').toLowerCase()}
+                                  </small>
+                                </td>
+                                <td className="p-3" style={{ fontSize: '0.88rem' }}>
+                                  {new Date(b.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  <br />
+                                  <small className="text-muted-custom">
+                                    Expires: {new Date(b.expires_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                                  </small>
+                                </td>
+                                <td className="p-3"><StatusBadge status={b.status} /></td>
+                                <td className="p-3"><LandlordContact b={b} /></td>
+                                <td className="p-3"><ActionButton b={b} /></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* ── Mobile Card List (hidden on desktop) ───────────────── */}
-                <div className="d-md-none d-flex flex-column gap-3">
-                  {bookings.map(b => (
-                    <div key={b.booking_id} className="card border-custom bg-surface rounded-custom p-3">
+                  {/* ── Mobile Card List (hidden on desktop) ───────────────── */}
+                  <div className="d-md-none d-flex flex-column gap-3">
+                    {bookings.map(b => (
+                      <div key={b.booking_id} className="card border-custom bg-surface rounded-custom p-3">
 
-                      {/* Card top: title + status */}
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <h6 className="mb-0 me-2" style={{ fontSize: '0.95rem', fontWeight: 700, lineHeight: 1.3 }}>
-                          {b.properties?.title}
-                        </h6>
-                        <StatusBadge status={b.status} />
-                      </div>
-
-                      {/* Location + Price */}
-                      <div className="d-flex align-items-center gap-1 text-muted-custom mb-2" style={{ fontSize: '0.82rem' }}>
-                        <MapPin size={12} />
-                        <span>{b.properties?.neighborhood}</span>
-                        <span className="ms-2 fw-semibold" style={{ color: 'var(--brand-orange)' }}>
-                          GHS {Number(b.properties?.price_per_semester).toLocaleString()}/{((b.properties?.payment_frequency) || 'Semester').toLowerCase()}
-                        </span>
-                      </div>
-
-                      {/* Dates */}
-                      <div className="d-flex align-items-center gap-1 text-muted-custom mb-3" style={{ fontSize: '0.8rem' }}>
-                        <Calendar size={12} />
-                        <span>
-                          Requested {new Date(b.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          {' · '}Expires {new Date(b.expires_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-
-                      {/* Landlord contact — shown when Approved or Pending */}
-                      {(b.status === 'Approved' || b.status === 'Pending') && (
-                        <div className="p-2 rounded-custom mb-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
-                          <div className="text-muted-custom mb-1" style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                            Landlord Contact
-                          </div>
-                          <LandlordContact b={b} />
+                        {/* Card top: title + status */}
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <h6 className="mb-0 me-2" style={{ fontSize: '0.95rem', fontWeight: 700, lineHeight: 1.3 }}>
+                            {b.properties?.title}
+                          </h6>
+                          <StatusBadge status={b.status} />
                         </div>
-                      )}
 
-                      {/* Action button */}
-                      <div className="d-flex justify-content-end">
-                        <ActionButton b={b} />
+                        {/* Location + Price */}
+                        <div className="d-flex align-items-center gap-1 text-muted-custom mb-2" style={{ fontSize: '0.82rem' }}>
+                          <MapPin size={12} />
+                          <span>{b.properties?.neighborhood}</span>
+                          <span className="ms-2 fw-semibold" style={{ color: 'var(--brand-orange)' }}>
+                            GHS {Number(b.properties?.price_per_semester).toLocaleString()}/{((b.properties?.payment_frequency) || 'Semester').toLowerCase()}
+                          </span>
+                        </div>
+
+                        {/* Dates */}
+                        <div className="d-flex align-items-center gap-1 text-muted-custom mb-3" style={{ fontSize: '0.8rem' }}>
+                          <Calendar size={12} />
+                          <span>
+                            Requested {new Date(b.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            {' · '}Expires {new Date(b.expires_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+
+                        {/* Landlord contact — shown when Approved or Pending */}
+                        {(b.status === 'Approved' || b.status === 'Pending') && (
+                          <div className="p-2 rounded-custom mb-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                            <div className="text-muted-custom mb-1" style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                              Landlord Contact
+                            </div>
+                            <LandlordContact b={b} />
+                          </div>
+                        )}
+
+                        {/* Action button */}
+                        <div className="d-flex justify-content-end">
+                          <ActionButton b={b} />
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              /* ── Active Tab: Viewings ───────────────────────────────────── */
+                    ))}
+                  </div>
+                </>
+              )
+            )}
+
+            {/* ── Active Tab: Viewings ───────────────────────────────────── */}
+            {!loading && activeTab === 'viewings' && (
               viewings.length === 0 ? (
                 <div className="card p-5 border-custom bg-surface rounded-custom text-center">
                   <div className="mb-3" style={{ fontSize: '2.5rem' }}>📅</div>
