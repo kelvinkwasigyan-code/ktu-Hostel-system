@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Bell, Home, Search, Map, LogOut, PlusSquare, Menu, X, LayoutDashboard, Settings } from 'lucide-react';
+import { Bell, Home, Search, Map, LogOut, PlusSquare, Menu, X } from 'lucide-react';
 import api from '../services/api';
 import ThemeToggle from './ThemeToggle';
 
@@ -80,16 +80,12 @@ export default function Navbar() {
 
   const isNavActive = (path) => location.pathname === path;
 
-  const isPortalView = location.pathname.startsWith('/student') || 
-                       location.pathname.startsWith('/landlord') || 
-                       location.pathname.startsWith('/admin');
-
-  const navLinks = (!user || user.role === 'Student') ? [
+  const navLinks = [
     { label: 'Browse', path: '/search', icon: <Search size={15} /> },
     { label: 'Map', path: '/map', icon: <Map size={15} /> },
     { label: 'FAQ', path: '/faq', icon: null },
     { label: 'Contact', path: '/contact', icon: null },
-  ] : [];
+  ];
 
   return (
     <>
@@ -114,15 +110,9 @@ export default function Navbar() {
                 </Link>
               ))}
               {user && (
-                isPortalView ? (
-                  <Link to="/" className="nav-link d-flex align-items-center gap-1">
-                    <Home size={15} /> Back to Main Site
-                  </Link>
-                ) : (
-                  <Link to={getDashboardLink()} className="nav-link d-flex align-items-center gap-1">
-                    <LayoutDashboard size={15} /> My Dashboard
-                  </Link>
-                )
+                <Link to={getDashboardLink()} className={`nav-link d-flex align-items-center gap-1 ${isNavActive(getDashboardLink()) ? 'active' : ''}`}>
+                  <Home size={15} /> Dashboard
+                </Link>
               )}
             </div>
 
@@ -235,11 +225,6 @@ export default function Navbar() {
                               <PlusSquare size={15} /> New Listing
                             </Link>
                           )}
-                          <Link to="/settings" className="d-flex align-items-center gap-2 notif-item"
-                                style={{ color: 'var(--text-secondary)', borderRadius: '8px' }}
-                                onClick={() => setShowUserMenu(false)}>
-                            <Settings size={15} /> Settings
-                          </Link>
                           <div className="d-flex align-items-center gap-2 notif-item"
                                style={{ color: 'var(--danger)', cursor: 'pointer', borderRadius: '8px' }}
                                onClick={logout}>
@@ -253,27 +238,8 @@ export default function Navbar() {
               ) : (
                 <div className="d-flex gap-2">
                   <Link to="/login" className="btn btn-outline-primary btn-sm">Sign In</Link>
-                  <Link to="/register" className="btn btn-primary btn-sm">Register</Link>
+                  <Link to="/register" className="btn btn-primary btn-sm d-none d-sm-inline-flex">Register</Link>
                 </div>
-              )}
-
-              {/* Mobile quick portal toggle */}
-              {user && (
-                <Link
-                  to={isPortalView ? '/' : getDashboardLink()}
-                  className="d-lg-none btn p-2"
-                  style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--surface)' }}
-                  aria-label="Toggle Portal"
-                >
-                  {isPortalView ? <Home size={20} /> : <LayoutDashboard size={20} />}
-                </Link>
-              )}
-
-              {/* Guest Register Button (Mobile) */}
-              {!user && (
-                <Link to="/register" className="btn btn-primary btn-sm d-lg-none" style={{ borderRadius: '8px' }}>
-                  Register
-                </Link>
               )}
 
               {/* Mobile hamburger — opens drawer */}
@@ -298,45 +264,6 @@ export default function Navbar() {
 
           {/* Drawer */}
           <div className="mobile-nav-drawer">
-
-            {/* Mobile Announcement Bar with Register Button */}
-            <div style={{
-              background: 'linear-gradient(135deg, var(--brand-orange), #c45b00)',
-              color: '#ffffff',
-              padding: '0.65rem 1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              boxShadow: '0 2px 8px rgba(224, 109, 6, 0.25)'
-            }}>
-              <span>📢 KTU Hostel Portal — Reserve & Inspect</span>
-              {!user ? (
-                <Link
-                  to="/register"
-                  onClick={() => setShowMobileNav(false)}
-                  style={{
-                    background: '#ffffff',
-                    color: 'var(--brand-orange-dark)',
-                    padding: '0.3rem 0.75rem',
-                    borderRadius: '6px',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    fontSize: '0.78rem',
-                    whiteSpace: 'nowrap',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  Register Free
-                </Link>
-              ) : (
-                <span className="badge bg-light text-dark" style={{ fontSize: '0.7rem' }}>
-                  {user.role} Portal
-                </span>
-              )}
-            </div>
-
             {/* Header */}
             <div className="mobile-nav-drawer-header">
               <Link to="/" onClick={() => setShowMobileNav(false)}>
@@ -364,46 +291,18 @@ export default function Navbar() {
               {user && (
                 <>
                   <div className="mobile-nav-drawer-divider" />
-                  {isPortalView ? (
-                    <Link
-                      to="/"
-                      className={`mobile-nav-drawer-link ${isNavActive('/') ? 'active' : ''}`}
-                      onClick={() => setShowMobileNav(false)}
-                    >
-                      <Home size={15} style={{ opacity: 0.7 }} /> Back to Main Site
-                    </Link>
-                  ) : (
-                    <Link
-                      to={getDashboardLink()}
-                      className={`mobile-nav-drawer-link ${isNavActive(getDashboardLink()) ? 'active' : ''}`}
-                      onClick={() => setShowMobileNav(false)}
-                    >
-                      <LayoutDashboard size={15} style={{ opacity: 0.7 }} /> My Dashboard
-                    </Link>
-                  )}
-                  {user.role === 'Student' && (
-                    <>
-                      <Link to="/student/bookings" className={`mobile-nav-drawer-link ${isNavActive('/student/bookings') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
-                        ⏱️ My Holds & Viewings
-                      </Link>
-                      <Link to="/student/reviews" className={`mobile-nav-drawer-link ${isNavActive('/student/reviews') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
-                        ⭐ My Reviews
-                      </Link>
-                    </>
-                  )}
-                  {user.role === 'Landlord' && (
-                    <>
-                      <Link to="/landlord/requests" className={`mobile-nav-drawer-link ${isNavActive('/landlord/requests') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
-                        📅 Holds & Inspection Requests
-                      </Link>
-                      <Link to="/landlord/create" className="mobile-nav-drawer-link" onClick={() => setShowMobileNav(false)}>
-                        <PlusSquare size={15} style={{ opacity: 0.7 }} /> New Listing
-                      </Link>
-                    </>
-                  )}
-                  <Link to="/settings" className={`mobile-nav-drawer-link ${isNavActive('/settings') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
-                    <Settings size={15} style={{ opacity: 0.7 }} /> Settings
+                  <Link
+                    to={getDashboardLink()}
+                    className={`mobile-nav-drawer-link ${isNavActive(getDashboardLink()) ? 'active' : ''}`}
+                    onClick={() => setShowMobileNav(false)}
+                  >
+                    <Home size={15} style={{ opacity: 0.7 }} /> Dashboard
                   </Link>
+                  {user.role === 'Landlord' && (
+                    <Link to="/landlord/create" className="mobile-nav-drawer-link" onClick={() => setShowMobileNav(false)}>
+                      <PlusSquare size={15} style={{ opacity: 0.7 }} /> New Listing
+                    </Link>
+                  )}
                 </>
               )}
             </div>
