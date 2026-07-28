@@ -1,6 +1,7 @@
 // src/App.jsx — Main Router
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import BottomNav from './components/BottomNav';
 
 // Public pages
 import HomePage from './pages/HomePage';
@@ -38,15 +39,20 @@ const PrivateRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="page-loader"><div className="spinner-ring"></div></div>;
   if (!user) return <Navigate to="/login" />;
-  if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
+  if (roles) {
+    const userRole = (user.role || '').toLowerCase();
+    const allowedRoles = roles.map(r => r.toLowerCase());
+    if (!allowedRoles.includes(userRole)) return <Navigate to="/" />;
+  }
   return children;
 };
 
 const GuestRoute = ({ children }) => {
   const { user } = useAuth();
   if (user) {
-    if (user.role === 'Admin') return <Navigate to="/admin" />;
-    if (user.role === 'Landlord') return <Navigate to="/landlord" />;
+    const roleLower = (user.role || '').toLowerCase();
+    if (roleLower === 'admin') return <Navigate to="/admin" />;
+    if (roleLower === 'landlord') return <Navigate to="/landlord" />;
     return <Navigate to="/student" />;
   }
   return children;
@@ -93,6 +99,8 @@ export default function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+        {/* Mobile bottom nav — hidden on desktop via CSS */}
+        <BottomNav />
       </BrowserRouter>
     </AuthProvider>
   );

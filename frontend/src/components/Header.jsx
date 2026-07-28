@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Building2, MapPin, HelpCircle, PhoneCall, LayoutDashboard, Bell, LogOut, Menu, X, Home, PlusSquare, Heart } from 'lucide-react';
+import { Building2, MapPin, HelpCircle, PhoneCall, LayoutDashboard, Bell, LogOut, Menu, X, Home, PlusSquare } from 'lucide-react';
 import api from '../services/api';
 import ThemeToggle from './ThemeToggle';
 
-export default function Navbar() {
+export default function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,12 +19,6 @@ export default function Navbar() {
 
   // Close mobile nav on route change
   useEffect(() => { setShowMobileNav(false); }, [location.pathname]);
-
-  // Prevent body scroll when mobile nav is open
-  useEffect(() => {
-    document.body.style.overflow = showMobileNav ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [showMobileNav]);
 
   useEffect(() => {
     if (user) {
@@ -164,7 +158,7 @@ export default function Navbar() {
                 style={{ position: 'relative', padding: '0.5rem', color: 'var(--text-secondary, #64748b)', cursor: 'pointer' }}
                 aria-label="Notifications"
               >
-                <Bell size={18} />
+                🔔
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center" style={{ position: 'absolute', top: '2px', right: '2px', width: '16px', height: '16px', backgroundColor: '#ef4444', color: '#ffffff', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {unreadCount > 9 ? '9+' : unreadCount}

@@ -20,7 +20,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const url = error.config?.url || '';
+    const isAuthEndpoint = url.includes('/auth/');
+    // Only redirect to login on 401 for non-auth endpoints (session expiry)
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('hostel_token');
       localStorage.removeItem('hostel_user');
       window.location.href = '/login';

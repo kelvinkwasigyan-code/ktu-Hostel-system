@@ -20,7 +20,7 @@ export default function PropertyDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [property, setProperty] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +54,7 @@ export default function PropertyDetailPage() {
       if (propData?.room_rates?.length > 0) {
         setSelectedRoomRate(propData.room_rates[0]);
       }
-      
+
       const images = propData?.property_images || [];
       if (images.length > 0) {
         // Sort by display order
@@ -86,7 +86,7 @@ export default function PropertyDetailPage() {
 
     try {
       setSubmittingHold(true);
-      const res = await api.post('/bookings', { 
+      const res = await api.post('/bookings', {
         property_id: property.property_id,
         room_type: selectedRoomRate?.room_type || property.room_type,
         price_per_semester: selectedRoomRate?.price_per_semester || property.price_per_semester
@@ -184,12 +184,12 @@ export default function PropertyDetailPage() {
   if (!property) return null;
 
   const images = property.property_images?.sort((a, b) => a.display_order - b.display_order) || [];
-  
+
   // Parse amenities from JSON string if necessary
   let parsedAmenities = [];
   try {
-    parsedAmenities = typeof property.amenities === 'string' 
-      ? JSON.parse(property.amenities) 
+    parsedAmenities = typeof property.amenities === 'string'
+      ? JSON.parse(property.amenities)
       : property.amenities || [];
   } catch {
     parsedAmenities = property.amenities?.split(',') || [];
@@ -199,7 +199,7 @@ export default function PropertyDetailPage() {
     <>
       <Navbar />
       <div className="container py-4">
-        
+
         {/* Navigation Breadcrumbs */}
         <div className="mb-3" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
           <Link to="/" className="text-decoration-none text-muted-custom">Home</Link> /{' '}
@@ -209,10 +209,10 @@ export default function PropertyDetailPage() {
 
         {/* E2E Main Grid */}
         <div className="row g-4">
-          
+
           {/* Left Column: Gallery & Details */}
           <div className="col-lg-8">
-            
+
             {/* Gallery */}
             <div className="card border-custom bg-surface rounded-custom overflow-hidden mb-4 p-2">
               <div className="mb-2" style={{ height: '400px', borderRadius: '12px', overflow: 'hidden' }}>
@@ -221,12 +221,12 @@ export default function PropertyDetailPage() {
               {images.length > 1 && (
                 <div className="d-flex gap-2 p-1 overflow-x-auto">
                   {images.map((img, i) => (
-                    <div 
-                      key={img.image_id} 
+                    <div
+                      key={img.image_id}
                       onClick={() => setActiveImage(img.image_path)}
-                      style={{ 
-                        width: '80px', height: '60px', 
-                        borderRadius: '6px', overflow: 'hidden', 
+                      style={{
+                        width: '80px', height: '60px',
+                        borderRadius: '6px', overflow: 'hidden',
                         cursor: 'pointer',
                         border: activeImage === img.image_path ? '2px solid var(--brand-orange)' : '2px solid transparent'
                       }}
@@ -310,10 +310,10 @@ export default function PropertyDetailPage() {
                     {property.room_rates.map((rate, idx) => {
                       const isSelected = selectedRoomRate?.room_type === rate.room_type && Number(selectedRoomRate?.price_per_semester) === Number(rate.price_per_semester);
                       return (
-                        <div 
-                          key={idx} 
+                        <div
+                          key={idx}
                           className={`p-3 rounded-custom border-custom transition-all d-flex justify-content-between align-items-center flex-wrap gap-2 ${isSelected ? 'bg-surface-2' : 'bg-surface'}`}
-                          style={{ 
+                          style={{
                             border: isSelected ? '2px solid var(--brand-orange)' : '1px solid var(--border)',
                             cursor: 'pointer'
                           }}
@@ -337,11 +337,11 @@ export default function PropertyDetailPage() {
                               </div>
                               <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>per {(property.payment_frequency || 'Semester').toLowerCase()}</small>
                             </div>
-                            <input 
-                              type="radio" 
-                              name="selectedRoomOption" 
-                              checked={isSelected} 
-                              onChange={() => setSelectedRoomRate(rate)} 
+                            <input
+                              type="radio"
+                              name="selectedRoomOption"
+                              checked={isSelected}
+                              onChange={() => setSelectedRoomRate(rate)}
                               className="form-check-input mt-0"
                               style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                             />
@@ -390,7 +390,7 @@ export default function PropertyDetailPage() {
               <h5 className="mb-3 d-flex align-items-center gap-2" style={{ fontFamily: 'Outfit,sans-serif' }}>
                 <Star size={18} className="text-gold" /> Verified Student Reviews
               </h5>
-              
+
               {user ? (
                 <form onSubmit={handleSubmitReview} className="mb-4 p-3 bg-surface-2 border-custom rounded-custom">
                   <h6 className="mb-2" style={{ fontWeight: 600, fontSize: '0.92rem' }}>Write a Review</h6>
@@ -479,7 +479,7 @@ export default function PropertyDetailPage() {
 
           {/* Right Column: Hold Booking Card */}
           <div className="col-lg-4">
-            
+
             {/* Booking Hold panel */}
             <div className="card p-4 border-custom bg-surface rounded-custom position-sticky" style={{ top: '85px' }}>
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -490,7 +490,7 @@ export default function PropertyDetailPage() {
                 }}>
                   {property.availability_status}
                 </span>
-                
+
                 {property.avg_rating && (
                   <div className="d-flex align-items-center gap-1 text-gold" style={{ fontSize: '0.9rem', fontWeight: 600 }}>
                     <Star size={14} fill="currentColor" /> {property.avg_rating} ({property.review_count} review{property.review_count !== 1 ? 's' : ''})
@@ -534,14 +534,14 @@ export default function PropertyDetailPage() {
               {/* Action */}
               {property.availability_status === 'Available' ? (
                 <div className="d-flex flex-column gap-2">
-                  <button 
+                  <button
                     className="btn btn-primary w-100 py-2.5 d-flex align-items-center justify-content-center gap-2"
                     onClick={handlePlaceHold}
                     disabled={submittingHold}
                   >
                     <Clock size={18} /> {submittingHold ? 'Placing Hold...' : 'Reserve Space'}
                   </button>
-                  <button 
+                  <button
                     className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2"
                     onClick={() => { setShowViewingModal(true); setStatusMsg(''); }}
                   >
@@ -553,7 +553,7 @@ export default function PropertyDetailPage() {
                   Reservation Unavailable ({property.availability_status})
                 </button>
               )}
-              
+
               <div className="text-center mt-3">
                 <p className="text-muted-custom mb-0" style={{ fontSize: '0.78rem' }}>
                   No booking fee required. Contact information is released upon landlord hold approval.
@@ -566,7 +566,7 @@ export default function PropertyDetailPage() {
         </div>
 
       </div>
-      
+
       {/* Schedule Viewing Modal */}
       {showViewingModal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} tabIndex="-1">
@@ -587,13 +587,13 @@ export default function PropertyDetailPage() {
                     <label className="form-label fw-semibold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
                       Preferred Date
                     </label>
-                    <input 
-                      type="date" 
-                      className="form-control" 
-                      required 
-                      min={new Date().toISOString().split('T')[0]} 
-                      value={preferredDate} 
-                      onChange={e => setPreferredDate(e.target.value)} 
+                    <input
+                      type="date"
+                      className="form-control"
+                      required
+                      min={new Date().toISOString().split('T')[0]}
+                      value={preferredDate}
+                      onChange={e => setPreferredDate(e.target.value)}
                     />
                   </div>
                   {statusMsg && (

@@ -26,7 +26,7 @@ createRoot(document.getElementById('root')).render(
             fontFamily: 'Inter, sans-serif'
           },
           success: { iconTheme: { primary: '#2ECC71', secondary: '#fff' } },
-          error:   { iconTheme: { primary: '#E74C3C', secondary: '#fff' } },
+          error: { iconTheme: { primary: '#E74C3C', secondary: '#fff' } },
         }}
       />
       <Analytics />

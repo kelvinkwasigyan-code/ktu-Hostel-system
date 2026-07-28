@@ -41,11 +41,11 @@ export default function PropertyCard({ property }) {
 
         {/* Body */}
         <div className="property-card-body">
-          <h6 className="mb-1 fw-700" style={{ fontFamily: 'Outfit,sans-serif', fontSize: '1rem', color: 'var(--text-primary)' }}>
+          <h6 className="mb-1 fw-700" style={{ fontFamily: 'Outfit,sans-serif', fontSize: '1rem', color: '#0f172a' }}>
             {property.title}
           </h6>
 
-          <p className="property-meta mb-2 d-flex align-items-center gap-1">
+          <p className="property-meta mb-2 d-flex align-items-center gap-1" style={{ color: '#475569' }}>
             <MapPin size={13} style={{ color: 'var(--brand-orange)' }} />
             {property.neighborhood} · {property.distance_from_campus_km
               ? `${property.distance_from_campus_km} km from KTU`
@@ -53,7 +53,7 @@ export default function PropertyCard({ property }) {
           </p>
 
           {/* Room Type + Occupancy */}
-          <div className="d-flex align-items-center gap-3 mb-3 property-meta">
+          <div className="d-flex align-items-center gap-3 mb-3 property-meta" style={{ color: '#475569' }}>
             <span className="text-truncate" style={{ maxWidth: '140px' }}>
               {ROOM_ICONS[property.room_type?.split(',')[0]?.trim()] || '🛏️'} {property.room_type}
             </span>
@@ -68,9 +68,9 @@ export default function PropertyCard({ property }) {
           {/* Rating */}
           {property.avg_rating && (
             <div className="d-flex align-items-center gap-1 mb-2 star-rating">
-              <Star size={13} fill="currentColor" />
-              <span style={{ fontWeight: 600 }}>{property.avg_rating}</span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+              <Star size={13} fill="currentColor" style={{ color: '#d97706' }} />
+              <span style={{ fontWeight: 600, color: '#0f172a' }}>{property.avg_rating}</span>
+              <span style={{ color: '#64748b', fontSize: '0.78rem' }}>
                 ({property.review_count} review{property.review_count !== 1 ? 's' : ''})
               </span>
             </div>

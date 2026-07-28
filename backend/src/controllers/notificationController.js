@@ -48,20 +48,29 @@ export const notifyUser = async (
  */
 export const getNotifications = async (req, res) => {
   try {
+    const userId = req.user?.user_id;
+    if (!userId) {
+      return res.json({ notifications: [], unread_count: 0 });
+    }
+
     const { data, error } = await supabaseAdmin
       .from('notifications')
       .select('*')
-      .eq('recipient_id', req.user.user_id)
+      .eq('recipient_id', userId)
       .order('created_at', { ascending: false })
       .limit(50);
 
-    if (error) return res.status(500).json({ error: 'Failed to fetch notifications.' });
+    // Return empty list on DB error instead of 500 (e.g. user not yet in DB)
+    if (error) {
+      console.warn('[Notifications] Query warning:', error.message);
+      return res.json({ notifications: [], unread_count: 0 });
+    }
 
-    const unreadCount = data.filter(n => !n.is_read).length;
-
-    res.json({ notifications: data, unread_count: unreadCount });
+    const unreadCount = (data || []).filter(n => !n.is_read).length;
+    res.json({ notifications: data || [], unread_count: unreadCount });
   } catch (err) {
-    res.status(500).json({ error: 'Server error.' });
+    console.error('[Notifications] Server error:', err.message);
+    res.json({ notifications: [], unread_count: 0 });
   }
 };
 

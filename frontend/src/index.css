@@ -318,12 +318,20 @@ a:hover {
 
 /* ─── Hero Section ───────────────────────────────────────────────────────── */
 .hero-section {
-  min-height: 85vh;
+  min-height: 80svh;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
   background-color: var(--dark-navy);
+  padding: 5rem 0 3rem;
+}
+
+@media (max-width: 767px) {
+  .hero-section {
+    min-height: auto;
+    padding: 4rem 0 2rem;
+  }
 }
 
 .hero-section::before {
@@ -350,10 +358,10 @@ a:hover {
 }
 
 .hero-title {
-  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-size: clamp(1.8rem, 6vw, 3.8rem);
   font-weight: 800;
   line-height: 1.15;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
 }
 
 .hero-title .highlight {
@@ -362,9 +370,9 @@ a:hover {
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
+  font-size: clamp(0.88rem, 2.5vw, 1.1rem);
   color: var(--text-secondary);
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
   max-width: 550px;
 }
 
@@ -378,28 +386,57 @@ a:hover {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
+@media (max-width: 767px) {
+  .search-hero-bar {
+    padding: 1.25rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+}
+
 .search-hero-bar .form-control,
 .search-hero-bar .form-select {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
-  min-height: 50px;
+  min-height: 44px;
+  font-size: 16px; /* prevents iOS zoom */
 }
 
 /* ─── Property Cards ─────────────────────────────────────────────────────── */
 .property-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0;
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: var(--transition);
   cursor: pointer;
   height: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .property-card:hover {
   transform: translateY(-6px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--border-hover);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-color: var(--brand-orange);
+}
+
+.property-card h6 {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+.property-card .property-meta {
+  color: #475569 !important;
+}
+
+.property-card .property-price-label {
+  color: #64748b !important;
+}
+
+.property-card .property-price {
+  color: var(--brand-orange) !important;
+  font-weight: 800 !important;
 }
 
 .property-card-img {
@@ -1187,3 +1224,545 @@ html.dark .mobile-nav-backdrop,
     background-position: 200% 0;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE-FIRST RESPONSIVE DESIGN SYSTEM
+   Breakpoints: xs <576px | sm 576-767px | md 768-991px | lg 992px+
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Base mobile meta ───────────────────────────────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ─── Header / Navbar ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Compact header on mobile */
+  header.sticky,
+  header[style*="sticky"] {
+    height: auto !important;
+    min-height: 56px;
+  }
+
+  /* Logo text shorter on tiny screens */
+  header .font-bold span:last-child {
+    font-size: 0.95rem !important;
+  }
+
+  /* Mobile drawer animation */
+  .mobile-nav-drawer {
+    animation: slideDown 0.22s ease-out;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Dashboard pill — hide text on tiny screens */
+  header a[style*="My Dashboard"] span,
+  header a span.hidden-xs {
+    display: none;
+  }
+}
+
+/* ─── Hero Section ───────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .hero-section {
+    min-height: 100svh !important;
+    padding-top: 0 !important;
+  }
+
+  .hero-section h1 {
+    font-size: clamp(2rem, 8vw, 3.2rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .hero-section p {
+    font-size: 0.95rem !important;
+  }
+
+  /* Hero action buttons stack on mobile */
+  .hero-section .d-flex.gap-3,
+  .hero-section .hero-actions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .hero-section .d-flex.gap-3 a,
+  .hero-section .d-flex.gap-3 button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Quick search card: full width, less padding */
+  .hero-section .card,
+  .hero-section [class*="quick-search"],
+  .hero-section > div > div > .card {
+    margin: 1rem !important;
+    padding: 1.25rem !important;
+    border-radius: 16px !important;
+  }
+
+  /* Stats bar: 2-column grid on mobile */
+  .hero-section .stats-row,
+  .hero-section .row.g-4 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
+/* ─── Property / Listing Grid ────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .property-grid,
+  .listings-grid,
+  .row.g-4,
+  .row.g-3 {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+  }
+
+  /* Single column on phone */
+  .col-md-4, .col-lg-4, .col-xl-4,
+  .col-md-3, .col-lg-3 {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  /* Two columns on small tablets */
+  .col-md-4, .col-lg-4 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+
+/* ─── Property Card ──────────────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .property-card,
+  .card.property-card {
+    border-radius: 12px !important;
+  }
+
+  .property-card img,
+  .property-card .card-img-top {
+    height: 180px !important;
+    object-fit: cover;
+  }
+
+  .property-card .card-body {
+    padding: 0.85rem !important;
+  }
+
+  .property-card .card-title {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ─── Search / Filter Page ───────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Filter sidebar collapses above search results */
+  .search-layout {
+    flex-direction: column !important;
+  }
+
+  .search-sidebar,
+  .filter-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 1rem;
+  }
+
+  /* Filter row scrolls horizontally */
+  .filter-chips,
+  .filter-tags {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Search bar full width */
+  .search-input-row {
+    flex-direction: column !important;
+    gap: 0.5rem;
+  }
+
+  .search-input-row input,
+  .search-input-row select,
+  .search-input-row button {
+    width: 100% !important;
+  }
+}
+
+/* ─── Auth Pages (Login / Register) ─────────────────────────────────────── */
+@media (max-width: 575px) {
+  .auth-page,
+  .login-page,
+  .register-page {
+    padding: 0.75rem !important;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .auth-card,
+  .login-card,
+  .register-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0.5rem 0 !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+  }
+
+  .auth-card .card-body {
+    padding: 0 !important;
+  }
+}
+
+/* ─── Dashboard Layout ───────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Sidebar collapses */
+  .dashboard-layout,
+  .admin-layout,
+  .landlord-layout {
+    flex-direction: column !important;
+  }
+
+  .sidebar,
+  .dashboard-sidebar {
+    width: 100% !important;
+    min-height: auto !important;
+    position: static !important;
+    padding: 0.75rem !important;
+  }
+
+  .sidebar-nav,
+  .nav.flex-column {
+    flex-direction: row !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .sidebar-nav .nav-item,
+  .nav.flex-column .nav-item {
+    display: inline-block !important;
+    white-space: nowrap;
+  }
+
+  .sidebar-nav .nav-link,
+  .nav.flex-column .nav-link {
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* Dashboard stat cards: 2-col grid */
+  .stats-grid,
+  .dashboard-stats {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Main content full width */
+  .dashboard-main,
+  .main-content {
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+
+  /* Data tables become scrollable */
+  .table-responsive-mobile {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 600px;
+  }
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  /* Stack table rows as cards on tiny screens */
+  .table-stack tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem;
+  }
+
+  .table-stack tbody td {
+    display: flex;
+    justify-content: space-between;
+    border: none;
+    padding: 0.3rem 0;
+    font-size: 0.85rem;
+  }
+
+  .table-stack tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 40%;
+  }
+
+  .table-stack thead {
+    display: none;
+  }
+}
+
+/* ─── Modals ─────────────────────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .modal-dialog {
+    margin: 0.5rem !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  .modal-content {
+    border-radius: 16px !important;
+  }
+
+  .modal-body {
+    padding: 1.25rem !important;
+  }
+}
+
+/* ─── Forms ──────────────────────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .form-control,
+  .form-select {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+
+  .btn-group .btn,
+  .input-group .btn {
+    padding: 0.4rem 0.7rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ─── Map Page ───────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .map-page-layout {
+    flex-direction: column !important;
+  }
+
+  .map-container {
+    height: 55svh !important;
+    min-height: 300px;
+  }
+
+  .map-listing-panel {
+    width: 100% !important;
+    max-height: 45svh;
+    overflow-y: auto;
+  }
+}
+
+/* ─── Property Detail Page ───────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .property-detail-gallery {
+    height: 260px !important;
+  }
+
+  .property-detail-layout {
+    flex-direction: column !important;
+  }
+
+  .property-detail-sidebar {
+    width: 100% !important;
+    position: static !important;
+    margin-top: 1.5rem;
+  }
+
+  /* Booking card sticks to bottom */
+  .booking-card-sticky {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.15) !important;
+    padding: 1.25rem !important;
+    background: var(--surface) !important;
+  }
+}
+
+/* ─── Admin Pages ────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .admin-header-row {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    align-items: flex-start !important;
+  }
+
+  .admin-stat-cards {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .admin-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .admin-actions .btn {
+    width: 100%;
+  }
+}
+
+/* ─── Bottom Navigation Bar (Mobile only) ───────────────────────────────── */
+@media (max-width: 767px) {
+  /* Add bottom padding so content isn't hidden behind bottom nav */
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    padding: 0.4rem 0;
+    padding-bottom: calc(0.4rem + env(safe-area-inset-bottom, 0));
+  }
+
+  .bottom-nav a {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-muted);
+    padding: 0.35rem 0;
+    transition: color 0.15s;
+  }
+
+  .bottom-nav a.active,
+  .bottom-nav a:hover {
+    color: var(--brand-orange);
+  }
+
+  .bottom-nav a svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Push page content above bottom nav */
+  #root > div:not(.bottom-nav),
+  .page-content-wrap {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
+/* ─── FAQ / Contact pages ────────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .faq-layout,
+  .contact-layout {
+    flex-direction: column !important;
+  }
+
+  .faq-sidebar {
+    display: none;
+  }
+
+  .accordion-button {
+    font-size: 0.9rem !important;
+    padding: 0.85rem 1rem !important;
+  }
+}
+
+/* ─── Notifications Dropdown ─────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .notif-dropdown {
+    position: fixed !important;
+    top: 56px !important;
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    width: auto !important;
+    max-width: none !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ─── Cards & Sections general ───────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .container,
+  .container-fluid {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  h2 { font-size: clamp(1.4rem, 6vw, 2rem) !important; }
+  h3 { font-size: clamp(1.15rem, 5vw, 1.5rem) !important; }
+}
+
+/* ─── Touch-friendly hit targets ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .btn {
+    min-height: 44px;
+  }
+
+  .nav-link,
+  .dropdown-item {
+    min-height: 44px;
+    display: flex !important;
+    align-items: center;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+}
+
+/* ─── Smooth scrolling & safe areas ─────────────────────────────────────── */
+@media (max-width: 767px) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* iOS safe areas */
+  .sticky-top,
+  header[style*="sticky"] {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+}

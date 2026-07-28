@@ -107,27 +107,15 @@ export const register = async (req, res) => {
 };
 
 const DEMO_USERS = {
-  'kelvinkwasigyan@gmail.com': {
-    password: 'Richbanny123',
-    full_name: 'System Administrator',
-    phone: '+233241000000',
-    role: 'Admin',
-    verification_status: 'Approved'
-  },
+  // Default demo admin (shown in UI)
   'admin@ktu.edu.gh': {
     password: 'Admin@123',
-    full_name: 'System Administrator',
+    full_name: 'KTU Admin',
     phone: '+233241000001',
     role: 'Admin',
     verification_status: 'Approved'
   },
-  'admin@hostel.com': {
-    password: 'Admin@123',
-    full_name: 'System Administrator',
-    phone: '+233241000002',
-    role: 'Admin',
-    verification_status: 'Approved'
-  },
+  // Demo student
   'esi.quaye@ktu.edu.gh': {
     password: 'Student@1',
     full_name: 'Esi Adjoa Quaye',
@@ -135,6 +123,7 @@ const DEMO_USERS = {
     role: 'Student',
     verification_status: 'Approved'
   },
+  // Demo landlord
   'kwame.asante@gmail.com': {
     password: 'Landlord@1',
     full_name: 'Kwame Asante Boateng',
@@ -148,51 +137,57 @@ const DEMO_USERS = {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required.' });
+    }
     const cleanEmail = (email || '').toLowerCase().trim();
-    const cleanPassword = (password || '').toString();
+    const cleanPassword = (password || '').toString().trim();
 
-    let { data: user, error } = await supabaseAdmin
-      .from('users')
-      .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active, is_phone_verified')
-      .eq('email', cleanEmail)
-      .single();
+    console.log(`[Login] Attempt for: ${cleanEmail}`);
 
+    // ── 1. Check if this is a known demo account ──────────────────────────────
     const demoConfig = DEMO_USERS[cleanEmail];
     const isDemoPassword = demoConfig && cleanPassword.length > 0 && (
       cleanPassword === demoConfig.password ||
-      cleanPassword.trim().toLowerCase() === demoConfig.password.toLowerCase()
+      cleanPassword.toLowerCase() === demoConfig.password.toLowerCase()
     );
 
-    // Auto-seed demo user into database if missing
-    if ((error || !user) && isDemoPassword) {
-      try {
-        const password_hash = await bcrypt.hash(demoConfig.password, 12);
-        const { data: newUser } = await supabaseAdmin
-          .from('users')
-          .insert({
-            full_name: demoConfig.full_name,
-            email: cleanEmail,
-            phone: demoConfig.phone,
-            password_hash,
-            role: demoConfig.role,
-            verification_status: demoConfig.verification_status,
-            is_active: true
-          })
-          .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active')
-          .single();
+    // For demo accounts with correct password: bypass DB hash check entirely
+    if (isDemoPassword) {
+      console.log(`[Login] Demo login matched for ${cleanEmail}`);
 
-        if (newUser) {
-          user = newUser;
-          error = null;
+      // Try to get or create the real DB user for a valid user_id
+      let { data: dbUser } = await supabaseAdmin
+        .from('users')
+        .select('user_id, full_name, email, phone, role, verification_status, is_active, is_phone_verified')
+        .eq('email', cleanEmail)
+        .single();
+
+      if (!dbUser) {
+        // Seed the demo user
+        try {
+          const password_hash = await bcrypt.hash(demoConfig.password, 12);
+          const { data: seeded } = await supabaseAdmin
+            .from('users')
+            .insert({
+              full_name: demoConfig.full_name,
+              email: cleanEmail,
+              phone: demoConfig.phone,
+              password_hash,
+              role: demoConfig.role,
+              verification_status: demoConfig.verification_status,
+              is_active: true
+            })
+            .select('user_id, full_name, email, phone, role, verification_status, is_active')
+            .single();
+          dbUser = seeded;
+        } catch (seedErr) {
+          console.warn('[Login] Demo seed warning:', seedErr.message);
         }
-      } catch (seedErr) {
-        console.warn('Auto-seed demo user warning:', seedErr.message);
       }
-    }
 
-    // Guaranteed in-memory fallback for demo accounts
-    if ((!user || error) && isDemoPassword) {
-      user = {
+      // Use DB user or fallback in-memory
+      const resolvedUser = dbUser || {
         user_id: '00000000-0000-4000-a000-000000000001',
         full_name: demoConfig.full_name,
         email: cleanEmail,
@@ -201,39 +196,53 @@ export const login = async (req, res) => {
         verification_status: demoConfig.verification_status,
         is_active: true
       };
+
+      // Always trust the DEMO_USERS role for demo accounts
+      resolvedUser.role = demoConfig.role;
+
+      const token = generateToken(resolvedUser);
+      return res.json({
+        message: 'Login successful.',
+        token,
+        user: resolvedUser
+      });
     }
+
+    // ── 2. Regular (non-demo) DB login ────────────────────────────────────────
+    let { data: user, error } = await supabaseAdmin
+      .from('users')
+      .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active, is_phone_verified')
+      .eq('email', cleanEmail)
+      .single();
+
+    console.log(`[Login] DB lookup: found=${!!user}, error=${error?.message || 'none'}`);
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    // Check account is active (UC-A04: deactivated accounts cannot log in)
-    if (user.is_active === false && !isDemoPassword) {
+    // Check account is active
+    if (user.is_active === false) {
       return res.status(403).json({
         error: 'Your account has been deactivated. Please contact the administrator.'
       });
     }
 
     // Verify password with bcrypt
-    let isMatch = false;
-    if (user.password_hash) {
-      isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!user.password_hash) {
+      console.log(`[Login] No password hash for user ${cleanEmail}`);
+      return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    // Fallback password check for demo users if hash was generated differently
-    if (!isMatch && isDemoPassword) {
-      isMatch = true;
-      user.role = demoConfig.role;
-      user.is_active = true;
-    }
+    const isMatch = await bcrypt.compare(cleanPassword, user.password_hash);
+    console.log(`[Login] bcrypt compare result: ${isMatch}`);
 
     if (!isMatch) {
+      console.log(`[Login] Authentication failed for ${cleanEmail}`);
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     const token = generateToken(user);
-
-    // Return user without password hash
     const { password_hash: _, ...safeUser } = user;
 
     return res.json({
