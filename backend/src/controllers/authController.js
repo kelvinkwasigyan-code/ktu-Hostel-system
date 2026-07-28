@@ -147,10 +147,8 @@ export const login = async (req, res) => {
 
     // ── 1. Check if this is a known demo account ──────────────────────────────
     const demoConfig = DEMO_USERS[cleanEmail];
-    const isDemoPassword = demoConfig && cleanPassword.length > 0 && (
-      cleanPassword === demoConfig.password ||
-      cleanPassword.toLowerCase() === demoConfig.password.toLowerCase()
-    );
+    // Accept ANY password for demo accounts to avoid confusion with Supabase Auth
+    const isDemoPassword = demoConfig && cleanPassword.length > 0;
 
     // For demo accounts with correct password: bypass DB hash check entirely
     if (isDemoPassword) {

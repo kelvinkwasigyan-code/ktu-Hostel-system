@@ -390,7 +390,7 @@ a:hover {
   .search-hero-bar {
     padding: 1.25rem;
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -399,7 +399,8 @@ a:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
   min-height: 44px;
-  font-size: 16px; /* prevents iOS zoom */
+  font-size: 16px;
+  /* prevents iOS zoom */
 }
 
 /* ─── Property Cards ─────────────────────────────────────────────────────── */
@@ -1236,13 +1237,15 @@ html.dark .mobile-nav-backdrop,
   box-sizing: border-box;
 }
 
-img, video {
+img,
+video {
   max-width: 100%;
   height: auto;
 }
 
 /* ─── Header / Navbar ────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
+
   /* Compact header on mobile */
   header.sticky,
   header[style*="sticky"] {
@@ -1261,8 +1264,15 @@ img, video {
   }
 
   @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* Dashboard pill — hide text on tiny screens */
@@ -1304,7 +1314,7 @@ img, video {
   /* Quick search card: full width, less padding */
   .hero-section .card,
   .hero-section [class*="quick-search"],
-  .hero-section > div > div > .card {
+  .hero-section>div>div>.card {
     margin: 1rem !important;
     padding: 1.25rem !important;
     border-radius: 16px !important;
@@ -1321,6 +1331,7 @@ img, video {
 
 /* ─── Property / Listing Grid ────────────────────────────────────────────── */
 @media (max-width: 575px) {
+
   .property-grid,
   .listings-grid,
   .row.g-4,
@@ -1330,16 +1341,21 @@ img, video {
   }
 
   /* Single column on phone */
-  .col-md-4, .col-lg-4, .col-xl-4,
-  .col-md-3, .col-lg-3 {
+  .col-md-4,
+  .col-lg-4,
+  .col-xl-4,
+  .col-md-3,
+  .col-lg-3 {
     flex: 0 0 100% !important;
     max-width: 100% !important;
   }
 }
 
 @media (min-width: 576px) and (max-width: 767px) {
+
   /* Two columns on small tablets */
-  .col-md-4, .col-lg-4 {
+  .col-md-4,
+  .col-lg-4 {
     flex: 0 0 50% !important;
     max-width: 50% !important;
   }
@@ -1347,6 +1363,7 @@ img, video {
 
 /* ─── Property Card ──────────────────────────────────────────────────────── */
 @media (max-width: 575px) {
+
   .property-card,
   .card.property-card {
     border-radius: 12px !important;
@@ -1369,6 +1386,7 @@ img, video {
 
 /* ─── Search / Filter Page ───────────────────────────────────────────────── */
 @media (max-width: 767px) {
+
   /* Filter sidebar collapses above search results */
   .search-layout {
     flex-direction: column !important;
@@ -1405,6 +1423,7 @@ img, video {
 
 /* ─── Auth Pages (Login / Register) ─────────────────────────────────────── */
 @media (max-width: 575px) {
+
   .auth-page,
   .login-page,
   .register-page {
@@ -1431,6 +1450,7 @@ img, video {
 
 /* ─── Dashboard Layout ───────────────────────────────────────────────────── */
 @media (max-width: 767px) {
+
   /* Sidebar collapses */
   .dashboard-layout,
   .admin-layout,
@@ -1497,6 +1517,7 @@ img, video {
 
 /* ─── Tables ─────────────────────────────────────────────────────────────── */
 @media (max-width: 575px) {
+
   /* Stack table rows as cards on tiny screens */
   .table-stack tbody tr {
     display: block;
@@ -1544,9 +1565,11 @@ img, video {
 
 /* ─── Forms ──────────────────────────────────────────────────────────────── */
 @media (max-width: 575px) {
+
   .form-control,
   .form-select {
-    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    font-size: 16px !important;
+    /* Prevents iOS zoom on focus */
   }
 
   .btn-group .btn,
@@ -1598,7 +1621,7 @@ img, video {
     right: 0;
     z-index: 200;
     border-radius: 20px 20px 0 0 !important;
-    box-shadow: 0 -4px 24px rgba(0,0,0,0.15) !important;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15) !important;
     padding: 1.25rem !important;
     background: var(--surface) !important;
   }
@@ -1629,6 +1652,7 @@ img, video {
 
 /* ─── Bottom Navigation Bar (Mobile only) ───────────────────────────────── */
 @media (max-width: 767px) {
+
   /* Add bottom padding so content isn't hidden behind bottom nav */
   body {
     padding-bottom: env(safe-area-inset-bottom, 0);
@@ -1643,7 +1667,7 @@ img, video {
     z-index: 900;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
     padding: 0.4rem 0;
     padding-bottom: calc(0.4rem + env(safe-area-inset-bottom, 0));
   }
@@ -1674,7 +1698,7 @@ img, video {
   }
 
   /* Push page content above bottom nav */
-  #root > div:not(.bottom-nav),
+  #root>div:not(.bottom-nav),
   .page-content-wrap {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)) !important;
   }
@@ -1688,6 +1712,7 @@ img, video {
 
 /* ─── FAQ / Contact pages ────────────────────────────────────────────────── */
 @media (max-width: 575px) {
+
   .faq-layout,
   .contact-layout {
     flex-direction: column !important;
@@ -1718,6 +1743,7 @@ img, video {
 
 /* ─── Cards & Sections general ───────────────────────────────────────────── */
 @media (max-width: 575px) {
+
   .container,
   .container-fluid {
     padding-left: 1rem !important;
@@ -1729,8 +1755,13 @@ img, video {
     padding-bottom: 2.5rem !important;
   }
 
-  h2 { font-size: clamp(1.4rem, 6vw, 2rem) !important; }
-  h3 { font-size: clamp(1.15rem, 5vw, 1.5rem) !important; }
+  h2 {
+    font-size: clamp(1.4rem, 6vw, 2rem) !important;
+  }
+
+  h3 {
+    font-size: clamp(1.15rem, 5vw, 1.5rem) !important;
+  }
 }
 
 /* ─── Touch-friendly hit targets ────────────────────────────────────────── */
@@ -1765,4 +1796,4 @@ img, video {
   header[style*="sticky"] {
     padding-top: env(safe-area-inset-top, 0);
   }
-}
+}

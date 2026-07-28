@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Building2, MapPin, HelpCircle, PhoneCall, LayoutDashboard, Bell, LogOut, Menu, X, Home, PlusSquare, Heart } from 'lucide-react';
+import {
+  Building2, MapPin, HelpCircle, PhoneCall,
+  LayoutDashboard, Bell, LogOut, Menu, X,
+  Home, PlusSquare
+} from 'lucide-react';
 import api from '../services/api';
 import ThemeToggle from './ThemeToggle';
 
@@ -9,35 +13,38 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [showNotif, setShowNotif] = useState(false);
+
+  const [showNotif,     setShowNotif]     = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [unreadCount,   setUnreadCount]   = useState(0);
+  const [showUserMenu,  setShowUserMenu]  = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
-  const notifRef = useRef(null);
+
+  const notifRef   = useRef(null);
   const userMenuRef = useRef(null);
 
   // Close mobile nav on route change
   useEffect(() => { setShowMobileNav(false); }, [location.pathname]);
 
-  // Prevent body scroll when mobile nav is open
+  // Lock body scroll when mobile drawer is open
   useEffect(() => {
     document.body.style.overflow = showMobileNav ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [showMobileNav]);
 
+  // Poll notifications
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
+      const iv = setInterval(fetchNotifications, 30000);
+      return () => clearInterval(iv);
     }
   }, [user]);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotif(false);
+      if (notifRef.current   && !notifRef.current.contains(e.target))   setShowNotif(false);
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
     };
     document.addEventListener('mousedown', handler);
@@ -50,8 +57,7 @@ export default function Navbar() {
       setNotifications(res.data?.notifications || []);
       setUnreadCount(res.data?.unread_count || 0);
     } catch {
-      setNotifications([]);
-      setUnreadCount(0);
+      setNotifications([]); setUnreadCount(0);
     }
   };
 
@@ -60,16 +66,14 @@ export default function Navbar() {
       await api.patch('/notifications/read-all');
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
-    } catch (err) {
-      console.error('Failed to mark notifications read:', err);
-    }
+    } catch {}
   };
 
   const getDashboardLink = () => {
     if (!user) return '/login';
-    const roleLower = (user.role || '').toLowerCase();
-    if (roleLower === 'admin') return '/admin';
-    if (roleLower === 'landlord') return '/landlord';
+    const r = (user.role || '').toLowerCase();
+    if (r === 'admin')    return '/admin';
+    if (r === 'landlord') return '/landlord';
     return '/student';
   };
 
@@ -83,90 +87,97 @@ export default function Navbar() {
     }
   };
 
-  const isNavActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
+
+  /* ─── inline style tokens ─────────────────────────────────────── */
+  const NAV_LINK = (active) => ({
+    textDecoration: 'none',
+    color: active ? 'var(--brand-orange)' : 'var(--text-secondary, #475569)',
+    fontWeight: active ? 600 : 500,
+    fontSize: '0.9rem',
+    display: 'flex', alignItems: 'center', gap: '0.35rem',
+    transition: 'color 0.15s',
+  });
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur" style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: 'var(--surface-glass, rgba(255, 255, 255, 0.95))', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border, #e2e8f0)' }}>
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between" style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1rem', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        
-        {/* Left: Brand Logo */}
-        <Link to="/" className="flex items-center gap-2 text-decoration-none" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <img src="/logo.jpg" alt="KTU Housing Logo" style={{ height: '48px', width: 'auto', borderRadius: '8px' }} />
-          <span className="font-bold text-gray-900 hidden sm:inline" style={{ fontWeight: 800, color: 'var(--text-primary, #0f172a)', fontSize: '1.2rem', fontFamily: 'Outfit, sans-serif' }}>
+    <header style={{
+      position: 'sticky', top: 0, zIndex: 1000,
+      backgroundColor: 'var(--surface-glass, rgba(255,255,255,0.97))',
+      backdropFilter: 'blur(16px)',
+      borderBottom: '1px solid var(--border, #e2e8f0)',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+    }}>
+      {/* ── Main bar ──────────────────────────────────────────────── */}
+      <div style={{
+        maxWidth: 1280, margin: '0 auto',
+        padding: '0 1rem', height: 60,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+
+        {/* LEFT: Logo */}
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+          <img
+            src="/logo.jpg"
+            alt="KTU Housing Portal"
+            style={{ height: 40, width: 'auto', maxWidth: 40, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }}
+          />
+          <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary, #0f172a)', whiteSpace: 'nowrap', lineHeight: 1.2 }}>
             KTU <span style={{ color: 'var(--brand-orange, #d97706)' }}>Housing Portal</span>
           </span>
         </Link>
 
-        {/* Center: Primary Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', fontSize: '0.9rem', fontWeight: 500 }}>
-          <Link 
-            to="/search" 
-            className={`hover:text-amber-600 transition nav-link p-0 d-flex align-items-center gap-1.5 ${isNavActive('/search') ? 'active fw-semibold text-orange' : ''}`} 
-            style={{ color: isNavActive('/search') ? 'var(--brand-orange)' : 'var(--text-secondary, #475569)', transition: 'color 0.2s', textDecoration: 'none' }}
-          >
-            <Building2 size={16} /> Browse Hostels
-          </Link>
-          <Link 
-            to="/map" 
-            className={`hover:text-amber-600 transition nav-link p-0 d-flex align-items-center gap-1.5 ${isNavActive('/map') ? 'active fw-semibold text-orange' : ''}`} 
-            style={{ color: isNavActive('/map') ? 'var(--brand-orange)' : 'var(--text-secondary, #475569)', transition: 'color 0.2s', textDecoration: 'none' }}
-          >
-            <MapPin size={16} /> Map View
-          </Link>
-          <Link 
-            to="/faq" 
-            className={`hover:text-amber-600 transition nav-link p-0 d-flex align-items-center gap-1.5 ${isNavActive('/faq') ? 'active fw-semibold text-orange' : ''}`} 
-            style={{ color: isNavActive('/faq') ? 'var(--brand-orange)' : 'var(--text-secondary, #475569)', transition: 'color 0.2s', textDecoration: 'none' }}
-          >
-            <HelpCircle size={16} /> FAQ
-          </Link>
-          <Link 
-            to="/contact" 
-            className={`hover:text-amber-600 transition nav-link p-0 d-flex align-items-center gap-1.5 ${isNavActive('/contact') ? 'active fw-semibold text-orange' : ''}`} 
-            style={{ color: isNavActive('/contact') ? 'var(--brand-orange)' : 'var(--text-secondary, #475569)', transition: 'color 0.2s', textDecoration: 'none' }}
-          >
-            <PhoneCall size={16} /> Contact Us
-          </Link>
+        {/* CENTER: Desktop nav — hidden on mobile via inline media-like wrapper */}
+        <nav className="d-none d-md-flex" style={{ alignItems: 'center', gap: '1.5rem' }}>
+          <Link to="/search"  style={NAV_LINK(isActive('/search'))} ><Building2 size={15}/> Browse Hostels</Link>
+          <Link to="/map"     style={NAV_LINK(isActive('/map'))}    ><MapPin size={15}/>    Map View</Link>
+          <Link to="/faq"     style={NAV_LINK(isActive('/faq'))}    ><HelpCircle size={15}/>FAQ</Link>
+          <Link to="/contact" style={NAV_LINK(isActive('/contact'))} ><PhoneCall size={15}/>Contact Us</Link>
         </nav>
 
-        {/* Right: Actions & User Profile */}
-        <div className="flex items-center gap-3" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          
-          {/* Dashboard Shortcut */}
+        {/* RIGHT: Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+
+          {/* Dashboard link — desktop only */}
           {user ? (
-            <Link 
-              to={getDashboardLink()} 
-              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-decoration-none"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.38rem', fontSize: '0.82rem', fontWeight: 600, padding: '0.45rem 0.85rem', borderRadius: '8px', backgroundColor: 'var(--surface-2, #f1f5f9)', color: 'var(--text-primary, #1e293b)' }}
-            >
-              <LayoutDashboard size={15} />
-              My Dashboard
+            <Link to={getDashboardLink()} className="d-none d-md-inline-flex" style={{
+              alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem',
+              fontWeight: 600, padding: '0.4rem 0.85rem', borderRadius: 8,
+              backgroundColor: 'var(--surface-2, #f1f5f9)',
+              color: 'var(--text-primary, #1e293b)', textDecoration: 'none',
+            }}>
+              <LayoutDashboard size={14}/> My Dashboard
             </Link>
           ) : (
-            <Link 
-              to="/login" 
-              className="btn btn-sm btn-primary px-3 py-1.5 rounded-lg font-semibold"
-              style={{ fontSize: '0.82rem' }}
-            >
+            <Link to="/login" className="btn btn-primary btn-sm d-none d-md-inline-flex" style={{ fontWeight: 600 }}>
               Sign In
             </Link>
           )}
 
-          {/* Utilities */}
+          {/* Theme toggle */}
           <ThemeToggle />
 
+          {/* Notifications bell */}
           {user && (
-            <div className="position-relative" ref={notifRef}>
+            <div style={{ position: 'relative' }} ref={notifRef}>
               <button
                 type="button"
-                className="p-2 text-gray-500 hover:text-gray-700 relative border-0 bg-transparent"
                 onClick={() => setShowNotif(v => !v)}
-                style={{ position: 'relative', padding: '0.5rem', color: 'var(--text-secondary, #64748b)', cursor: 'pointer' }}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  padding: '0.4rem', color: 'var(--text-secondary, #64748b)',
+                  position: 'relative',
+                }}
                 aria-label="Notifications"
               >
-                <Bell size={18} />
+                <Bell size={19} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center" style={{ position: 'absolute', top: '2px', right: '2px', width: '16px', height: '16px', backgroundColor: '#ef4444', color: '#ffffff', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{
+                    position: 'absolute', top: 2, right: 2,
+                    width: 15, height: 15, borderRadius: '50%',
+                    backgroundColor: '#ef4444', color: '#fff',
+                    fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700,
+                  }}>
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -174,7 +185,7 @@ export default function Navbar() {
 
               {showNotif && (
                 <div className="notif-dropdown">
-                  <div className="d-flex justify-content-between align-items-center p-3" style={{ borderBottom: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)' }}>
                     <strong style={{ fontSize: '0.9rem' }}>Notifications</strong>
                     {unreadCount > 0 && (
                       <button className="btn btn-sm" style={{ color: 'var(--brand-orange)', fontSize: '0.8rem' }} onClick={handleMarkAllRead}>
@@ -182,126 +193,157 @@ export default function Navbar() {
                       </button>
                     )}
                   </div>
-                  <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                  <div style={{ maxHeight: 320, overflowY: 'auto' }}>
                     {notifications.length === 0 ? (
-                      <div className="p-4 text-center" style={{ color: 'var(--text-muted)' }}>
-                        No notifications yet
-                      </div>
-                    ) : (
-                      notifications.slice(0, 10).map(n => (
-                        <div key={n.notification_id} className={`notif-item ${!n.is_read ? 'unread' : ''}`}>
-                          <div className="d-flex gap-2">
-                            <span>{notifIcon(n.type)}</span>
-                            <div>
-                              <p className="mb-0" style={{ color: 'var(--text-primary)', lineHeight: '1.4' }}>
-                                {n.message}
-                              </p>
-                              <small style={{ color: 'var(--text-muted)' }}>
-                                {new Date(n.created_at).toLocaleDateString('en-GB', {
-                                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                                })}
-                              </small>
-                            </div>
+                      <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)' }}>No notifications yet</div>
+                    ) : notifications.slice(0, 10).map(n => (
+                      <div key={n.notification_id} className={`notif-item ${!n.is_read ? 'unread' : ''}`}>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <span>{notifIcon(n.type)}</span>
+                          <div>
+                            <p style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.85rem', lineHeight: 1.4 }}>{n.message}</p>
+                            <small style={{ color: 'var(--text-muted)' }}>
+                              {new Date(n.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </small>
                           </div>
                         </div>
-                      ))
-                    )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Profile */}
+          {/* User avatar + dropdown — desktop */}
           {user && (
-            <div className="position-relative" ref={userMenuRef}>
+            <div style={{ position: 'relative' }} ref={userMenuRef}>
               <button
                 type="button"
-                className="flex items-center gap-2 pl-2 border-l border-gray-200 border-0 bg-transparent cursor-pointer"
                 onClick={() => setShowUserMenu(v => !v)}
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingLeft: '0.5rem', borderLeft: '1px solid var(--border, #e2e8f0)' }}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  paddingLeft: '0.5rem', borderLeft: '1px solid var(--border)',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  borderLeft: '1px solid var(--border, #e2e8f0)',
+                }}
               >
-                <div className="h-8 w-8 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm" style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--brand-orange, #d97706)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem' }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  backgroundColor: 'var(--brand-orange)', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, fontSize: '0.85rem',
+                }}>
                   {(user.full_name || 'U')[0].toUpperCase()}
                 </div>
-                <span className="text-sm font-medium text-gray-800 hidden lg:inline" style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary, #1e293b)' }}>
-                  {(user.full_name || '').split(' ')[0]}
-                </span>
               </button>
 
               {showUserMenu && (
-                <div 
-                  className="position-absolute end-0 mt-2 py-2 bg-white rounded-3 shadow-lg"
-                  style={{
-                    position: 'absolute', right: 0, marginTop: '0.5rem', minWidth: '180px',
-                    backgroundColor: 'var(--surface)', border: '1px solid var(--border)',
-                    borderRadius: '8px', zIndex: 1050, boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  <div className="px-3 py-2 border-bottom" style={{ borderColor: 'var(--border)', padding: '0.5rem 1rem' }}>
-                    <div className="fw-bold text-truncate" style={{ fontSize: '0.85rem', color: 'var(--text-primary)' }}>{user.full_name}</div>
-                    <div className="text-muted text-truncate" style={{ fontSize: '0.75rem' }}>{user.role}</div>
+                <div style={{
+                  position: 'absolute', right: 0, top: 'calc(100% + 8px)',
+                  minWidth: 180, backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border)', borderRadius: 10,
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.12)', zIndex: 1050, overflow: 'hidden',
+                }}>
+                  <div style={{ padding: '0.6rem 1rem', borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{user.full_name}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.role}</div>
                   </div>
-                  <Link to={getDashboardLink()} className="dropdown-item px-3 py-2 d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-                    <Home size={15} /> Dashboard
+                  <Link to={getDashboardLink()} className="dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', fontSize: '0.85rem' }}>
+                    <Home size={14}/> Dashboard
                   </Link>
                   {user.role === 'Landlord' && (
-                    <Link to="/landlord/listings/create" className="dropdown-item px-3 py-2 d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-                      <PlusSquare size={15} /> Add Property
+                    <Link to="/landlord/create" className="dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', fontSize: '0.85rem' }}>
+                      <PlusSquare size={14}/> Add Property
                     </Link>
                   )}
-                  <button 
-                    className="dropdown-item px-3 py-2 text-danger d-flex align-items-center gap-2 w-100 text-start"
-                    style={{ fontSize: '0.85rem' }}
-                    onClick={logout}
-                  >
-                    <LogOut size={15} /> Log Out
+                  <button onClick={logout} className="dropdown-item text-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', fontSize: '0.85rem', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}>
+                    <LogOut size={14}/> Log Out
                   </button>
                 </div>
               )}
             </div>
           )}
 
-          {/* Mobile Nav Toggle */}
+          {/* Mobile hamburger — ONLY on mobile */}
           <button
             type="button"
-            className="btn d-md-none p-1"
-            style={{ color: 'var(--text-primary)' }}
+            className="d-md-none"
             onClick={() => setShowMobileNav(v => !v)}
             aria-label="Toggle menu"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.4rem', color: 'var(--text-primary)' }}
           >
-            {showMobileNav ? <X size={22} /> : <Menu size={22} />}
+            {showMobileNav ? <X size={22}/> : <Menu size={22}/>}
           </button>
-
         </div>
-
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* ── Mobile Drawer ──────────────────────────────────────────── */}
       {showMobileNav && (
-        <div 
-          className="d-md-none border-top px-4 py-3"
-          style={{
-            backgroundColor: 'var(--surface)',
-            borderTop: '1px solid var(--border)'
-          }}
-        >
-          <div className="d-flex flex-column gap-2">
-            <Link to="/search" className="nav-link py-2 d-flex align-items-center gap-2"><Building2 size={16} /> Browse Hostels</Link>
-            <Link to="/map" className="nav-link py-2 d-flex align-items-center gap-2"><MapPin size={16} /> Map View</Link>
-            <Link to="/faq" className="nav-link py-2 d-flex align-items-center gap-2"><HelpCircle size={16} /> FAQ</Link>
-            <Link to="/contact" className="nav-link py-2 d-flex align-items-center gap-2"><PhoneCall size={16} /> Contact Us</Link>
+        <div className="d-md-none" style={{
+          backgroundColor: 'var(--surface, #fff)',
+          borderTop: '1px solid var(--border, #e2e8f0)',
+          padding: '0.5rem 0.75rem 1rem',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+        }}>
+          {/* Nav links */}
+          {[
+            { to: '/search',  icon: <Building2 size={17}/>, label: 'Browse Hostels' },
+            { to: '/map',     icon: <MapPin size={17}/>,    label: 'Map View' },
+            { to: '/faq',     icon: <HelpCircle size={17}/>,label: 'FAQ' },
+            { to: '/contact', icon: <PhoneCall size={17}/>, label: 'Contact Us' },
+          ].map(item => (
+            <Link
+              key={item.to}
+              to={item.to}
+              onClick={() => setShowMobileNav(false)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.6rem',
+                padding: '0.65rem 0.75rem', borderRadius: 8, textDecoration: 'none',
+                color: isActive(item.to) ? 'var(--brand-orange)' : 'var(--text-primary, #1e293b)',
+                fontWeight: isActive(item.to) ? 600 : 500,
+                fontSize: '0.95rem',
+                backgroundColor: isActive(item.to) ? 'rgba(255,107,53,0.08)' : 'transparent',
+              }}
+            >
+              {item.icon} {item.label}
+            </Link>
+          ))}
+
+          {/* Divider + user actions */}
+          <div style={{ borderTop: '1px solid var(--border)', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
             {user ? (
               <>
-                <Link to={getDashboardLink()} className="nav-link py-2 fw-bold text-orange d-flex align-items-center gap-2">
-                  <LayoutDashboard size={16} /> My Dashboard
+                <Link
+                  to={getDashboardLink()}
+                  onClick={() => setShowMobileNav(false)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.6rem',
+                    padding: '0.65rem 0.75rem', borderRadius: 8, textDecoration: 'none',
+                    color: 'var(--brand-orange)', fontWeight: 700, fontSize: '0.95rem',
+                  }}
+                >
+                  <LayoutDashboard size={17}/> My Dashboard
                 </Link>
-                <button onClick={logout} className="btn btn-outline-danger btn-sm text-start py-2 mt-2">
-                  <LogOut size={16} className="me-2" /> Log Out
+                <button
+                  onClick={() => { logout(); setShowMobileNav(false); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.6rem',
+                    padding: '0.65rem 0.75rem', borderRadius: 8, width: '100%',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: '#ef4444', fontWeight: 500, fontSize: '0.95rem',
+                  }}
+                >
+                  <LogOut size={17}/> Log Out
                 </button>
               </>
             ) : (
-              <Link to="/login" className="btn btn-primary w-100 mt-2">
+              <Link
+                to="/login"
+                onClick={() => setShowMobileNav(false)}
+                className="btn btn-primary w-100 mt-1"
+                style={{ fontWeight: 700 }}
+              >
                 Sign In
               </Link>
             )}
