@@ -107,8 +107,8 @@ export const register = async (req, res) => {
 };
 
 const DEMO_USERS = {
-  'admin@hostelportal.edu.gh': {
-    password: 'Admin@1234',
+  'kelvinkwasigyan@gmail.com': {
+    password: 'Richbanny123',
     full_name: 'System Administrator',
     phone: '+233241000000',
     role: 'Admin',
@@ -139,7 +139,7 @@ export const login = async (req, res) => {
 
     let { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active')
+      .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active, is_phone_verified')
       .eq('email', cleanEmail)
       .single();
 
@@ -232,7 +232,7 @@ export const getProfile = async (req, res) => {
   try {
     const { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('user_id, full_name, email, phone, role, verification_status, id_document_path, profile_picture, bio, is_active, created_at')
+      .select('user_id, full_name, email, phone, role, verification_status, id_document_path, profile_picture, bio, is_active, created_at, is_phone_verified')
       .eq('user_id', req.user.user_id)
       .single();
 
@@ -291,11 +291,62 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+// ─── Change Password ────────────────────────────────────────────────────────
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+    const { current_password, new_password } = req.body;
+
+    if (!new_password || new_password.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+    }
+
+    // Get user to verify current password (if they have one)
+    const { data: user, error: fetchError } = await supabaseAdmin
+      .from('users')
+      .select('password_hash')
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError || !user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    // Verify current password if user has one (Google users might not)
+    if (user.password_hash) {
+      if (!current_password) {
+        return res.status(400).json({ error: 'Current password is required.' });
+      }
+      const isMatch = await bcrypt.compare(current_password, user.password_hash);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Incorrect current password.' });
+      }
+    }
+
+    // Hash and update new password
+    const newHash = await bcrypt.hash(new_password, 12);
+    const { error: updateError } = await supabaseAdmin
+      .from('users')
+      .update({ password_hash: newHash })
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.error('Change password error:', updateError);
+      return res.status(500).json({ error: 'Failed to update password.' });
+    }
+
+    return res.json({ message: 'Password changed successfully.' });
+  } catch (err) {
+    console.error('Change password unhandled error:', err);
+    res.status(500).json({ error: 'Server error while changing password.' });
+  }
+};
+
 
 // ─── UC-S03: Google OAuth Sign-In / Sign-Up ──────────────────────────────────
 export const googleAuth = async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, role: requestedRole } = req.body;
     if (!credential) {
       return res.status(400).json({ error: 'Google credential is required.' });
     }
@@ -323,7 +374,10 @@ export const googleAuth = async (req, res) => {
       .single();
 
     if (!user) {
-      // New user — register as Student
+      // New user — register with requested role (default to Student)
+      const finalRole = (requestedRole === 'Landlord' || requestedRole === 'Admin') ? requestedRole : 'Student';
+      const initialStatus = finalRole === 'Student' ? 'Approved' : 'Pending';
+
       const { data: newUser, error: insertError } = await supabaseAdmin
         .from('users')
         .insert({
@@ -331,8 +385,8 @@ export const googleAuth = async (req, res) => {
           email: email.toLowerCase(),
           phone: '',
           password_hash: null,       // Google users have no password
-          role: 'Student',
-          verification_status: 'Approved',
+          role: finalRole,
+          verification_status: initialStatus,
           profile_picture: picture || null,
           is_active: true
         })

@@ -1,6 +1,6 @@
 // routes/auth.js
 import express from 'express';
-import { register, login, getProfile, updateProfile, googleAuth } from '../controllers/authController.js';
+import { register, login, getProfile, updateProfile, changePassword, googleAuth } from '../controllers/authController.js';
 import { authenticate } from '../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
 
@@ -41,5 +41,10 @@ router.put('/profile', authenticate, [
   body('phone').trim().notEmpty().withMessage('Phone number is required.'),
   body('bio').optional({ nullable: true }).isLength({ max: 500 }).withMessage('Bio cannot exceed 500 characters.')
 ], validate, updateProfile);
+
+// Change password
+router.put('/password', authenticate, [
+  body('new_password').isLength({ min: 6 }).withMessage('New password must be at least 6 characters.')
+], validate, changePassword);
 
 export default router;

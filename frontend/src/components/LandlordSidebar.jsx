@@ -7,7 +7,6 @@ const menuItems = [
   { name: 'Add Listing',     path: '/landlord/create',    icon: <PlusSquare size={18} /> },
   { name: 'Manage Listings', path: '/landlord/listings',  icon: <List size={18} /> },
   { name: 'Hold Requests',   path: '/landlord/requests',  icon: <Inbox size={18} /> },
-  { name: 'Profile Settings',path: '/landlord/profile',   icon: <User size={18} /> },
 ];
 
 const mobileTabItems = [
@@ -15,7 +14,6 @@ const mobileTabItems = [
   { name: 'Add',       path: '/landlord/create',   icon: <PlusSquare size={20} /> },
   { name: 'Listings',  path: '/landlord/listings', icon: <List size={20} /> },
   { name: 'Requests',  path: '/landlord/requests', icon: <Inbox size={20} /> },
-  { name: 'Profile',   path: '/landlord/profile',  icon: <User size={20} /> },
 ];
 
 export default function LandlordSidebar() {

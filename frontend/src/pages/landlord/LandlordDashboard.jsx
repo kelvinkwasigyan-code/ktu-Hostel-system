@@ -80,7 +80,7 @@ export default function LandlordDashboard() {
                 <p className="text-muted-custom mb-0">Manage listings, monitor student reservation holds, and check ratings.</p>
               </div>
               <div className="d-flex align-items-center gap-3">
-                <Link to="/landlord/profile" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
+                <Link to="/settings" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
                   <User size={15} /> Edit Profile
                 </Link>
                 <span className="text-muted-custom d-none d-md-inline" style={{ fontSize: '0.85rem' }}>

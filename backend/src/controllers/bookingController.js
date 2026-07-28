@@ -139,7 +139,7 @@ export const respondToHold = async (req, res) => {
       .from('bookings')
       .select(`
         *,
-        properties!property_id (property_id, title, landlord_id, phone),
+        properties!property_id (property_id, title, landlord_id, phone, rooms_available),
         users!student_id (user_id, full_name)
       `)
       .eq('booking_id', booking_id)
@@ -174,15 +174,23 @@ export const respondToHold = async (req, res) => {
     const now = new Date().toISOString();
 
     if (action === 'accept') {
-      // Accept: set booking Approved, property → Occupied
+      // Accept: set booking Approved, decrement rooms_available
       await supabaseAdmin
         .from('bookings')
         .update({ status: 'Approved', resolved_at: now })
         .eq('booking_id', booking_id);
 
+      const currentRooms = booking.properties?.rooms_available !== undefined ? booking.properties.rooms_available : 1;
+      const newRooms = Math.max(0, currentRooms - 1);
+      
+      const propertyUpdate = { rooms_available: newRooms };
+      if (newRooms === 0) {
+        propertyUpdate.availability_status = 'Occupied';
+      }
+
       await supabaseAdmin
         .from('properties')
-        .update({ availability_status: 'Occupied' })
+        .update(propertyUpdate)
         .eq('property_id', booking.property_id);
 
       // UC-7.4: Only NOW release landlord contact to student (never on public page)

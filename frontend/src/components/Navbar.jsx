@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Bell, Home, Search, Map, LogOut, PlusSquare, Menu, X } from 'lucide-react';
+import { Bell, Home, Search, Map, LogOut, PlusSquare, Menu, X, LayoutDashboard, Settings } from 'lucide-react';
 import api from '../services/api';
 import ThemeToggle from './ThemeToggle';
 
@@ -80,12 +80,16 @@ export default function Navbar() {
 
   const isNavActive = (path) => location.pathname === path;
 
-  const navLinks = [
+  const isPortalView = location.pathname.startsWith('/student') || 
+                       location.pathname.startsWith('/landlord') || 
+                       location.pathname.startsWith('/admin');
+
+  const navLinks = (!user || user.role === 'Student') ? [
     { label: 'Browse', path: '/search', icon: <Search size={15} /> },
     { label: 'Map', path: '/map', icon: <Map size={15} /> },
     { label: 'FAQ', path: '/faq', icon: null },
     { label: 'Contact', path: '/contact', icon: null },
-  ];
+  ] : [];
 
   return (
     <>
@@ -110,9 +114,15 @@ export default function Navbar() {
                 </Link>
               ))}
               {user && (
-                <Link to={getDashboardLink()} className={`nav-link d-flex align-items-center gap-1 ${isNavActive(getDashboardLink()) ? 'active' : ''}`}>
-                  <Home size={15} /> Dashboard
-                </Link>
+                isPortalView ? (
+                  <Link to="/" className="nav-link d-flex align-items-center gap-1">
+                    <Home size={15} /> Back to Main Site
+                  </Link>
+                ) : (
+                  <Link to={getDashboardLink()} className="nav-link d-flex align-items-center gap-1">
+                    <LayoutDashboard size={15} /> My Dashboard
+                  </Link>
+                )
               )}
             </div>
 
@@ -225,6 +235,11 @@ export default function Navbar() {
                               <PlusSquare size={15} /> New Listing
                             </Link>
                           )}
+                          <Link to="/settings" className="d-flex align-items-center gap-2 notif-item"
+                                style={{ color: 'var(--text-secondary)', borderRadius: '8px' }}
+                                onClick={() => setShowUserMenu(false)}>
+                            <Settings size={15} /> Settings
+                          </Link>
                           <div className="d-flex align-items-center gap-2 notif-item"
                                style={{ color: 'var(--danger)', cursor: 'pointer', borderRadius: '8px' }}
                                onClick={logout}>
@@ -240,6 +255,25 @@ export default function Navbar() {
                   <Link to="/login" className="btn btn-outline-primary btn-sm">Sign In</Link>
                   <Link to="/register" className="btn btn-primary btn-sm">Register</Link>
                 </div>
+              )}
+
+              {/* Mobile quick portal toggle */}
+              {user && (
+                <Link
+                  to={isPortalView ? '/' : getDashboardLink()}
+                  className="d-lg-none btn p-2"
+                  style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '8px', background: 'var(--surface)' }}
+                  aria-label="Toggle Portal"
+                >
+                  {isPortalView ? <Home size={20} /> : <LayoutDashboard size={20} />}
+                </Link>
+              )}
+
+              {/* Guest Register Button (Mobile) */}
+              {!user && (
+                <Link to="/register" className="btn btn-primary btn-sm d-lg-none" style={{ borderRadius: '8px' }}>
+                  Register
+                </Link>
               )}
 
               {/* Mobile hamburger — opens drawer */}
@@ -291,18 +325,31 @@ export default function Navbar() {
               {user && (
                 <>
                   <div className="mobile-nav-drawer-divider" />
-                  <Link
-                    to={getDashboardLink()}
-                    className={`mobile-nav-drawer-link ${isNavActive(getDashboardLink()) ? 'active' : ''}`}
-                    onClick={() => setShowMobileNav(false)}
-                  >
-                    <Home size={15} style={{ opacity: 0.7 }} /> Dashboard
-                  </Link>
+                  {isPortalView ? (
+                    <Link
+                      to="/"
+                      className={`mobile-nav-drawer-link ${isNavActive('/') ? 'active' : ''}`}
+                      onClick={() => setShowMobileNav(false)}
+                    >
+                      <Home size={15} style={{ opacity: 0.7 }} /> Back to Main Site
+                    </Link>
+                  ) : (
+                    <Link
+                      to={getDashboardLink()}
+                      className={`mobile-nav-drawer-link ${isNavActive(getDashboardLink()) ? 'active' : ''}`}
+                      onClick={() => setShowMobileNav(false)}
+                    >
+                      <LayoutDashboard size={15} style={{ opacity: 0.7 }} /> My Dashboard
+                    </Link>
+                  )}
                   {user.role === 'Landlord' && (
                     <Link to="/landlord/create" className="mobile-nav-drawer-link" onClick={() => setShowMobileNav(false)}>
                       <PlusSquare size={15} style={{ opacity: 0.7 }} /> New Listing
                     </Link>
                   )}
+                  <Link to="/settings" className={`mobile-nav-drawer-link ${isNavActive('/settings') ? 'active' : ''}`} onClick={() => setShowMobileNav(false)}>
+                    <Settings size={15} style={{ opacity: 0.7 }} /> Settings
+                  </Link>
                 </>
               )}
             </div>

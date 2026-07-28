@@ -23,21 +23,7 @@ export default function MapboxLocationPicker({
   const token = ((import.meta.env.VITE_MAPBOX_TOKEN || '') || DEFAULT_PUBLIC_TOKEN).replace(/^["']|["']$/g, '').trim();
 
   useEffect(() => {
-    if (!document.getElementById('mapbox-geocoder-css')) {
-      const link = document.createElement('link');
-      link.id = 'mapbox-geocoder-css';
-      link.rel = 'stylesheet';
-      link.href = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.css';
-      link.type = 'text/css';
-      document.head.appendChild(link);
-    }
-    if (!document.getElementById('mapbox-geocoder-js')) {
-      const script = document.createElement('script');
-      script.id = 'mapbox-geocoder-js';
-      script.src = 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.3/mapbox-gl-geocoder.min.js';
-      script.async = true;
-      document.head.appendChild(script);
-    }
+    // Geocoder scripts removed per user request
   }, []);
 
   useEffect(() => {
@@ -89,41 +75,7 @@ export default function MapboxLocationPicker({
       onChangeCoords(clickLat, clickLng);
     });
 
-    const initGeocoder = () => {
-      if (window.MapboxGeocoder && !map.hasControl(geocoderControl)) {
-        const geocoder = new window.MapboxGeocoder({
-          accessToken: mapboxgl.accessToken,
-          mapboxgl: mapboxgl,
-          marker: false, // We use our own marker
-          placeholder: 'Search for address...',
-        });
-        
-        geocoder.on('result', (e) => {
-          const coords = e.result.center; // [lng, lat]
-          marker.setLngLat(coords);
-          onChangeCoords(coords[1].toFixed(6), coords[0].toFixed(6));
-        });
-
-        geocoderControl = geocoder;
-        map.addControl(geocoder, 'top-left');
-      }
-    };
-
-    let geocoderControl = null;
-    let timeoutId;
-    
-    // Poll for the script to be loaded
-    const checkGeocoder = () => {
-      if (window.MapboxGeocoder) {
-        initGeocoder();
-      } else {
-        timeoutId = setTimeout(checkGeocoder, 100);
-      }
-    };
-    checkGeocoder();
-
     return () => {
-      clearTimeout(timeoutId);
       map.remove();
       mapRef.current = null;
     };

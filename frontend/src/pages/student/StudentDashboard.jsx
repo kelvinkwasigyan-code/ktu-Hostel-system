@@ -61,15 +61,15 @@ export default function StudentDashboard() {
   const nextSlide = () => goToSlide((currentSlide + 1) % featuredHostels.length);
   const prevSlide = () => goToSlide((currentSlide - 1 + featuredHostels.length) % featuredHostels.length);
 
-  // Auto-slide every 5 seconds — reset timer on manual nav
+  // Auto-slide every 2 seconds — reset timer on manual nav
   useEffect(() => {
-    intervalRef.current = setInterval(nextSlide, 5000);
+    intervalRef.current = setInterval(nextSlide, 2000);
     return () => clearInterval(intervalRef.current);
   }, [currentSlide]);
 
   const handleCarouselMouseEnter = () => clearInterval(intervalRef.current);
   const handleCarouselMouseLeave = () => {
-    intervalRef.current = setInterval(nextSlide, 5000);
+    intervalRef.current = setInterval(nextSlide, 2000);
   };
 
   // ── Dashboard data ─────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ export default function StudentDashboard() {
       <Navbar />
       <div className="d-flex">
         <StudentSidebar />
-        <main className="flex-grow-1 p-4" style={{ minHeight: '100vh' }}>
+        <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
 
 
@@ -147,7 +147,7 @@ export default function StudentDashboard() {
             {/* ── Hero Carousel ──────────────────────────────────────────────── */}
             <div
               className="position-relative mb-4 rounded-custom overflow-hidden"
-              style={{ height: '320px', cursor: 'pointer' }}
+              style={{ height: '250px', cursor: 'pointer' }}
               onMouseEnter={handleCarouselMouseEnter}
               onMouseLeave={handleCarouselMouseLeave}
             >
@@ -165,7 +165,7 @@ export default function StudentDashboard() {
                   <img
                     src={slide.image}
                     alt={slide.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
                   />
                   {/* Gradient overlay */}
                   <div style={{
@@ -274,7 +274,7 @@ export default function StudentDashboard() {
                       📍 {activeHold.properties?.address}, {activeHold.properties?.neighborhood} •{' '}
                       💰 {activeHold.selected_room_type ? `${activeHold.selected_room_type} Room (` : ''}
                       GHS {activeHold.agreed_price || activeHold.properties?.price_per_semester}
-                      {activeHold.selected_room_type ? ')' : ''}/semester
+                      {activeHold.selected_room_type ? ')' : ''}/{((activeHold.properties?.payment_frequency) || 'Semester').toLowerCase()}
                     </p>
                     {activeHold.landlord_contact && (
                       <div className="d-flex flex-wrap align-items-center gap-3 mt-2 pt-2 border-top border-custom" style={{ fontSize: '0.82rem' }}>

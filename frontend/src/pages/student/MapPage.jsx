@@ -83,7 +83,7 @@ export default function MapPage() {
                             📍 {p.neighborhood} • {p.distance_from_campus_km ? `${p.distance_from_campus_km} km` : 'Near KTU'}
                           </div>
                           <div className="d-flex justify-content-between align-items-center">
-                            <span className="text-orange fw-bold" style={{ fontSize: '0.9rem' }}>GHS {p.price_per_semester}</span>
+                            <span className="text-orange fw-bold" style={{ fontSize: '0.9rem' }}>GHS {p.price_per_semester} / {((p.payment_frequency) || 'Semester').toLowerCase()}</span>
                             <span style={{ fontSize: '0.72rem' }} className="badge bg-secondary">{p.room_type}</span>
                           </div>
                         </div>

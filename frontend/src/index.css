@@ -519,7 +519,7 @@ a:hover { color: var(--brand-orange-light); }
   .property-card-img { height: 170px; }
   .stat-number { font-size: 1.8rem; }
   .search-hero-bar { border-radius: var(--radius-lg); }
-  .notif-dropdown { width: calc(100vw - 24px); right: -60px; max-width: 340px; }
+  .notif-dropdown { width: calc(100vw - 24px); right: -10px; max-width: 340px; }
   .stat-card { padding: 1rem; }
   .footer { padding: 2rem 0 1rem; }
 }

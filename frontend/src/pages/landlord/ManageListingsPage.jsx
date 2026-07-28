@@ -124,7 +124,7 @@ export default function ManageListingsPage() {
                               <MapPin size={12} className="text-orange" /> {p.address}, {p.neighborhood}
                             </p>
                             <small className="text-gold fw-bold">
-                              GHS {Number(p.price_per_semester).toLocaleString()} / semester
+                              GHS {Number(p.price_per_semester).toLocaleString()} / {((p.payment_frequency) || 'Semester').toLowerCase()}
                             </small>
                           </div>
 

@@ -9,7 +9,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase', 'Apenkwa', 'Mile 50'];
+const NEIGHBORHOODS = ['KTU Main Campus Area', 'Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Okorase', 'Apenkwa', 'Mile 50'];
 const ROOM_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
 
 export default function SearchPage() {
@@ -19,6 +19,7 @@ export default function SearchPage() {
   // Filter states initialized from URL params if present
   const [neighborhood, setNeighborhood] = useState(searchParams.get('neighborhood') || '');
   const [roomType, setRoomType] = useState(searchParams.get('room_type') || '');
+  const [propertyType, setPropertyType] = useState(searchParams.get('property_type') || '');
   const [genderPolicy, setGenderPolicy] = useState(searchParams.get('gender_policy') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') || '');
   const [maxDistance, setMaxDistance] = useState(searchParams.get('max_distance') || '');
@@ -50,6 +51,7 @@ export default function SearchPage() {
       const params = {};
       if (neighborhood) params.neighborhood = neighborhood;
       if (roomType)     params.room_type = roomType;
+      if (propertyType) params.property_type = propertyType;
       if (genderPolicy) params.gender_policy = genderPolicy;
       if (maxPrice)     params.max_price = maxPrice;
       if (maxDistance)  params.max_distance = maxDistance;
@@ -85,6 +87,7 @@ export default function SearchPage() {
     const newParams = {};
     if (neighborhood) newParams.neighborhood = neighborhood;
     if (roomType)     newParams.room_type = roomType;
+    if (propertyType) newParams.property_type = propertyType;
     if (genderPolicy) newParams.gender_policy = genderPolicy;
     if (maxPrice)     newParams.max_price = maxPrice;
     if (maxDistance)  newParams.max_distance = maxDistance;
@@ -96,6 +99,7 @@ export default function SearchPage() {
   const handleClearFilters = () => {
     setNeighborhood('');
     setRoomType('');
+    setPropertyType('');
     setGenderPolicy('');
     setMaxPrice('');
     setMaxDistance('');
@@ -166,6 +170,15 @@ export default function SearchPage() {
                   <select className="form-select" value={neighborhood} onChange={e => setNeighborhood(e.target.value)}>
                     <option value="">All Areas</option>
                     {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Property Type</label>
+                  <select className="form-select" value={propertyType} onChange={e => setPropertyType(e.target.value)}>
+                    <option value="">All Property Types</option>
+                    <option value="hostel">Hostel (Shared / Block Units)</option>
+                    <option value="apartment">Self-Contained Apartment</option>
+                    <option value="private_room">Single Room (Shared Facilities)</option>
                   </select>
                 </div>
                 <div className="mb-3">
@@ -240,6 +253,34 @@ export default function SearchPage() {
 
           {/* Right Column: Grid and Pagination */}
           <div className="col-lg-9">
+            {/* Quick Filter Tabs */}
+            <div className="d-flex align-items-center gap-2 mb-3 flex-wrap">
+              {[
+                { value: '', label: 'All Properties' },
+                { value: 'hostel', label: '🏢 Hostels' },
+                { value: 'apartment', label: '🏠 Apartments' },
+                { value: 'private_room', label: '🛏️ Single Rooms' }
+              ].map(f => (
+                <button
+                  key={f.value}
+                  type="button"
+                  className={`btn btn-sm rounded-pill ${propertyType === f.value ? 'btn-primary' : 'btn-outline-secondary'}`}
+                  style={{ fontSize: '0.8rem', fontWeight: 600 }}
+                  onClick={() => {
+                    setPropertyType(f.value);
+                    const newParams = Object.fromEntries(searchParams.entries());
+                    if (f.value) newParams.property_type = f.value;
+                    else delete newParams.property_type;
+                    newParams.page = '1';
+                    setPage(1);
+                    setSearchParams(newParams);
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
             <div className="d-flex justify-content-between align-items-center mb-3">
               <span className="text-muted-custom" style={{ fontSize: '0.9rem' }}>
                 Found <strong>{totalCount}</strong> available properties

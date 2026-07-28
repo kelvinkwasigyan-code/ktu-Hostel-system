@@ -181,7 +181,7 @@ export default function ModerateListingsPage() {
                               <div className="d-flex gap-3 flex-wrap" style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                                 <span><MapPin size={12} className="me-1" />{listing.neighborhood}, {listing.city}</span>
                                 <span><Home size={12} className="me-1" />{listing.property_type}</span>
-                                <span><DollarSign size={12} className="me-1" />GHS {Number(listing.price_per_semester).toLocaleString()} / sem</span>
+                                <span><DollarSign size={12} className="me-1" />GHS {Number(listing.price_per_semester).toLocaleString()} / {((listing.payment_frequency) || 'Semester').toLowerCase()}</span>
                               </div>
                               <div className="mt-1" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
                                 Landlord: <strong style={{ color: 'var(--text-primary)' }}>{listing.users?.full_name}</strong>

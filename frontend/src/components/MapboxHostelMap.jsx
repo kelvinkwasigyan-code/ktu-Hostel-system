@@ -26,6 +26,10 @@ export default function MapboxHostelMap({
   const token = ((import.meta.env.VITE_MAPBOX_TOKEN || '') || DEFAULT_PUBLIC_TOKEN).replace(/^["']|["']$/g, '').trim();
 
   useEffect(() => {
+    // Geocoder scripts removed per user request
+  }, []);
+
+  useEffect(() => {
     const invalid = !token || token === '' || token.includes('YOUR_MAPBOX') || !token.startsWith('pk.');
     if (invalid) {
       console.warn('[MapboxHostelMap] Token missing or invalid:', token || '(empty)');
@@ -118,7 +122,7 @@ export default function MapboxHostelMap({
             🚶 ${p.distance_from_campus_km ? `${p.distance_from_campus_km} km to campus` : 'Near Campus'}
           </p>
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <strong style="color: #E06D06; font-size: 0.9rem;">GHS ${p.price_per_semester}</strong>
+            <strong style="color: #E06D06; font-size: 0.9rem;">GHS ${p.price_per_semester} / ${((p.payment_frequency) || 'Semester').toLowerCase()}</strong>
             <a href="/property/${p.property_id}" style="font-size: 0.78rem; font-weight: 700; color: #008BCE; text-decoration: none;">Details →</a>
           </div>
         `;

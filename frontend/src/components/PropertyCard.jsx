@@ -54,10 +54,15 @@ export default function PropertyCard({ property }) {
 
           {/* Room Type + Occupancy */}
           <div className="d-flex align-items-center gap-3 mb-3 property-meta">
-            <span className="text-truncate" style={{ maxWidth: '160px' }}>
+            <span className="text-truncate" style={{ maxWidth: '140px' }}>
               {ROOM_ICONS[property.room_type?.split(',')[0]?.trim()] || '🛏️'} {property.room_type}
             </span>
             <span><Users size={13} /> Max {property.max_occupancy}</span>
+            {property.availability_status === 'Available' && (
+              <span className="text-success fw-semibold ms-auto" style={{ fontSize: '0.75rem' }}>
+                {property.rooms_available !== undefined ? property.rooms_available : 1} left
+              </span>
+            )}
           </div>
 
           {/* Rating */}
@@ -78,7 +83,9 @@ export default function PropertyCard({ property }) {
                 {property.room_rates?.length > 1 ? 'From ' : ''}GHS {Number(property.price_per_semester).toLocaleString()}
               </span>
               <br />
-              <span className="property-price-label">per semester</span>
+              <span className="property-price-label">
+                per {(property.payment_frequency || 'Semester').toLowerCase()}
+              </span>
             </div>
             <span style={{
               background: 'rgba(255,107,53,0.12)',

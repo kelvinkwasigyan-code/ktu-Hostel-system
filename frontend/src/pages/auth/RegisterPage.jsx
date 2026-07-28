@@ -78,7 +78,7 @@ export default function RegisterPage() {
         backgroundImage: "url('/hostel-bg.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        opacity: 0.15,
+        opacity: 0.2,
         filter: 'blur(1px)',
         transform: 'scale(1.03)',
         zIndex: 0
@@ -88,7 +88,7 @@ export default function RegisterPage() {
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0, bottom: 0,
-        background: 'radial-gradient(circle at center, transparent 20%, var(--dark-navy) 90%)',
+        background: 'linear-gradient(135deg, rgba(10, 34, 64, 0.85) 0%, rgba(5, 20, 40, 0.95) 100%)',
         zIndex: 0
       }} />
 
@@ -255,7 +255,8 @@ export default function RegisterPage() {
                   onSuccess={async (credentialResponse) => {
                     try {
                       const res = await api.post('/auth/google', {
-                        credential: credentialResponse.credential
+                        credential: credentialResponse.credential,
+                        role: form.role
                       });
                       login(res.data.user, res.data.token);
                       const firstName = res.data.user.full_name?.split(' ')[0] || 'there';

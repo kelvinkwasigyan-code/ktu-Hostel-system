@@ -4,19 +4,29 @@ import { Mail, Phone, MapPin, Send, HelpCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import toast from 'react-hot-toast';
+import api from '../services/api';
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api.post('/support', {
+        topic: form.subject,
+        message: form.message,
+        name: form.name,
+        email: form.email
+      });
       toast.success('Your message has been sent successfully! Our team will contact you shortly.');
       setForm({ name: '', email: '', subject: '', message: '' });
-    }, 1200);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to send message.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

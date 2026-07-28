@@ -11,6 +11,7 @@ import PropertyDetailPage from './pages/student/PropertyDetailPage';
 import MapPage from './pages/student/MapPage';
 import FaqPage from './pages/FaqPage';
 import ContactPage from './pages/ContactPage';
+import SettingsPage from './pages/common/SettingsPage';
 
 // Student pages
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -23,7 +24,6 @@ import CreateListingPage from './pages/landlord/CreateListingPage';
 import EditListingPage from './pages/landlord/EditListingPage';
 import ManageListingsPage from './pages/landlord/ManageListingsPage';
 import ReservationRequestsPage from './pages/landlord/ReservationRequestsPage';
-import LandlordProfilePage from './pages/landlord/LandlordProfilePage';
 
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -72,13 +72,15 @@ export default function App() {
           <Route path="/student/bookings" element={<PrivateRoute roles={['Student']}><MyBookingsPage /></PrivateRoute>} />
           <Route path="/student/reviews" element={<PrivateRoute roles={['Student']}><MyReviewsPage /></PrivateRoute>} />
 
+          {/* Common Protected Routes */}
+          <Route path="/settings" element={<PrivateRoute roles={['Student', 'Landlord']}><SettingsPage /></PrivateRoute>} />
+
           {/* Landlord */}
           <Route path="/landlord" element={<PrivateRoute roles={['Landlord']}><LandlordDashboard /></PrivateRoute>} />
           <Route path="/landlord/create" element={<PrivateRoute roles={['Landlord']}><CreateListingPage /></PrivateRoute>} />
           <Route path="/landlord/listings" element={<PrivateRoute roles={['Landlord']}><ManageListingsPage /></PrivateRoute>} />
           <Route path="/landlord/listings/:id/edit" element={<PrivateRoute roles={['Landlord']}><EditListingPage /></PrivateRoute>} />
           <Route path="/landlord/requests" element={<PrivateRoute roles={['Landlord']}><ReservationRequestsPage /></PrivateRoute>} />
-          <Route path="/landlord/profile" element={<PrivateRoute roles={['Landlord']}><LandlordProfilePage /></PrivateRoute>} />
 
           {/* Admin */}
           <Route path="/admin" element={<PrivateRoute roles={['Admin']}><AdminDashboard /></PrivateRoute>} />

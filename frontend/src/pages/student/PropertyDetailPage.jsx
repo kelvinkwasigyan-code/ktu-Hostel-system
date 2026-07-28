@@ -33,6 +33,12 @@ export default function PropertyDetailPage() {
   const [newComment, setNewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  // Viewing request states
+  const [showViewingModal, setShowViewingModal] = useState(false);
+  const [preferredDate, setPreferredDate] = useState('');
+  const [submittingViewing, setSubmittingViewing] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
+
   useEffect(() => {
     fetchPropertyDetails();
   }, [id]);
@@ -92,6 +98,48 @@ export default function PropertyDetailPage() {
       toast.error(errorMsg);
     } finally {
       setSubmittingHold(false);
+    }
+  };
+
+  const handleRequestViewing = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error('Please log in to schedule a property viewing.');
+      return navigate('/login');
+    }
+    if (!preferredDate) {
+      return toast.error('Please select a preferred viewing date.');
+    }
+
+    try {
+      setSubmittingViewing(true);
+      setStatusMsg('');
+      const res = await api.post('/inspections/request-inspection', {
+        studentId: user.user_id || user.id,
+        landlordId: property.landlord_id,
+        hostelId: property.property_id || property.id,
+        studentName: user.full_name || user.user_metadata?.full_name || 'Student',
+        studentPhone: user.phone || '0240000000',
+        preferredDate
+      });
+
+      if (res.data?.success || res.status === 200 || res.status === 201) {
+        setStatusMsg('✅ Site inspection request sent to landlord!');
+        toast.success('Site inspection request sent to landlord!');
+        setTimeout(() => {
+          setShowViewingModal(false);
+          setStatusMsg('');
+          setPreferredDate('');
+        }, 2000);
+      } else {
+        setStatusMsg('❌ Failed to send request.');
+      }
+    } catch (err) {
+      console.error('Viewing request error:', err);
+      setStatusMsg('❌ Failed to send request.');
+      toast.error(err.response?.data?.error || 'Failed to submit viewing request.');
+    } finally {
+      setSubmittingViewing(false);
     }
   };
 
@@ -194,6 +242,11 @@ export default function PropertyDetailPage() {
             <div className="card p-4 border-custom bg-surface rounded-custom mb-4">
               <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                 <div>
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <span className="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" style={{ fontSize: '0.78rem' }}>
+                      {property.property_type === 'apartment' ? '🏠 Self-Contained Apartment' : property.property_type === 'private_room' ? '🛏️ Single Room (Shared Facilities)' : '🏢 Hostel (Shared / Block Units)'}
+                    </span>
+                  </div>
                   <h3 style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800 }}>{property.title}</h3>
                   <p className="text-muted-custom d-flex align-items-center gap-1 mb-0" style={{ fontSize: '0.9rem' }}>
                     <MapPin size={15} className="text-orange" /> {property.address}, {property.neighborhood}
@@ -201,7 +254,7 @@ export default function PropertyDetailPage() {
                 </div>
                 <div className="d-flex flex-column align-items-md-end">
                   <div className="property-price">GHS {Number(property.price_per_semester).toLocaleString()}</div>
-                  <small className="text-muted-custom">per semester</small>
+                  <small className="text-muted-custom">per {(property.payment_frequency || 'Semester').toLowerCase()}</small>
                 </div>
               </div>
 
@@ -209,15 +262,15 @@ export default function PropertyDetailPage() {
 
               {/* Quick Specs */}
               <div className="row g-2 text-center mb-3">
-                <div className="col-3">
-                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
+                <div className="col">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom h-100">
                     <div style={{ fontSize: '1.2rem' }}>{ROOM_ICONS[property.room_type] || '🛏️'}</div>
                     <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.room_type}</div>
                     <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Room Type</small>
                   </div>
                 </div>
-                <div className="col-3">
-                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
+                <div className="col">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom h-100">
                     <div style={{ fontSize: '1.2rem' }}>
                       {property.gender_policy === 'Boys only' ? '🚹' : property.gender_policy === 'Girls only' ? '🚺' : '🚻'}
                     </div>
@@ -225,18 +278,25 @@ export default function PropertyDetailPage() {
                     <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Gender Policy</small>
                   </div>
                 </div>
-                <div className="col-3">
-                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
+                <div className="col">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom h-100">
                     <div className="text-orange"><Users size={20} className="mx-auto" /></div>
                     <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>Max {property.max_occupancy}</div>
                     <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Occupancy</small>
                   </div>
                 </div>
-                <div className="col-3">
-                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom">
+                <div className="col">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom h-100">
                     <div className="text-gold"><MapPin size={20} className="mx-auto" /></div>
                     <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.distance_from_campus_km ? `${property.distance_from_campus_km} km` : 'Near Campus'}</div>
                     <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Distance</small>
+                  </div>
+                </div>
+                <div className="col">
+                  <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom h-100">
+                    <div className="text-success"><CheckCircle size={20} className="mx-auto" /></div>
+                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.rooms_available !== undefined ? property.rooms_available : 1}</div>
+                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Rooms Left</small>
                   </div>
                 </div>
               </div>
@@ -275,7 +335,7 @@ export default function PropertyDetailPage() {
                               <div style={{ fontWeight: 800, color: 'var(--brand-orange)', fontSize: '1.1rem' }}>
                                 GHS {Number(rate.price_per_semester).toLocaleString()}
                               </div>
-                              <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>per semester</small>
+                              <small className="text-muted-custom" style={{ fontSize: '0.75rem' }}>per {(property.payment_frequency || 'Semester').toLowerCase()}</small>
                             </div>
                             <input 
                               type="radio" 
@@ -450,7 +510,7 @@ export default function PropertyDetailPage() {
                     Selected Option: {selectedRoomRate.room_type} Room
                   </div>
                 )}
-                <div className="text-muted-custom mt-1" style={{ fontSize: '0.78rem' }}>Rent is paid directly to the landlord per semester.</div>
+                <div className="text-muted-custom mt-1" style={{ fontSize: '0.78rem' }}>Rent is paid directly to the landlord per {(property.payment_frequency || 'Semester').toLowerCase()}.</div>
               </div>
 
               {/* Key Features Callout */}
@@ -473,13 +533,21 @@ export default function PropertyDetailPage() {
 
               {/* Action */}
               {property.availability_status === 'Available' ? (
-                <button 
-                  className="btn btn-primary w-100 py-2.5 d-flex align-items-center justify-content-center gap-2"
-                  onClick={handlePlaceHold}
-                  disabled={submittingHold}
-                >
-                  <Clock size={18} /> {submittingHold ? 'Placing Hold...' : 'Place 24-Hour Hold'}
-                </button>
+                <div className="d-flex flex-column gap-2">
+                  <button 
+                    className="btn btn-primary w-100 py-2.5 d-flex align-items-center justify-content-center gap-2"
+                    onClick={handlePlaceHold}
+                    disabled={submittingHold}
+                  >
+                    <Clock size={18} /> {submittingHold ? 'Placing Hold...' : 'Reserve Space'}
+                  </button>
+                  <button 
+                    className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+                    onClick={() => { setShowViewingModal(true); setStatusMsg(''); }}
+                  >
+                    🔍 Request Site Inspection
+                  </button>
+                </div>
               ) : (
                 <button className="btn btn-secondary w-100 py-2.5" disabled>
                   Reservation Unavailable ({property.availability_status})
@@ -498,6 +566,54 @@ export default function PropertyDetailPage() {
         </div>
 
       </div>
+      
+      {/* Schedule Viewing Modal */}
+      {showViewingModal && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} tabIndex="-1">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content border-custom bg-surface rounded-custom p-2">
+              <div className="modal-header border-0 pb-0">
+                <h5 className="modal-title fw-bold" style={{ fontFamily: 'Outfit,sans-serif' }}>
+                  🔍 Request Site Inspection
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setShowViewingModal(false)}></button>
+              </div>
+              <form onSubmit={handleRequestViewing}>
+                <div className="modal-body">
+                  <p className="text-muted-custom" style={{ fontSize: '0.88rem' }}>
+                    Schedule an in-person viewing for <strong>{property.title}</strong>. Your contact details will be shared with the landlord.
+                  </p>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                      Preferred Date
+                    </label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      required 
+                      min={new Date().toISOString().split('T')[0]} 
+                      value={preferredDate} 
+                      onChange={e => setPreferredDate(e.target.value)} 
+                    />
+                  </div>
+                  {statusMsg && (
+                    <div className="p-2 rounded bg-surface-2 mt-2" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+                      {statusMsg}
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer border-0 pt-0">
+                  <button type="button" className="btn btn-sm btn-secondary" onClick={() => setShowViewingModal(false)}>Cancel</button>
+                  <button type="submit" className="btn btn-sm btn-primary px-4" disabled={submittingViewing}>
+                    {submittingViewing ? 'Submitting...' : 'Submit Request'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );

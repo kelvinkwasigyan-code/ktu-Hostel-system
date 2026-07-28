@@ -10,7 +10,7 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { processAndUploadFile, compressImageFile } from '../../utils/fileUpload';
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase', 'Apenkwa', 'Mile 50'];
+const NEIGHBORHOODS = ['KTU Main Campus Area', 'Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Okorase', 'Apenkwa', 'Mile 50'];
 const ROOM_TYPES = ['Single', 'Shared', 'Self-contained', 'Apartment'];
 const AMENITIES_LIST = [
   'Water Flow', 'Electricity (Prepaid)', 'WiFi Internet', 'Generator Backup',
@@ -30,6 +30,8 @@ export default function EditListingPage() {
   const [address, setAddress] = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [genderPolicy, setGenderPolicy] = useState('Mixed');
+  const [propertyType, setPropertyType] = useState('hostel');
+  const [paymentFrequency, setPaymentFrequency] = useState('Semester');
   const [description, setDescription] = useState('');
 
   // Payment / contact states
@@ -37,6 +39,9 @@ export default function EditListingPage() {
   const [momoNumber, setMomoNumber] = useState('');
   const [momoName, setMomoName] = useState('');
   const [paymentInstructions, setPaymentInstructions] = useState('');
+
+  // Inventory
+  const [roomsAvailable, setRoomsAvailable] = useState('1');
 
   // Room rates
   const [roomRates, setRoomRates] = useState([
@@ -64,9 +69,12 @@ export default function EditListingPage() {
         setAddress(p.address || '');
         setNeighborhood(p.neighborhood || '');
         setGenderPolicy(p.gender_policy || 'Mixed');
+        setPropertyType(p.property_type || 'hostel');
+        setPaymentFrequency(p.payment_frequency || 'Semester');
         setDescription(p.description || '');
         setLat(String(p.latitude || '6.0900'));
         setLng(String(p.longitude || '-0.2573'));
+        setRoomsAvailable(String(p.rooms_available !== undefined ? p.rooms_available : '1'));
 
         // Room rates
         let rates = [];
@@ -246,6 +254,7 @@ export default function EditListingPage() {
         address,
         neighborhood,
         gender_policy: genderPolicy,
+        payment_frequency: paymentFrequency,
         room_type: primaryRoomType,
         price_per_semester: minPrice,
         max_occupancy: maxOcc,
@@ -259,6 +268,8 @@ export default function EditListingPage() {
         momo_number: momoNumber,
         momo_name: momoName,
         payment_instructions: paymentInstructions,
+        rooms_available: parseInt(roomsAvailable, 10) || 1,
+        property_type: propertyType,
         latitude: parseFloat(lat),
         longitude: parseFloat(lng),
         amenities: selectedAmenities,
@@ -337,6 +348,15 @@ export default function EditListingPage() {
                   </div>
 
                   <div>
+                    <label className="form-label">Property Type</label>
+                    <select className="form-select" value={propertyType} onChange={e => setPropertyType(e.target.value)}>
+                      <option value="hostel">Hostel (Shared / Block Units)</option>
+                      <option value="apartment">Self-Contained Apartment</option>
+                      <option value="private_room">Single Room (Shared Facilities)</option>
+                    </select>
+                  </div>
+
+                  <div>
                     <label className="form-label">Neighborhood</label>
                     <select className="form-select" required value={neighborhood} onChange={e => setNeighborhood(e.target.value)}>
                       <option value="">Select Neighborhood</option>
@@ -361,6 +381,24 @@ export default function EditListingPage() {
                           onClick={() => setGenderPolicy(g.value)}
                         >
                           {g.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="form-label d-block fw-semibold mb-1">Payment Frequency</label>
+                    <small className="text-muted-custom d-block mb-2" style={{ fontSize: '0.78rem' }}>Select how rent is charged</small>
+                    <div className="d-flex gap-2">
+                      {['Semester', 'Yearly'].map(f => (
+                        <button
+                          key={f}
+                          type="button"
+                          className={`btn btn-sm flex-grow-1 ${paymentFrequency === f ? 'btn-primary' : 'btn-outline-secondary'}`}
+                          style={{ fontSize: '0.82rem', fontWeight: 600 }}
+                          onClick={() => setPaymentFrequency(f)}
+                        >
+                          {f}
                         </button>
                       ))}
                     </div>
@@ -393,7 +431,7 @@ export default function EditListingPage() {
                             </select>
                           </div>
                           <div className="col-md-4 col-7">
-                            <label className="form-label mb-1" style={{ fontSize: '0.78rem' }}>Price / Sem (GHS)</label>
+                            <label className="form-label mb-1" style={{ fontSize: '0.78rem' }}>Price / {paymentFrequency} (GHS)</label>
                             <input type="number" className="form-control form-control-sm" required
                               placeholder="e.g. 1500"
                               value={rate.price_per_semester}
@@ -417,6 +455,25 @@ export default function EditListingPage() {
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Room Inventory */}
+                  <div className="mb-4">
+                    <label className="form-label mb-2 fw-semibold">Total Property Inventory</label>
+                    <div className="bg-surface-2 p-3 rounded-custom border-custom d-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="mb-1 fw-bold" style={{ fontSize: '0.9rem' }}>Number of Rooms Available</p>
+                        <small className="text-muted-custom">Total number of rooms available for booking across this property.</small>
+                      </div>
+                      <input 
+                        type="number" 
+                        className="form-control" 
+                        style={{ width: '100px' }} 
+                        min="1" 
+                        value={roomsAvailable} 
+                        onChange={(e) => setRoomsAvailable(e.target.value)} 
+                      />
+                    </div>
                   </div>
 
                   <div>

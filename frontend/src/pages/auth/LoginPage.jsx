@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const fillAdmin = () => setForm({ email: 'admin@hostelportal.edu.gh', password: 'Admin@1234' });
+  const fillAdmin = () => setForm({ email: 'kelvinkwasigyan@gmail.com', password: 'Richbanny123' });
   const fillStudent = () => setForm({ email: 'esi.quaye@ktu.edu.gh', password: 'Student@1' });
   const fillLandlord = () => setForm({ email: 'kwame.asante@gmail.com', password: 'Landlord@1' });
 
@@ -54,7 +54,7 @@ export default function LoginPage() {
         backgroundImage: "url('/hostel-bg.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        opacity: 0.45,
+        opacity: 0.2,
         zIndex: 0
       }} />
 
@@ -62,7 +62,7 @@ export default function LoginPage() {
       <div style={{
         position: 'absolute',
         top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(245, 245, 247, 0.75) 100%)',
+        background: 'linear-gradient(135deg, rgba(10, 34, 64, 0.85) 0%, rgba(5, 20, 40, 0.95) 100%)',
         zIndex: 0
       }} />
 

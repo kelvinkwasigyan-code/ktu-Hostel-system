@@ -21,6 +21,10 @@ import reviewRoutes from './routes/reviews.js';
 import adminRoutes from './routes/admin.js';
 import notificationRoutes from './routes/notifications.js';
 import mapRoutes from './routes/map.js';
+import supportRoutes from './routes/support.js';
+import paymentsRoutes from './routes/payments.js';
+import otpRoutes from './routes/otp.js';
+import viewingRoutes from './routes/viewingRoutes.js';
 
 // Services
 import { expireHolds } from './services/holdExpiryService.js';
@@ -89,7 +93,11 @@ app.use('/api/reviews',       reviewRoutes);
 app.use('/api/admin',         adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/map',           mapRoutes);
-
+app.use('/api/support',       supportRoutes);
+app.use('/api/payments',      paymentsRoutes);
+app.use('/api/viewings',      viewingRoutes);
+app.use('/api/inspections',   viewingRoutes);
+app.use('/api',               otpRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'KTU Hostel Portal API' });

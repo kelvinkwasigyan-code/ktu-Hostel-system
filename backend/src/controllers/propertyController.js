@@ -70,9 +70,10 @@ export const createProperty = async (req, res) => {
 
     const {
       title, address, latitude, longitude, description,
-      price_per_semester, room_type, max_occupancy, amenities, neighborhood, room_rates,
+      price_per_semester, payment_frequency, room_type, max_occupancy, amenities, neighborhood, room_rates,
       gender_policy,
-      payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info
+      payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info,
+      rooms_available, property_type
     } = req.body;
 
     const formattedRates = parseRoomRates(room_rates, room_type, price_per_semester, max_occupancy);
@@ -87,6 +88,9 @@ export const createProperty = async (req, res) => {
 
     const ALLOWED_GENDER_POLICIES = ['Mixed', 'Boys only', 'Girls only'];
     const safeGenderPolicy = ALLOWED_GENDER_POLICIES.includes(gender_policy) ? gender_policy : 'Mixed';
+
+    const ALLOWED_PROPERTY_TYPES = ['hostel', 'apartment', 'homestay', 'private_room'];
+    const safePropertyType = ALLOWED_PROPERTY_TYPES.includes(property_type) ? property_type : 'hostel';
 
     const paymentContactObj = parsePaymentContact(payment_contact_info, landlord?.phone);
     if (payment_phone) paymentContactObj.phone = payment_phone;
@@ -110,6 +114,7 @@ export const createProperty = async (req, res) => {
       latitude: parseFloat(latitude),
       longitude: parseFloat(longitude),
       description,
+      payment_frequency: ['Semester', 'Yearly'].includes(payment_frequency) ? payment_frequency : 'Semester',
       price_per_semester: minPrice || parseFloat(price_per_semester),
       room_type: primaryRoomType,
       max_occupancy: maxOcc || parseInt(max_occupancy),
@@ -118,9 +123,11 @@ export const createProperty = async (req, res) => {
       amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
       neighborhood,
       gender_policy: safeGenderPolicy,
+      property_type: safePropertyType,
       distance_from_campus_km,
       availability_status: 'Available',
-      verification_status: 'Pending' // admin must approve before it's visible
+      verification_status: 'Pending', // admin must approve before it's visible
+      rooms_available: rooms_available !== undefined ? parseInt(rooms_available, 10) : 1
     };
 
     let { data: property, error } = await supabaseAdmin
@@ -135,6 +142,7 @@ export const createProperty = async (req, res) => {
       const fallbackPayload = { ...insertPayload };
       delete fallbackPayload.room_rates;
       delete fallbackPayload.payment_contact_info;
+      delete fallbackPayload.rooms_available;
       const fallbackRes = await supabaseAdmin
         .from('properties')
         .insert(fallbackPayload)
@@ -209,10 +217,10 @@ export const updateProperty = async (req, res) => {
 
     const {
       title, address, latitude, longitude, description,
-      price_per_semester, room_type, max_occupancy, amenities, neighborhood, room_rates,
+      price_per_semester, payment_frequency, room_type, max_occupancy, amenities, neighborhood, room_rates,
       gender_policy,
       payment_phone, momo_number, momo_name, payment_instructions, payment_contact_info,
-      image_urls, image_data_urls
+      image_urls, image_data_urls, rooms_available, property_type
     } = req.body;
 
     const formattedRates = parseRoomRates(room_rates, room_type, price_per_semester, max_occupancy);
@@ -255,15 +263,20 @@ export const updateProperty = async (req, res) => {
       latitude: parseFloat(latitude),
       longitude: parseFloat(longitude),
       description,
+      payment_frequency: ['Semester', 'Yearly'].includes(payment_frequency) ? payment_frequency : 'Semester',
       price_per_semester: minPrice || parseFloat(price_per_semester),
       room_type: primaryRoomType,
       max_occupancy: maxOcc || parseInt(max_occupancy),
       amenities: typeof amenities === 'string' ? amenities : JSON.stringify(amenities),
       neighborhood,
       gender_policy: safeGenderPolicy,
+      property_type: ALLOWED_PROPERTY_TYPES.includes(property_type) ? property_type : 'hostel',
       distance_from_campus_km,
       verification_status: 'Pending'
     };
+    if (rooms_available !== undefined) {
+      corePayload.rooms_available = parseInt(rooms_available, 10);
+    }
 
     // Optional columns — only include if they exist in DB (added via migration)
     const fullPayload = {
@@ -282,9 +295,11 @@ export const updateProperty = async (req, res) => {
 
     if (updateErr) {
       console.warn('Optional columns not in schema cache or database — retrying with core fields only:', updateErr.message || updateErr);
+      const fallbackPayload = { ...corePayload };
+      delete fallbackPayload.rooms_available;
       const fallback = await supabaseAdmin
         .from('properties')
-        .update(corePayload)
+        .update(fallbackPayload)
         .eq('property_id', propertyId)
         .select()
         .single();
@@ -330,7 +345,7 @@ export const updateProperty = async (req, res) => {
 export const searchProperties = async (req, res) => {
   try {
     const {
-      neighborhood, room_type, gender_policy,
+      neighborhood, room_type, gender_policy, property_type,
       min_price, max_price,
       max_distance, page = 1, limit = 12
     } = req.query;
@@ -351,6 +366,7 @@ export const searchProperties = async (req, res) => {
 
     if (neighborhood)  query = query.ilike('neighborhood', `%${neighborhood}%`);
     if (room_type)     query = query.eq('room_type', room_type);
+    if (property_type) query = query.eq('property_type', property_type);
     if (gender_policy) query = query.eq('gender_policy', gender_policy);
     if (min_price)     query = query.gte('price_per_semester', parseFloat(min_price));
     if (max_price)     query = query.lte('price_per_semester', parseFloat(max_price));

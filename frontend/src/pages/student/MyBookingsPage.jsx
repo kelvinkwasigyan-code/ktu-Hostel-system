@@ -1,14 +1,17 @@
 // src/pages/student/MyBookingsPage.jsx
 import { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, AlertCircle, Phone, Mail, Star, Calendar, MapPin } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, AlertCircle, Phone, Mail, Star, Calendar, MapPin, Upload } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import StudentSidebar from '../../components/StudentSidebar';
+import SubmitPayment from '../../components/SubmitPayment';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState([]);
+  const [viewings, setViewings] = useState([]);
+  const [activeTab, setActiveTab] = useState('holds');
   const [loading, setLoading] = useState(true);
 
   // Review modal state
@@ -18,16 +21,24 @@ export default function MyBookingsPage() {
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
 
+  // Payment modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentBooking, setPaymentBooking] = useState(null);
+
   useEffect(() => { fetchBookings(); }, []);
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/bookings/student/mine');
-      setBookings(res.data.bookings || []);
+      const [bRes, vRes] = await Promise.all([
+        api.get('/bookings/student/mine'),
+        api.get('/viewings/student')
+      ]);
+      setBookings(bRes.data.bookings || []);
+      setViewings(vRes.data.requests || []);
     } catch (err) {
-      console.error('Error fetching student bookings:', err);
-      toast.error('Failed to load bookings.');
+      console.error('Error fetching student portal data:', err);
+      toast.error('Failed to load data.');
     } finally {
       setLoading(false);
     }
@@ -43,6 +54,16 @@ export default function MyBookingsPage() {
   const handleCloseReviewModal = () => {
     setSelectedBooking(null);
     setShowModal(false);
+  };
+
+  const handleOpenPaymentModal = (booking) => {
+    setPaymentBooking(booking);
+    setShowPaymentModal(true);
+  };
+
+  const handleClosePaymentModal = () => {
+    setPaymentBooking(null);
+    setShowPaymentModal(false);
   };
 
   const handleSubmitReview = async (e) => {
@@ -112,6 +133,11 @@ export default function MyBookingsPage() {
   };
 
   const ActionButton = ({ b }) => {
+    if (b.status === 'Approved') return (
+      <button className="btn btn-success btn-sm text-white" onClick={() => handleOpenPaymentModal(b)}>
+        <Upload size={13} className="me-1" /> Pay / Receipt
+      </button>
+    );
     if (b.can_review) return (
       <button className="btn btn-primary btn-sm" onClick={() => handleOpenReviewModal(b)}>
         <Star size={13} className="me-1" /> Write Review
@@ -131,26 +157,45 @@ export default function MyBookingsPage() {
 
             {/* Page Header */}
             <div className="mb-4">
-              <h2 className="mb-1">My Booking History</h2>
-              <p className="text-muted-custom mb-0">Track your 24-hour reservation holds and approved accommodations</p>
+              <h2 className="mb-1">My Accommodations & Viewings</h2>
+              <p className="text-muted-custom mb-0">Track your 24-hour reservation holds and physical viewing requests</p>
             </div>
+
+            {/* Tab Navigation */}
+            <div className="d-flex gap-2 mb-4">
+              <button 
+                className={`btn btn-sm ${activeTab === 'holds' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => setActiveTab('holds')}
+                style={{ fontWeight: 600 }}
+              >
+                ⏱️ Reservation Holds ({bookings.length})
+              </button>
+              <button 
+                className={`btn btn-sm ${activeTab === 'viewings' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                onClick={() => setActiveTab('viewings')}
+                style={{ fontWeight: 600 }}
+              >
+                📅 Scheduled Viewings ({viewings.length})
+              </button>
+            </div>
+
             <hr className="divider-orange mb-4" />
 
             {/* ── Loading ─────────────────────────────────────────────────── */}
             {loading ? (
               <div className="page-loader"><div className="spinner-ring" /></div>
 
-            /* ── Empty ─────────────────────────────────────────────────────── */
-            ) : bookings.length === 0 ? (
-              <div className="card p-5 border-custom bg-surface rounded-custom text-center">
-                <div className="mb-3" style={{ fontSize: '2.5rem' }}>📭</div>
-                <h5 className="mb-2">No Bookings Yet</h5>
-                <p className="text-muted-custom mx-auto mb-0" style={{ maxWidth: '400px', fontSize: '0.9rem' }}>
-                  You haven't requested any holds. Head over to the hostel catalog and place a 24-hour hold to secure your booking.
-                </p>
-              </div>
-
-            ) : (
+            /* ── Active Tab: Holds ─────────────────────────────────────── */
+            ) : activeTab === 'holds' ? (
+              bookings.length === 0 ? (
+                <div className="card p-5 border-custom bg-surface rounded-custom text-center">
+                  <div className="mb-3" style={{ fontSize: '2.5rem' }}>📭</div>
+                  <h5 className="mb-2">No Bookings Yet</h5>
+                  <p className="text-muted-custom mx-auto mb-0" style={{ maxWidth: '400px', fontSize: '0.9rem' }}>
+                    You haven't requested any holds. Head over to the hostel catalog and place a 24-hour hold to secure your booking.
+                  </p>
+                </div>
+              ) : (
               <>
                 {/* ── Desktop Table (hidden on mobile) ───────────────────── */}
                 <div className="d-none d-md-block">
@@ -172,7 +217,7 @@ export default function MyBookingsPage() {
                               <td className="p-3">
                                 <h6 className="mb-1" style={{ fontSize: '0.92rem', fontWeight: 600 }}>{b.properties?.title}</h6>
                                 <small className="text-muted-custom">
-                                  📍 {b.properties?.neighborhood} · GHS {Number(b.properties?.price_per_semester).toLocaleString()} / semester
+                                  📍 {b.properties?.neighborhood} · GHS {Number(b.properties?.price_per_semester).toLocaleString()} / {((b.properties?.payment_frequency) || 'Semester').toLowerCase()}
                                 </small>
                               </td>
                               <td className="p-3" style={{ fontSize: '0.88rem' }}>
@@ -211,7 +256,7 @@ export default function MyBookingsPage() {
                         <MapPin size={12} />
                         <span>{b.properties?.neighborhood}</span>
                         <span className="ms-2 fw-semibold" style={{ color: 'var(--brand-orange)' }}>
-                          GHS {Number(b.properties?.price_per_semester).toLocaleString()}/sem
+                          GHS {Number(b.properties?.price_per_semester).toLocaleString()}/{((b.properties?.payment_frequency) || 'Semester').toLowerCase()}
                         </span>
                       </div>
 
@@ -242,6 +287,55 @@ export default function MyBookingsPage() {
                   ))}
                 </div>
               </>
+            ) : (
+              /* ── Active Tab: Viewings ───────────────────────────────────── */
+              viewings.length === 0 ? (
+                <div className="card p-5 border-custom bg-surface rounded-custom text-center">
+                  <div className="mb-3" style={{ fontSize: '2.5rem' }}>📅</div>
+                  <h5 className="mb-2">No Scheduled Viewings</h5>
+                  <p className="text-muted-custom mx-auto mb-0" style={{ maxWidth: '400px', fontSize: '0.9rem' }}>
+                    You haven't requested any property viewings yet. Click "Schedule Inspection" on any hostel detail page to request a visit.
+                  </p>
+                </div>
+              ) : (
+                <div className="card border-custom bg-surface rounded-custom p-3">
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0" style={{ color: 'var(--text-primary)' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--surface-2)' }}>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Property</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Preferred Date</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Status</th>
+                          <th className="p-3 text-muted-custom" style={{ fontSize: '0.85rem' }}>Submitted On</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {viewings.map(v => (
+                          <tr key={v.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td className="p-3 fw-semibold">
+                              {v.properties?.title}
+                              <div className="text-muted-custom small font-normal">📍 {v.properties?.address}, {v.properties?.neighborhood}</div>
+                            </td>
+                            <td className="p-3 fw-bold text-orange">{v.preferred_date}</td>
+                            <td className="p-3">
+                              <span className={`badge px-2 py-1 ${
+                                v.status === 'approved' ? 'bg-success text-white' :
+                                v.status === 'completed' ? 'bg-info text-dark' :
+                                v.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-dark'
+                              }`} style={{ textTransform: 'capitalize' }}>
+                                {v.status}
+                              </span>
+                            </td>
+                            <td className="p-3 text-muted-custom small">
+                              {new Date(v.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )
             )}
 
             {/* ── Review Modal ─────────────────────────────────────────────── */}
@@ -287,6 +381,40 @@ export default function MyBookingsPage() {
                       </button>
                     </div>
                   </form>
+                </div>
+              </div>
+            )}
+            {/* Payment Modal */}
+            {showPaymentModal && paymentBooking && (
+              <div className="position-fixed inset-0 d-flex align-items-center justify-content-center p-3"
+                   style={{ background: 'rgba(0,0,0,0.6)', zIndex: 3000, top: 0, left: 0, width: '100vw', height: '100vh' }}>
+                <div className="card p-4 border-custom bg-surface rounded-custom w-100"
+                     style={{ maxWidth: '480px', animation: 'slideDown 0.2s ease' }}>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="mb-0" style={{ fontFamily: 'Outfit,sans-serif' }}>Upload Payment Receipt</h5>
+                    <button className="btn btn-close btn-close-white p-1" onClick={handleClosePaymentModal} />
+                  </div>
+                  <hr className="border-custom my-2" />
+                  
+                  <p style={{ fontSize: '0.85rem' }} className="text-muted-custom mb-3">
+                    Paying for: <strong>{paymentBooking.properties?.title}</strong><br/>
+                    Amount Due: GHS {Number(paymentBooking.properties?.price_per_semester).toLocaleString()}
+                  </p>
+
+                  <SubmitPayment 
+                    hostelId={paymentBooking.property_id}
+                    landlordId={paymentBooking.properties?.landlord_id}
+                    amount={paymentBooking.properties?.price_per_semester}
+                    studentId={paymentBooking.student_id}
+                    onSuccess={() => {
+                      handleClosePaymentModal();
+                      fetchBookings();
+                    }}
+                  />
+                  
+                  <div className="d-flex justify-content-end mt-2">
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={handleClosePaymentModal}>Close</button>
+                  </div>
                 </div>
               </div>
             )}
