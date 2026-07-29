@@ -152,13 +152,13 @@ export default function HomePage() {
             {/* Right: Quick Search Card */}
             <div className="col-12 col-lg-5">
               <div className="search-hero-bar" style={{ margin: 0 }}>
-                <h5 className="mb-3" style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 700 }}>
+                <h5 className="mb-3" style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 700, color: '#fff' }}>
                   🔍 Quick Search
                 </h5>
                 <form onSubmit={handleSearch}>
                   <div className="row g-2 mb-3">
                     <div className="col-12 col-md-6">
-                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Neighborhood</label>
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)' }}>Neighborhood</label>
                       <select className="form-select" value={filters.neighborhood}
                         onChange={e => setFilters(f => ({ ...f, neighborhood: e.target.value }))}>
                         <option value="">All Areas</option>
@@ -166,7 +166,7 @@ export default function HomePage() {
                       </select>
                     </div>
                     <div className="col-12 col-md-6">
-                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Room Type</label>
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)' }}>Room Type</label>
                       <select className="form-select" value={filters.room_type}
                         onChange={e => setFilters(f => ({ ...f, room_type: e.target.value }))}>
                         <option value="">Any Type</option>
@@ -177,7 +177,7 @@ export default function HomePage() {
                   </div>
                   <div className="row g-2 mb-4">
                     <div className="col-12 col-md-6">
-                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Gender Policy</label>
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)' }}>Gender Policy</label>
                       <select className="form-select" value={filters.gender_policy}
                         onChange={e => setFilters(f => ({ ...f, gender_policy: e.target.value }))}>
                         <option value="">Any Policy</option>
@@ -187,7 +187,7 @@ export default function HomePage() {
                       </select>
                     </div>
                     <div className="col-12 col-md-6">
-                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Max Price (GHS)</label>
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)' }}>Max Price (GHS)</label>
                       <input type="number" className="form-control" placeholder="e.g. 1500"
                         value={filters.max_price}
                         onChange={e => setFilters(f => ({ ...f, max_price: e.target.value }))} />

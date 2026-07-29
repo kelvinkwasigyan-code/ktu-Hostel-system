@@ -378,12 +378,13 @@ a:hover {
 
 /* ─── Search Bar ─────────────────────────────────────────────────────────── */
 .search-hero-bar {
-  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(25, 30, 45, 0.4);
+  backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-xl);
   padding: 1.5rem;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  color: #fff;
 }
 
 @media (max-width: 767px) {
@@ -396,11 +397,18 @@ a:hover {
 
 .search-hero-bar .form-control,
 .search-hero-bar .form-select {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
   min-height: 44px;
   font-size: 16px;
   /* prevents iOS zoom */
+}
+.search-hero-bar .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+.search-hero-bar .form-select option {
+  color: #000; /* Ensure options are visible in the dropdown */
 }
 
 /* ─── Property Cards ─────────────────────────────────────────────────────── */
