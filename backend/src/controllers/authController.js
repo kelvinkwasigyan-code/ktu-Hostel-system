@@ -157,7 +157,7 @@ export const login = async (req, res) => {
       // Try to get or create the real DB user for a valid user_id
       let { data: dbUser } = await supabaseAdmin
         .from('users')
-        .select('user_id, full_name, email, phone, role, verification_status, is_active, is_phone_verified')
+        .select('user_id, full_name, email, phone, role, verification_status, is_active')
         .eq('email', cleanEmail)
         .single();
 
@@ -165,28 +165,59 @@ export const login = async (req, res) => {
         // Seed the demo user
         try {
           const password_hash = await bcrypt.hash(demoConfig.password, 12);
-          const { data: seeded } = await supabaseAdmin
+          const seedPayload = {
+            full_name: demoConfig.full_name,
+            email: cleanEmail,
+            phone: demoConfig.phone,
+            password_hash,
+            role: demoConfig.role,
+            verification_status: demoConfig.verification_status,
+            is_active: true
+          };
+          let { data: seeded, error: seedError } = await supabaseAdmin
             .from('users')
-            .insert({
-              full_name: demoConfig.full_name,
-              email: cleanEmail,
-              phone: demoConfig.phone,
-              password_hash,
-              role: demoConfig.role,
-              verification_status: demoConfig.verification_status,
-              is_active: true
-            })
+            .insert(seedPayload)
             .select('user_id, full_name, email, phone, role, verification_status, is_active')
             .single();
+            
+          if (seedError) {
+            console.warn('[Login] Demo seed insert error (full):', seedError.message || seedError);
+            // Try again without optional columns that may not exist
+            const minimalPayload = {
+              full_name: demoConfig.full_name,
+              email: cleanEmail,
+              password_hash,
+              role: demoConfig.role,
+            };
+            const fallbackSeed = await supabaseAdmin
+              .from('users')
+              .insert(minimalPayload)
+              .select('user_id, full_name, email, role')
+              .single();
+            if (!fallbackSeed.error) {
+              seeded = { ...fallbackSeed.data, phone: demoConfig.phone, verification_status: demoConfig.verification_status, is_active: true };
+              console.log('[Login] Demo user seeded via minimal payload, user_id:', seeded.user_id);
+            } else {
+              console.warn('[Login] Demo seed fallback also failed:', fallbackSeed.error.message);
+            }
+          } else {
+            console.log('[Login] Demo user seeded, user_id:', seeded?.user_id);
+          }
           dbUser = seeded;
         } catch (seedErr) {
-          console.warn('[Login] Demo seed warning:', seedErr.message);
+          console.warn('[Login] Demo seed exception:', seedErr.message);
         }
       }
 
+      // Assign a deterministic integer ID based on role for fallback
+      let fallbackId = 999;
+      if (demoConfig.role === 'Admin') fallbackId = 1;
+      else if (demoConfig.role === 'Student') fallbackId = 2;
+      else if (demoConfig.role === 'Landlord') fallbackId = 3;
+
       // Use DB user or fallback in-memory
       const resolvedUser = dbUser || {
-        user_id: '00000000-0000-4000-a000-000000000001',
+        user_id: fallbackId,
         full_name: demoConfig.full_name,
         email: cleanEmail,
         phone: demoConfig.phone,
@@ -209,7 +240,7 @@ export const login = async (req, res) => {
     // ── 2. Regular (non-demo) DB login ────────────────────────────────────────
     let { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active, is_phone_verified')
+      .select('user_id, full_name, email, phone, role, password_hash, verification_status, is_active')
       .eq('email', cleanEmail)
       .single();
 
@@ -265,11 +296,17 @@ export const getProfile = async (req, res) => {
   try {
     const { data: user, error } = await supabaseAdmin
       .from('users')
-      .select('user_id, full_name, email, phone, role, verification_status, id_document_path, profile_picture, bio, is_active, created_at, is_phone_verified')
+      .select('user_id, full_name, email, phone, role, verification_status, is_active, created_at')
       .eq('user_id', req.user.user_id)
       .single();
 
     if (error || !user) {
+      console.warn(`[getProfile] Failed to find user in DB. req.user_id: ${req.user?.user_id}, db_error: ${error?.message || error?.code}`);
+      // Fallback for demo users that failed to seed to the remote database
+      if (req.user && (req.user.user_id < 10 || req.user.user_id === '00000000-0000-4000-a000-000000000001')) {
+        console.log(`[getProfile] Using fallback token payload for user_id: ${req.user.user_id}`);
+        return res.json({ user: req.user });
+      }
       return res.status(404).json({ error: 'User not found.' });
     }
 

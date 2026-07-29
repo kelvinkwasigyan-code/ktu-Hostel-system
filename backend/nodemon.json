@@ -1,0 +1,3 @@
+{
+  "ignore": ["src/config/mock_db.json"]
+}

@@ -1,7 +1,7 @@
 // src/pages/student/PropertyDetailPage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { MapPin, Users, BedDouble, Calendar, Clock, Star, ShieldCheck, Heart, User } from 'lucide-react';
+import { MapPin, Users, BedDouble, Calendar, Clock, Star, ShieldCheck, Heart, User, CheckCircle } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import MapboxSingleLocation from '../../components/MapboxSingleLocation';

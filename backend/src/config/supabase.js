@@ -39,7 +39,9 @@ mockAdmin = createMockSupabase();
 const isFallbackError = (err) => {
   if (!err) return false;
   const code = err.code || err.statusCode;
-  return code === 'PGRST205' || code === 'PGRST204' || code === 'PGRST100' || code === '42P01';
+  // Only fallback to mock when the table itself doesn't exist in the remote DB.
+  // Do NOT fallback for column errors (PGRST204) — the controller has its own fallback logic.
+  return code === '42P01';
 };
 
 export const supabaseAdmin = new Proxy({}, {
@@ -63,7 +65,11 @@ export const supabaseAdmin = new Proxy({}, {
                   }
                   return onFulfilled(res);
                 }, err => {
-                  return mockQuery.then(onFulfilled, onRejected);
+                  // Only fall back on schema-level errors, not on all errors
+                  if (isFallbackError(err)) {
+                    return mockQuery.then(onFulfilled, onRejected);
+                  }
+                  return onRejected ? onRejected(err) : Promise.reject(err);
                 });
               };
             }
@@ -82,7 +88,11 @@ export const supabaseAdmin = new Proxy({}, {
                             }
                             return onF(resData);
                           }, err => {
-                            return mockQuery[qProp](...args).then(onF, onR);
+                            // Only fall back on schema-level errors, not on all errors
+                            if (isFallbackError(err)) {
+                              return mockQuery[qProp](...args).then(onF, onR);
+                            }
+                            return onR ? onR(err) : Promise.reject(err);
                           });
                         };
                       }

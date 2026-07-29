@@ -262,7 +262,31 @@ export const getStudentBookings = async (req, res) => {
       .eq('student_id', req.user.user_id)
       .order('created_at', { ascending: false });
 
-    if (error) return res.status(500).json({ error: 'Failed to fetch bookings.' });
+    // Fallback if remote DB is missing foreign key relations (PGRST200)
+    if (error && (error.code === 'PGRST200' || error.message?.includes('relationship') || error.code === 'PGRST100')) {
+      console.warn('getStudentBookings relation error, falling back to manual join:', error.message);
+      const bookRes = await supabaseAdmin.from('bookings').select('*').eq('student_id', req.user.user_id).order('created_at', { ascending: false });
+      if (!bookRes.error && bookRes.data) {
+        const propRes = await supabaseAdmin.from('properties').select('*');
+        const imgRes = await supabaseAdmin.from('property_images').select('*');
+        const usrRes = await supabaseAdmin.from('users').select('*');
+        
+        data = bookRes.data.map(b => {
+          const prop = propRes.data?.find(p => p.property_id === b.property_id) || null;
+          if (prop) {
+            prop.property_images = imgRes.data?.filter(img => img.property_id === prop.property_id) || [];
+            prop.users = usrRes.data?.find(u => u.user_id === prop.landlord_id) || null;
+          }
+          return { ...b, properties: prop };
+        });
+        error = null;
+      }
+    }
+
+    if (error) {
+      console.error('getStudentBookings error:', error);
+      return res.status(500).json({ error: 'Failed to fetch bookings.' });
+    }
 
     // Check if a review has been submitted for bookings
     const bookingIds = data.map(b => b.booking_id);

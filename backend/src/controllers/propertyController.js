@@ -65,7 +65,10 @@ export const createProperty = async (req, res) => {
       .eq('user_id', req.user.user_id)
       .single();
 
-    if (landlord?.verification_status !== 'Approved') {
+    // Fallback to token payload for demo accounts that failed to seed
+    const vStatus = landlord?.verification_status || req.user.verification_status;
+
+    if (vStatus !== 'Approved') {
       return res.status(403).json({
         error: 'Your account must be verified by an admin before you can list properties.'
       });
@@ -140,8 +143,9 @@ export const createProperty = async (req, res) => {
     if (error) {
       console.warn('Property creation note, retrying insert without new JSON columns:', error.message || error);
       const fallbackPayload = { ...insertPayload };
-      delete fallbackPayload.room_rates;
-      delete fallbackPayload.payment_contact_info;
+      delete fallbackPayload.payment_frequency;
+      delete fallbackPayload.gender_policy;
+      delete fallbackPayload.property_type;
       delete fallbackPayload.rooms_available;
       const fallbackRes = await supabaseAdmin
         .from('properties')
