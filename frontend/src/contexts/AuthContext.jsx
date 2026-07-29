@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('hostel_user');
     sessionStorage.clear();
     setUser(null);
-    window.location.href = '/login';
   };
 
   return (

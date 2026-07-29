@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
+
 import toast from 'react-hot-toast';
 import api from '../../services/api';
 import { Eye, EyeOff, UserPlus, X } from 'lucide-react';
@@ -228,34 +228,6 @@ export default function RegisterPage() {
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
-
-          <div className="d-flex align-items-center my-2.5">
-            <hr className="flex-grow-1 border-secondary opacity-25 m-0" />
-            <span className="px-2 text-muted" style={{ fontSize: '0.75rem' }}>OR</span>
-            <hr className="flex-grow-1 border-secondary opacity-25 m-0" />
-          </div>
-
-          <div className="d-flex justify-content-center">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                try {
-                  const res = await api.post('/auth/google', {
-                    credential: credentialResponse.credential
-                  });
-                  login(res.data.user, res.data.token);
-                  toast.success('Account created with Google!');
-                  const role = res.data.user.role;
-                  if (role === 'Admin') navigate('/admin');
-                  else if (role === 'Landlord') navigate('/landlord');
-                  else navigate('/student');
-                } catch (err) {
-                  toast.error(err.response?.data?.error || 'Google Sign-Up failed.');
-                }
-              }}
-              onError={() => { toast.error('Google Sign-Up failed.'); }}
-              useOneTap
-            />
-          </div>
 
           <p className="text-center mt-3 mb-0" style={{ color: '#64748b', fontSize: '0.82rem' }}>
             Already have an account?{' '}

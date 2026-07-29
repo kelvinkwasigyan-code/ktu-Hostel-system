@@ -38,11 +38,11 @@ import ManageUsersPage from './pages/admin/ManageUsersPage';
 const PrivateRoute = ({ children, roles }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="page-loader"><div className="spinner-ring"></div></div>;
-  if (!user) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" replace />;
   if (roles) {
     const userRole = (user.role || '').toLowerCase();
     const allowedRoles = roles.map(r => r.toLowerCase());
-    if (!allowedRoles.includes(userRole)) return <Navigate to="/" />;
+    if (!allowedRoles.includes(userRole)) return <Navigate to="/" replace />;
   }
   return children;
 };
@@ -51,9 +51,9 @@ const GuestRoute = ({ children }) => {
   const { user } = useAuth();
   if (user) {
     const roleLower = (user.role || '').toLowerCase();
-    if (roleLower === 'admin') return <Navigate to="/admin" />;
-    if (roleLower === 'landlord') return <Navigate to="/landlord" />;
-    return <Navigate to="/student" />;
+    if (roleLower === 'admin') return <Navigate to="/admin" replace />;
+    if (roleLower === 'landlord') return <Navigate to="/landlord" replace />;
+    return <Navigate to="/student" replace />;
   }
   return children;
 };

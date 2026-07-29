@@ -39,7 +39,7 @@ mockAdmin = createMockSupabase();
 const isFallbackError = (err) => {
   if (!err) return false;
   const code = err.code || err.statusCode;
-  return code === 'PGRST205' || code === 'PGRST204' || code === 'PGRST100' || code === '42703' || code === '42P01';
+  return code === 'PGRST205' || code === 'PGRST204' || code === 'PGRST100' || code === '42P01';
 };
 
 export const supabaseAdmin = new Proxy({}, {

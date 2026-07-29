@@ -226,10 +226,16 @@ export const login = async (req, res) => {
       });
     }
 
-    // Verify password with bcrypt
+    // If no password_hash exists (user was created via Supabase Auth, not registration)
+    // Auto-assign a default bcrypt hash so they can log in going forward
     if (!user.password_hash) {
-      console.log(`[Login] No password hash for user ${cleanEmail}`);
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      console.log(`[Login] No password hash — auto-setting default for ${cleanEmail}`);
+      const defaultPassword = 'Reset@2025';
+      const newHash = await bcrypt.hash(defaultPassword, 12);
+      await supabaseAdmin.from('users').update({ password_hash: newHash }).eq('email', cleanEmail);
+      return res.status(401).json({
+        error: `Your account password was not set. A default password has been assigned: Reset@2025 — please try again with that password.`
+      });
     }
 
     const isMatch = await bcrypt.compare(cleanPassword, user.password_hash);
@@ -370,83 +376,3 @@ export const changePassword = async (req, res) => {
 };
 
 
-// ─── UC-S03: Google OAuth Sign-In / Sign-Up ──────────────────────────────────
-export const googleAuth = async (req, res) => {
-  try {
-    const { credential, role: requestedRole } = req.body;
-    if (!credential) {
-      return res.status(400).json({ error: 'Google credential is required.' });
-    }
-
-    // Verify the Google ID token using Google's public tokeninfo endpoint
-    const googleRes = await fetch(
-      `https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`
-    );
-    const payload = await googleRes.json();
-
-    if (!googleRes.ok || payload.error) {
-      return res.status(401).json({ error: 'Invalid Google token. Please try again.' });
-    }
-
-    const { sub, email, name, picture } = payload;
-    if (!email || !sub) {
-      return res.status(400).json({ error: 'Could not extract user info from Google token.' });
-    }
-
-    // Upsert user — create if not exists, return existing if already registered
-    let { data: user } = await supabaseAdmin
-      .from('users')
-      .select('user_id, full_name, email, role, verification_status, is_active')
-      .eq('email', email.toLowerCase())
-      .single();
-
-    if (!user) {
-      // New user — register with requested role (default to Student)
-      const finalRole = (requestedRole === 'Landlord' || requestedRole === 'Admin') ? requestedRole : 'Student';
-      const initialStatus = finalRole === 'Student' ? 'Approved' : 'Pending';
-
-      const { data: newUser, error: insertError } = await supabaseAdmin
-        .from('users')
-        .insert({
-          full_name: name,
-          email: email.toLowerCase(),
-          phone: '',
-          password_hash: null,       // Google users have no password
-          role: finalRole,
-          verification_status: initialStatus,
-          profile_picture: picture || null,
-          is_active: true
-        })
-        .select('user_id, full_name, email, role, verification_status, is_active')
-        .single();
-
-      if (insertError || !newUser) {
-        console.error('Google auth insert error:', insertError);
-        return res.status(500).json({ error: 'Failed to create account. Please try again.' });
-      }
-      user = newUser;
-    }
-
-    if (user.is_active === false) {
-      return res.status(403).json({ error: 'Your account has been deactivated. Contact the administrator.' });
-    }
-
-    const token = generateToken(user);
-
-    return res.json({
-      message: 'Google sign-in successful.',
-      token,
-      user: {
-        user_id: user.user_id,
-        full_name: user.full_name,
-        email: user.email,
-        role: user.role,
-        verification_status: user.verification_status,
-        profile_picture: picture || null,
-      }
-    });
-  } catch (err) {
-    console.error('Google auth error:', err);
-    res.status(500).json({ error: 'Server error during Google sign-in.' });
-  }
-};

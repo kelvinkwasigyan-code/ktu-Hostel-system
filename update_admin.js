@@ -1,5 +1,5 @@
-const fs = require('fs');
-const bcrypt = require('bcrypt');
+import fs from 'fs';
+import bcrypt from 'bcryptjs';
 const path = './backend/src/config/mock_db.json';
 
 async function updateAdmin() {
@@ -10,8 +10,8 @@ async function updateAdmin() {
     // Find admin user
     let admin = db.users.find(u => u.role === 'Admin');
     if (admin) {
-      admin.email = 'kelvinkwasigyan@gmail.com';
-      admin.password_hash = await bcrypt.hash('Richbanny123', 12);
+      admin.email = 'admin@ktu.edu.gh';
+      admin.password_hash = await bcrypt.hash('Admin123!', 12);
       fs.writeFileSync(path, JSON.stringify(db, null, 2));
       console.log('Successfully updated Admin credentials in mock_db.json');
     } else {

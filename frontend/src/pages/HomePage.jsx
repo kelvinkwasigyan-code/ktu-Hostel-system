@@ -190,21 +190,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Stats Bar ─────────────────────────────────────────────────────── */}
-      <section style={{ background: 'var(--dark-navy)', borderBottom: '1px solid var(--border)' }}>
-        <div className="container py-3">
-          <div className="row g-2 text-center">
-            {STATS.map((s, i) => (
-              <div key={i} className="col-6 col-md-3 py-2">
-                <div style={{ fontSize: 'clamp(1.3rem, 4vw, 1.7rem)', fontWeight: 800, fontFamily: 'Outfit,sans-serif', color: 'var(--brand-orange)' }}>
-                  {s.value}
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Browse Listings ────────────────────────────────────────────────── */}
       <section id="browse-listings" ref={listingsSectionRef} className="py-4 py-md-5" style={{ background: 'var(--dark-navy-2)' }}>
@@ -325,6 +310,68 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ─────────────────────────────────────────────────────── */}
+      <section style={{ background: 'var(--dark-navy-2)', overflow: 'hidden' }}>
+        <div className="container py-4 py-md-5">
+          {/* Staggered grid — cards offset vertically so they don't line up flat */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}
+               className="d-md-none">
+            {/* Mobile: 2-col with alternating vertical offset */}
+            {STATS.map((s, i) => (
+              <div key={i} style={{ marginTop: i % 2 === 0 ? 0 : '1.5rem' }}>
+                <div style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderTop: `3px solid ${['var(--brand-orange)', '#3498DB', '#2ECC71', '#F5A623'][i]}`,
+                  borderRadius: 16,
+                  padding: '1rem 0.75rem',
+                  textAlign: 'center',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                }}>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: 'Outfit,sans-serif', color: ['var(--brand-orange)', '#3498DB', '#2ECC71', '#F5A623'][i], lineHeight: 1 }}>
+                    {s.value}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.3rem', fontWeight: 500 }}>{s.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: 4-col with wave-like vertical stagger */}
+          <div className="d-none d-md-flex" style={{ gap: '1rem', alignItems: 'flex-start' }}>
+            {STATS.map((s, i) => {
+              const offsets   = [0, 24, 12, 36]; // px vertical offset per card
+              const rotations = [-1.2, 1.0, -0.8, 1.5]; // slight rotation
+              const colors    = ['var(--brand-orange)', '#3498DB', '#2ECC71', '#F5A623'];
+              return (
+                <div key={i} style={{ flex: 1, marginTop: offsets[i] }}>
+                  <div style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderTop: `4px solid ${colors[i]}`,
+                    borderRadius: 18,
+                    padding: '1.5rem 1rem',
+                    textAlign: 'center',
+                    transform: `rotate(${rotations[i]}deg)`,
+                    boxShadow: '0 6px 24px rgba(0,0,0,0.08)',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                    cursor: 'default',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'rotate(0deg) translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.14)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = `rotate(${rotations[i]}deg)`; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.08)'; }}
+                  >
+                    <div style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: 800, fontFamily: 'Outfit,sans-serif', color: colors[i], lineHeight: 1 }}>
+                      {s.value}
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.4rem', fontWeight: 500 }}>{s.label}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -1,6 +1,6 @@
 // routes/auth.js
 import express from 'express';
-import { register, login, getProfile, updateProfile, changePassword, googleAuth } from '../controllers/authController.js';
+import { register, login, getProfile, updateProfile, changePassword } from '../controllers/authController.js';
 import { authenticate } from '../middleware/auth.js';
 import { body, validationResult } from 'express-validator';
 
@@ -30,8 +30,6 @@ router.post('/login', [
   body('password').notEmpty().withMessage('Password is required.')
 ], validate, login);
 
-// UC-S03: Google OAuth Sign-In / Register
-router.post('/google', googleAuth);
 
 // Get current user profile
 router.get('/profile', authenticate, getProfile);

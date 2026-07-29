@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { GoogleLogin } from '@react-oauth/google';
+
 import toast from 'react-hot-toast';
 import api from '../../services/api';
 import { Eye, EyeOff, LogIn, X } from 'lucide-react';
@@ -13,10 +13,10 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const fillAdmin = () => setForm({ email: 'admin@ktu.edu.gh', password: 'Admin@123' });
-  const fillStudent = () => setForm({ email: 'esi.quaye@ktu.edu.gh', password: 'Student@1' });
-  const fillLandlord = () => setForm({ email: 'kwame.asante@gmail.com', password: 'Landlord@1' });
-
+  // Always reset form on mount (clears stale values after logout)
+  useEffect(() => {
+    setForm({ email: '', password: '' });
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -110,25 +110,6 @@ export default function LoginPage() {
               Sign in to manage hostelling and bookings
             </p>
           </div>
-
-          {/* Demo Logins */}
-          {import.meta.env.DEV && (
-            <div className="p-2 mb-3 rounded-3" style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd' }}>
-              <div className="fw-semibold mb-1" style={{ fontSize: '0.75rem', color: '#0369a1' }}>⚡ Demo Logins:</div>
-              <div className="d-flex flex-wrap gap-1">
-                <button type="button" className="btn btn-sm btn-outline-primary py-0 px-1.5" style={{ fontSize: '0.7rem', borderRadius: '4px' }} onClick={fillAdmin}>
-                  👑 Admin
-                </button>
-                <button type="button" className="btn btn-sm btn-outline-primary py-0 px-1.5" style={{ fontSize: '0.7rem', borderRadius: '4px' }} onClick={fillStudent}>
-                  🎓 Student
-                </button>
-                <button type="button" className="btn btn-sm btn-outline-primary py-0 px-1.5" style={{ fontSize: '0.7rem', borderRadius: '4px' }} onClick={fillLandlord}>
-                  🏠 Landlord
-                </button>
-              </div>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} autoComplete="off">
             <div className="mb-3">
               <label className="form-label mb-1" style={{ color: '#334155', fontWeight: 600, fontSize: '0.82rem' }}>Email Address</label>
@@ -141,7 +122,7 @@ export default function LoginPage() {
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value.trim() }))}
                 style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1', padding: '0.45rem 0.75rem', fontSize: '0.88rem' }}
-                autoComplete="username"
+                autoComplete="off"
                 spellCheck={false}
                 required 
               />
@@ -158,7 +139,7 @@ export default function LoginPage() {
                   value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                   style={{ backgroundColor: '#ffffff', color: '#0f172a', borderColor: '#cbd5e1', padding: '0.45rem 0.75rem', fontSize: '0.88rem' }}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required 
                 />
                 <button 
@@ -177,36 +158,18 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-
-          <div className="d-flex align-items-center my-2.5">
-            <hr className="flex-grow-1 border-secondary opacity-25 m-0" />
-            <span className="px-2 text-muted" style={{ fontSize: '0.75rem' }}>OR</span>
-            <hr className="flex-grow-1 border-secondary opacity-25 m-0" />
-          </div>
-
-          <div className="d-flex justify-content-center">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                try {
-                  const res = await api.post('/auth/google', {
-                    credential: credentialResponse.credential
-                  });
-                  login(res.data.user, res.data.token);
-                  const firstName = res.data.user.full_name?.split(' ')[0] || 'there';
-                  toast.success(`Welcome back, ${firstName}!`);
-                  const role = res.data.user.role;
-                  if (role === 'Admin')    navigate('/admin');
-                  else if (role === 'Landlord') navigate('/landlord');
-                  else navigate('/student');
-                } catch (err) {
-                  toast.error(err.response?.data?.error || 'Google Sign-In failed.');
-                }
-              }}
-              onError={() => { toast.error('Google Sign-In failed.'); }}
-              useOneTap
-            />
-          </div>
-
+          {import.meta.env.DEV && (
+            <div className="mt-4 p-3 rounded" style={{ backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1' }}>
+              <p className="text-center mb-2" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Demo Quick Logins (DEV ONLY)
+              </p>
+              <div className="d-flex gap-2 justify-content-center flex-wrap">
+                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'admin@ktu.edu.gh', password: 'Admin123!' })}>Admin</button>
+                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'esi.quaye@ktu.edu.gh', password: 'Student@1' })}>Student</button>
+                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'kwame.asante@gmail.com', password: 'Landlord@1' })}>Landlord</button>
+              </div>
+            </div>
+          )}
           <p className="text-center mt-3 mb-0" style={{ color: '#64748b', fontSize: '0.82rem' }}>
             Don't have an account?{' '}
             <Link to="/register" style={{ color: 'var(--brand-orange, #d97706)', fontWeight: 600 }}>Register here</Link>

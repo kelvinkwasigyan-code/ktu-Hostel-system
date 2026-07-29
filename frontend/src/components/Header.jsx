@@ -59,6 +59,19 @@ export default function Header() {
     }
   };
 
+  const handleLogout = () => {
+    // Let context clear its state (setUser(null))
+    logout();
+    
+    // Clear tokens/user data
+    localStorage.clear(); 
+    sessionStorage.clear();
+    
+    // Use replace: true so /admin is wiped from history
+    navigate('/login', { replace: true });
+  };
+
+
   const getDashboardLink = () => {
     if (!user) return '/login';
     const roleLower = (user.role || '').toLowerCase();
@@ -247,7 +260,7 @@ export default function Header() {
                   <button 
                     className="dropdown-item px-3 py-2 text-danger d-flex align-items-center gap-2 w-100 text-start"
                     style={{ fontSize: '0.85rem' }}
-                    onClick={logout}
+                    onClick={handleLogout}
                   >
                     <LogOut size={15} /> Log Out
                   </button>
@@ -290,7 +303,7 @@ export default function Header() {
                 <Link to={getDashboardLink()} className="nav-link py-2 fw-bold text-orange d-flex align-items-center gap-2">
                   <LayoutDashboard size={16} /> My Dashboard
                 </Link>
-                <button onClick={logout} className="btn btn-outline-danger btn-sm text-start py-2 mt-2">
+                <button onClick={handleLogout} className="btn btn-outline-danger btn-sm text-start py-2 mt-2">
                   <LogOut size={16} className="me-2" /> Log Out
                 </button>
               </>
