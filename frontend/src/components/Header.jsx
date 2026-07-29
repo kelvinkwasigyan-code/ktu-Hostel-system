@@ -159,8 +159,10 @@ export default function Header() {
             </Link>
           )}
 
-          {/* Utilities */}
-          <ThemeToggle />
+          {/* Utilities - desktop only */}
+          <div className="d-none d-md-block">
+            <ThemeToggle />
+          </div>
 
           {user && (
             <div className="position-relative" ref={notifRef}>
@@ -168,10 +170,10 @@ export default function Header() {
                 type="button"
                 className="p-2 text-gray-500 hover:text-gray-700 relative border-0 bg-transparent"
                 onClick={() => setShowNotif(v => !v)}
-                style={{ position: 'relative', padding: '0.5rem', color: 'var(--text-secondary, #64748b)', cursor: 'pointer' }}
+                style={{ position: 'relative', padding: '0.45rem', color: 'var(--text-secondary, #64748b)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Notifications"
               >
-                🔔
+                <Bell size={20} />
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 h-4 w-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center" style={{ position: 'absolute', top: '2px', right: '2px', width: '16px', height: '16px', backgroundColor: '#ef4444', color: '#ffffff', fontSize: '10px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -219,9 +221,9 @@ export default function Header() {
             </div>
           )}
 
-          {/* Profile */}
+          {/* Profile — desktop */}
           {user && (
-            <div className="position-relative" ref={userMenuRef}>
+            <div className="d-none d-md-block position-relative" ref={userMenuRef}>
               <button
                 type="button"
                 className="flex items-center gap-2 pl-2 border-l border-gray-200 border-0 bg-transparent cursor-pointer"
@@ -272,8 +274,19 @@ export default function Header() {
           {/* Mobile Nav Toggle */}
           <button
             type="button"
-            className="btn d-md-none p-1"
-            style={{ color: 'var(--text-primary)' }}
+            className="btn d-md-none"
+            style={{
+              background: showMobileNav ? 'rgba(217, 119, 6, 0.12)' : 'var(--surface-2, #f1f5f9)',
+              border: '1px solid var(--border, #e2e8f0)',
+              borderRadius: 8,
+              cursor: 'pointer',
+              padding: '0.45rem 0.6rem',
+              color: showMobileNav ? 'var(--brand-orange, #d97706)' : 'var(--text-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+            }}
             onClick={() => setShowMobileNav(v => !v)}
             aria-label="Toggle menu"
           >
@@ -287,28 +300,82 @@ export default function Header() {
       {/* Mobile Navigation Drawer */}
       {showMobileNav && (
         <div 
-          className="d-md-none border-top px-4 py-3"
+          className="d-md-none border-top"
           style={{
             backgroundColor: 'var(--surface)',
-            borderTop: '1px solid var(--border)'
+            borderTop: '1px solid var(--border)',
+            padding: '1rem',
+            boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.85rem',
+            maxHeight: 'calc(100vh - 65px)',
+            overflowY: 'auto'
           }}
         >
-          <div className="d-flex flex-column gap-2">
-            <Link to="/search" className="nav-link py-2 d-flex align-items-center gap-2"><Building2 size={16} /> Browse Hostels</Link>
-            <Link to="/map" className="nav-link py-2 d-flex align-items-center gap-2"><MapPin size={16} /> Map View</Link>
-            <Link to="/faq" className="nav-link py-2 d-flex align-items-center gap-2"><HelpCircle size={16} /> FAQ</Link>
-            <Link to="/contact" className="nav-link py-2 d-flex align-items-center gap-2"><PhoneCall size={16} /> Contact Us</Link>
+          {/* User Info Card (if logged in) */}
+          {user && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem 0.9rem',
+              borderRadius: 10,
+              backgroundColor: 'var(--surface-2, #f8fafc)',
+              border: '1px solid var(--border, #e2e8f0)',
+              marginBottom: '0.2rem'
+            }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: '50%',
+                backgroundColor: 'var(--brand-orange)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: '0.95rem', flexShrink: 0
+              }}>
+                {(user.full_name || 'U')[0].toUpperCase()}
+              </div>
+              <div style={{ overflow: 'hidden' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user.full_name}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  {user.role}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 0.5rem 0.2rem' }}>
+              Navigation
+            </div>
+            <Link to="/search" onClick={() => setShowMobileNav(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none', color: isNavActive('/search') ? 'var(--brand-orange)' : 'var(--text-primary)', fontWeight: isNavActive('/search') ? 600 : 500, fontSize: '0.95rem', backgroundColor: isNavActive('/search') ? 'rgba(217,119,6,0.1)' : 'transparent' }}><Building2 size={18} /> Browse Hostels</Link>
+            <Link to="/map" onClick={() => setShowMobileNav(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none', color: isNavActive('/map') ? 'var(--brand-orange)' : 'var(--text-primary)', fontWeight: isNavActive('/map') ? 600 : 500, fontSize: '0.95rem', backgroundColor: isNavActive('/map') ? 'rgba(217,119,6,0.1)' : 'transparent' }}><MapPin size={18} /> Map View</Link>
+            <Link to="/faq" onClick={() => setShowMobileNav(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none', color: isNavActive('/faq') ? 'var(--brand-orange)' : 'var(--text-primary)', fontWeight: isNavActive('/faq') ? 600 : 500, fontSize: '0.95rem', backgroundColor: isNavActive('/faq') ? 'rgba(217,119,6,0.1)' : 'transparent' }}><HelpCircle size={18} /> FAQ</Link>
+            <Link to="/contact" onClick={() => setShowMobileNav(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none', color: isNavActive('/contact') ? 'var(--brand-orange)' : 'var(--text-primary)', fontWeight: isNavActive('/contact') ? 600 : 500, fontSize: '0.95rem', backgroundColor: isNavActive('/contact') ? 'rgba(217,119,6,0.1)' : 'transparent' }}><PhoneCall size={18} /> Contact Us</Link>
+          </div>
+
+          {/* Preferences Section: Dark Mode Toggle */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 0.5rem 0.2rem' }}>
+              Preferences
+            </div>
+            <ThemeToggle showLabel={true} />
+          </div>
+
+          {/* Account Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
             {user ? (
               <>
-                <Link to={getDashboardLink()} className="nav-link py-2 fw-bold text-orange d-flex align-items-center gap-2">
-                  <LayoutDashboard size={16} /> My Dashboard
+                <Link to={getDashboardLink()} onClick={() => setShowMobileNav(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none', color: 'var(--brand-orange)', fontWeight: 700, fontSize: '0.95rem', backgroundColor: 'rgba(217,119,6,0.08)' }}>
+                  <LayoutDashboard size={18} /> My Dashboard
                 </Link>
-                <button onClick={handleLogout} className="btn btn-outline-danger btn-sm text-start py-2 mt-2">
-                  <LogOut size={16} className="me-2" /> Log Out
+                <button onClick={() => { handleLogout(); setShowMobileNav(false); }} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 0.9rem', borderRadius: 10, width: '100%', background: 'none', border: '1px solid rgba(239,68,68,0.25)', cursor: 'pointer', color: '#ef4444', fontWeight: 600, fontSize: '0.95rem' }}>
+                  <LogOut size={18} /> Log Out
                 </button>
               </>
             ) : (
-              <Link to="/login" className="btn btn-primary w-100 mt-2">
+              <Link to="/login" onClick={() => setShowMobileNav(false)} className="btn btn-primary w-100" style={{ fontWeight: 700, padding: '0.75rem', borderRadius: 10, fontSize: '0.95rem' }}>
                 Sign In
               </Link>
             )}

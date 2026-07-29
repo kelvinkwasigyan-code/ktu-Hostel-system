@@ -135,7 +135,7 @@ export default function Navbar() {
         </nav>
 
         {/* RIGHT: Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
 
           {/* Dashboard link — desktop only */}
           {user ? (
@@ -153,8 +153,10 @@ export default function Navbar() {
             </Link>
           )}
 
-          {/* Theme toggle */}
-          <ThemeToggle />
+          {/* Theme toggle — desktop view */}
+          <div className="d-none d-md-block">
+            <ThemeToggle />
+          </div>
 
           {/* Notifications bell */}
           {user && (
@@ -164,16 +166,16 @@ export default function Navbar() {
                 onClick={() => setShowNotif(v => !v)}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
-                  padding: '0.4rem', color: 'var(--text-secondary, #64748b)',
-                  position: 'relative',
+                  padding: '0.45rem', color: 'var(--text-secondary, #64748b)',
+                  position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}
                 aria-label="Notifications"
               >
-                <Bell size={19} />
+                <Bell size={20} />
                 {unreadCount > 0 && (
                   <span style={{
                     position: 'absolute', top: 2, right: 2,
-                    width: 15, height: 15, borderRadius: '50%',
+                    width: 16, height: 16, borderRadius: '50%',
                     backgroundColor: '#ef4444', color: '#fff',
                     fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontWeight: 700,
@@ -217,15 +219,14 @@ export default function Navbar() {
 
           {/* User avatar + dropdown — desktop */}
           {user && (
-            <div style={{ position: 'relative' }} ref={userMenuRef}>
+            <div className="d-none d-md-block" style={{ position: 'relative' }} ref={userMenuRef}>
               <button
                 type="button"
                 onClick={() => setShowUserMenu(v => !v)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.4rem',
-                  paddingLeft: '0.5rem', borderLeft: '1px solid var(--border)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  borderLeft: '1px solid var(--border, #e2e8f0)',
+                  paddingLeft: '0.5rem', borderLeft: '1px solid var(--border, #e2e8f0)',
+                  background: 'none', border: 'none', cursor: 'pointer'
                 }}
               >
                 <div style={{
@@ -271,7 +272,18 @@ export default function Navbar() {
             className="d-md-none"
             onClick={() => setShowMobileNav(v => !v)}
             aria-label="Toggle menu"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.4rem', color: 'var(--text-primary)' }}
+            style={{
+              background: showMobileNav ? 'rgba(217, 119, 6, 0.12)' : 'var(--surface-2, #f1f5f9)',
+              border: '1px solid var(--border, #e2e8f0)',
+              borderRadius: 8,
+              cursor: 'pointer',
+              padding: '0.45rem 0.6rem',
+              color: showMobileNav ? 'var(--brand-orange, #d97706)' : 'var(--text-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+            }}
           >
             {showMobileNav ? <X size={22}/> : <Menu size={22}/>}
           </button>
@@ -283,66 +295,118 @@ export default function Navbar() {
         <div className="d-md-none" style={{
           backgroundColor: 'var(--surface, #fff)',
           borderTop: '1px solid var(--border, #e2e8f0)',
-          padding: '0.5rem 0.75rem 1rem',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+          padding: '1rem',
+          boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.85rem',
+          maxHeight: 'calc(100vh - 65px)',
+          overflowY: 'auto'
         }}>
-          {/* Nav links */}
-          {[
-            { to: '/search',  icon: <Building2 size={17}/>, label: 'Browse Hostels' },
-            { to: '/map',     icon: <MapPin size={17}/>,    label: 'Map View' },
-            { to: '/faq',     icon: <HelpCircle size={17}/>,label: 'FAQ' },
-            { to: '/contact', icon: <PhoneCall size={17}/>, label: 'Contact Us' },
-          ].map(item => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setShowMobileNav(false)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.6rem',
-                padding: '0.65rem 0.75rem', borderRadius: 8, textDecoration: 'none',
-                color: isActive(item.to) ? 'var(--brand-orange)' : 'var(--text-primary, #1e293b)',
-                fontWeight: isActive(item.to) ? 600 : 500,
-                fontSize: '0.95rem',
-                backgroundColor: isActive(item.to) ? 'rgba(255,107,53,0.08)' : 'transparent',
-              }}
-            >
-              {item.icon} {item.label}
-            </Link>
-          ))}
+          {/* User Info Card (if logged in) */}
+          {user && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              padding: '0.75rem 0.9rem',
+              borderRadius: 10,
+              backgroundColor: 'var(--surface-2, #f8fafc)',
+              border: '1px solid var(--border, #e2e8f0)',
+              marginBottom: '0.2rem'
+            }}>
+              <div style={{
+                width: 38, height: 38, borderRadius: '50%',
+                backgroundColor: 'var(--brand-orange)', color: '#fff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, fontSize: '0.95rem', flexShrink: 0
+              }}>
+                {(user.full_name || 'U')[0].toUpperCase()}
+              </div>
+              <div style={{ overflow: 'hidden' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user.full_name}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  {user.role}
+                </div>
+              </div>
+            </div>
+          )}
 
-          {/* Divider + user actions */}
-          <div style={{ borderTop: '1px solid var(--border)', marginTop: '0.5rem', paddingTop: '0.5rem' }}>
+          {/* Nav links section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 0.5rem 0.2rem' }}>
+              Navigation
+            </div>
+            {[
+              { to: '/search',  icon: <Building2 size={18}/>, label: 'Browse Hostels' },
+              { to: '/map',     icon: <MapPin size={18}/>,    label: 'Map View' },
+              { to: '/faq',     icon: <HelpCircle size={18}/>,label: 'FAQ' },
+              { to: '/contact', icon: <PhoneCall size={18}/>, label: 'Contact Us' },
+            ].map(item => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setShowMobileNav(false)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none',
+                  color: isActive(item.to) ? 'var(--brand-orange)' : 'var(--text-primary, #1e293b)',
+                  fontWeight: isActive(item.to) ? 600 : 500,
+                  fontSize: '0.95rem',
+                  backgroundColor: isActive(item.to) ? 'rgba(217, 119, 6, 0.1)' : 'transparent',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {item.icon} {item.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Appearance Section: Dark Mode Toggle Feature inside Hamburger Tab */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
+            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 0.5rem 0.2rem' }}>
+              Preferences
+            </div>
+            <ThemeToggle showLabel={true} />
+          </div>
+
+          {/* Account Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', borderTop: '1px solid var(--border)', paddingTop: '0.75rem' }}>
             {user ? (
               <>
                 <Link
                   to={getDashboardLink()}
                   onClick={() => setShowMobileNav(false)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '0.6rem',
-                    padding: '0.65rem 0.75rem', borderRadius: 8, textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    padding: '0.75rem 0.9rem', borderRadius: 10, textDecoration: 'none',
                     color: 'var(--brand-orange)', fontWeight: 700, fontSize: '0.95rem',
+                    backgroundColor: 'rgba(217, 119, 6, 0.08)'
                   }}
                 >
-                  <LayoutDashboard size={17}/> My Dashboard
+                  <LayoutDashboard size={18}/> My Dashboard
                 </Link>
                 <button
                   onClick={() => { logout(); setShowMobileNav(false); }}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '0.6rem',
-                    padding: '0.65rem 0.75rem', borderRadius: 8, width: '100%',
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    color: '#ef4444', fontWeight: 500, fontSize: '0.95rem',
+                    display: 'flex', alignItems: 'center', gap: '0.75rem',
+                    padding: '0.75rem 0.9rem', borderRadius: 10, width: '100%',
+                    background: 'none', border: '1px solid rgba(239,68,68,0.25)', cursor: 'pointer',
+                    color: '#ef4444', fontWeight: 600, fontSize: '0.95rem',
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  <LogOut size={17}/> Log Out
+                  <LogOut size={18}/> Log Out
                 </button>
               </>
             ) : (
               <Link
                 to="/login"
                 onClick={() => setShowMobileNav(false)}
-                className="btn btn-primary w-100 mt-1"
-                style={{ fontWeight: 700 }}
+                className="btn btn-primary w-100"
+                style={{ fontWeight: 700, padding: '0.75rem', borderRadius: 10, fontSize: '0.95rem' }}
               >
                 Sign In
               </Link>
