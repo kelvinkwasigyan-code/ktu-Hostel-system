@@ -26,7 +26,7 @@ const hostelBg = '/hostel-bg.jpg';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [filters, setFilters] = useState({ neighborhood: '', room_type: '', max_price: '' });
+  const [filters, setFilters] = useState({ neighborhood: '', room_type: '', max_price: '', gender_policy: '' });
   const [listings, setListings] = useState([]);
   const [listingsLoading, setListingsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
@@ -63,6 +63,7 @@ export default function HomePage() {
     if (filters.neighborhood) params.set('neighborhood', filters.neighborhood);
     if (filters.room_type)    params.set('room_type', filters.room_type);
     if (filters.max_price)    params.set('max_price', filters.max_price);
+    if (filters.gender_policy) params.set('gender_policy', filters.gender_policy);
     navigate(`/search?${params.toString()}`);
   };
 
@@ -155,17 +156,17 @@ export default function HomePage() {
                   🔍 Quick Search
                 </h5>
                 <form onSubmit={handleSearch}>
-                  <div className="mb-3">
-                    <label className="form-label">Neighborhood</label>
-                    <select className="form-select" value={filters.neighborhood}
-                      onChange={e => setFilters(f => ({ ...f, neighborhood: e.target.value }))}>
-                      <option value="">All Areas</option>
-                      {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
-                    </select>
-                  </div>
                   <div className="row g-2 mb-3">
-                    <div className="col-6">
-                      <label className="form-label">Room Type</label>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Neighborhood</label>
+                      <select className="form-select" value={filters.neighborhood}
+                        onChange={e => setFilters(f => ({ ...f, neighborhood: e.target.value }))}>
+                        <option value="">All Areas</option>
+                        {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Room Type</label>
                       <select className="form-select" value={filters.room_type}
                         onChange={e => setFilters(f => ({ ...f, room_type: e.target.value }))}>
                         <option value="">Any Type</option>
@@ -173,15 +174,27 @@ export default function HomePage() {
                         <option>Self-contained</option><option>Apartment</option>
                       </select>
                     </div>
-                    <div className="col-6">
-                      <label className="form-label">Max Price (GHS)</label>
+                  </div>
+                  <div className="row g-2 mb-4">
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Gender Policy</label>
+                      <select className="form-select" value={filters.gender_policy}
+                        onChange={e => setFilters(f => ({ ...f, gender_policy: e.target.value }))}>
+                        <option value="">Any Policy</option>
+                        <option>Mixed</option>
+                        <option>Male Only</option>
+                        <option>Female Only</option>
+                      </select>
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Max Price (GHS)</label>
                       <input type="number" className="form-control" placeholder="e.g. 1500"
                         value={filters.max_price}
                         onChange={e => setFilters(f => ({ ...f, max_price: e.target.value }))} />
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-primary w-100 py-2">
-                    <Search size={16} className="me-2" />Search Properties
+                  <button type="submit" className="btn btn-primary w-100 py-3 d-flex align-items-center justify-content-center" style={{ fontWeight: 600, fontSize: '1.05rem', background: 'linear-gradient(135deg, var(--brand-orange), #ff6b00)', border: 'none', borderRadius: '12px', boxShadow: '0 8px 16px rgba(255,107,0,0.3)', transition: 'all 0.3s ease' }}>
+                    <Search size={18} className="me-2" /> Find Your Hostel
                   </button>
                 </form>
               </div>

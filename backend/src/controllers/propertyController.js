@@ -59,7 +59,7 @@ export const createProperty = async (req, res) => {
       return res.status(403).json({ error: 'Only landlords can create listings.' });
     }
 
-    const { data: landlord } = await supabaseAdmin
+    const { data: landlord, error: landlordError } = await supabaseAdmin
       .from('users')
       .select('verification_status, phone, full_name')
       .eq('user_id', req.user.user_id)
@@ -385,17 +385,37 @@ export const searchProperties = async (req, res) => {
     if (max_price)     query = query.lte('price_per_semester', parseFloat(max_price));
     if (max_distance)  query = query.lte('distance_from_campus_km', parseFloat(max_distance));
 
-    const { data, error, count } = await query
+    let { data, error, count } = await query
       .order('created_at', { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
+
+    // Fallback: if join fails due to schema cache issue, retry without join
+    if (error && (error.code === 'PGRST200' || error.code === 'PGRST100' || error.message?.includes('relationship'))) {
+      console.warn('searchProperties: join failed, retrying without user join:', error.message);
+      const { data: d2, error: e2, count: c2 } = await supabaseAdmin
+        .from('properties')
+        .select('*, property_images (image_path, display_order)', { count: 'exact' })
+        .eq('verification_status', 'Approved')
+        .eq('availability_status', 'Available')
+        .order('created_at', { ascending: false })
+        .range(offset, offset + parseInt(limit) - 1);
+      data = d2;
+      error = e2;
+      count = c2;
+    }
 
     if (error) {
       console.error('Search error:', error);
       return res.status(500).json({ error: 'Search failed.' });
     }
 
+    // Post-filter: exclude properties from deactivated landlords (belt-and-suspenders)
+    const activeData = (data || []).filter(p =>
+      !p.users || (p.users.is_active !== false && p.users.verification_status !== 'Rejected')
+    );
+
     // Attach average rating to each property
-    const propertyIds = data.map(p => p.property_id);
+    const propertyIds = activeData.map(p => p.property_id);
     let ratingsMap = {};
     if (propertyIds.length > 0) {
       const { data: reviews } = await supabaseAdmin
@@ -410,7 +430,7 @@ export const searchProperties = async (req, res) => {
       });
     }
 
-    const properties = data.map(p => ({
+    const properties = activeData.map(p => ({
       ...p,
       room_rates: parseRoomRates(p.room_rates, p.room_type, p.price_per_semester, p.max_occupancy),
       payment_contact_info: parsePaymentContact(p.payment_contact_info, null),
