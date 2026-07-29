@@ -300,6 +300,9 @@ export const updateProperty = async (req, res) => {
     if (updateErr) {
       console.warn('Optional columns not in schema cache or database — retrying with core fields only:', updateErr.message || updateErr);
       const fallbackPayload = { ...corePayload };
+      delete fallbackPayload.payment_frequency;
+      delete fallbackPayload.gender_policy;
+      delete fallbackPayload.property_type;
       delete fallbackPayload.rooms_available;
       const fallback = await supabaseAdmin
         .from('properties')
