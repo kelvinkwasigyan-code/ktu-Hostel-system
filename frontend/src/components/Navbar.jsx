@@ -148,7 +148,7 @@ export default function Navbar() {
               <LayoutDashboard size={14}/> My Dashboard
             </Link>
           ) : (
-            <Link to="/login" className="btn btn-primary btn-sm d-none d-md-inline-flex" style={{ fontWeight: 600 }}>
+            <Link to="/login" className="btn btn-primary btn-sm d-inline-flex align-items-center" style={{ fontWeight: 600, fontSize: '0.82rem', padding: '0.4rem 0.85rem', borderRadius: '8px' }}>
               Sign In
             </Link>
           )}

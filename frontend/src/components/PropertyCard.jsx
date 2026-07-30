@@ -60,7 +60,9 @@ export default function PropertyCard({ property }) {
             <span><Users size={13} /> Max {property.max_occupancy}</span>
             {property.availability_status === 'Available' && (
               <span className="text-success fw-semibold ms-auto" style={{ fontSize: '0.75rem' }}>
-                {property.rooms_available !== undefined ? property.rooms_available : 1} left
+                {property.rooms_available !== undefined && property.rooms_available !== null
+                  ? (property.rooms_available > 1 ? `${property.rooms_available} rooms available` : property.rooms_available === 1 ? '1 room left' : 'Occupied')
+                  : 'Available'}
               </span>
             )}
           </div>

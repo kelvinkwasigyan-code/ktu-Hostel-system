@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS properties (
     amenities                TEXT,         -- stored as JSON string (parsed in app layer)
     neighborhood             VARCHAR(100),
     distance_from_campus_km  DECIMAL(5, 2),  -- cached via Distance Matrix API on creation
+    rooms_available          INT DEFAULT 5,
     availability_status      VARCHAR(20) DEFAULT 'Available'
                              CHECK (availability_status IN ('Available', 'Pending', 'Occupied')),
     verification_status      VARCHAR(20) DEFAULT 'Pending'

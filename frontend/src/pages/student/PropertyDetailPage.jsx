@@ -295,8 +295,12 @@ export default function PropertyDetailPage() {
                 <div className="col">
                   <div className="p-2 py-3 bg-surface-2 rounded-custom border-custom h-100">
                     <div className="text-success"><CheckCircle size={20} className="mx-auto" /></div>
-                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>{property.rooms_available !== undefined ? property.rooms_available : 1}</div>
-                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Rooms Left</small>
+                    <div style={{ fontWeight: 600, fontSize: '0.82rem' }}>
+                      {property.rooms_available !== undefined && property.rooms_available !== null
+                        ? property.rooms_available
+                        : 'Available'}
+                    </div>
+                    <small className="text-muted-custom" style={{ fontSize: '0.72rem' }}>Rooms Available</small>
                   </div>
                 </div>
               </div>
