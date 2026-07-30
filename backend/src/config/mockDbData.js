@@ -326,7 +326,7 @@ export const INITIAL_DB_STATE = {
       amenities: '["Private Bathroom","CCTV","Security","WiFi","Air Conditioning","Study Desk","Generator Backup"]',
       neighborhood: "Effiduase",
       distance_from_campus_km: 2.0,
-      availability_status: "Pending",
+      availability_status: "Available",
       verification_status: "Approved",
       property_type: "apartment",
       created_at: new Date(Date.now() - 17 * 24 * 60 * 60 * 1000).toISOString()
@@ -577,10 +577,10 @@ export const INITIAL_DB_STATE = {
       booking_id: 6,
       student_id: 12,
       property_id: 9,
-      status: "Pending",
+      status: "Cancelled",
       created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
       expires_at: new Date(Date.now() + 22 * 60 * 60 * 1000).toISOString(),
-      resolved_at: null
+      resolved_at: new Date().toISOString()
     }
   ],
   reviews: [

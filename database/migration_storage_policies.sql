@@ -2,9 +2,11 @@
 -- Migration: Secure ID Scans RLS Storage Policies
 -- ==========================================
 
--- Ensure storage bucket 'id-documents' exists and is private
+-- Ensure storage buckets 'ID-images' and 'id-documents' exist and are private
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('id-documents', 'id-documents', false)
+VALUES 
+  ('ID-images', 'ID-images', false),
+  ('id-documents', 'id-documents', false)
 ON CONFLICT (id) DO UPDATE SET public = false;
 
 -- 1. Allow authenticated landlords to upload their own ID scans
@@ -13,7 +15,7 @@ CREATE POLICY "Allow landlords to upload own ID"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
-  bucket_id = 'id-documents' AND
+  (bucket_id = 'ID-images' OR bucket_id = 'id-documents') AND
   (storage.foldername(name))[1] = auth.uid()::text
 );
 
@@ -23,7 +25,7 @@ CREATE POLICY "Allow owners and admins to view ID"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
-  bucket_id = 'id-documents' AND (
+  (bucket_id = 'ID-images' OR bucket_id = 'id-documents') AND (
     (storage.foldername(name))[1] = auth.uid()::text OR
     (auth.jwt() ->> 'role') = 'admin'
   )

@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     student_id  INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     property_id INT NOT NULL REFERENCES properties(property_id) ON DELETE CASCADE,
     status      VARCHAR(20) DEFAULT 'Pending'
-                CHECK (status IN ('Pending', 'Approved', 'Declined', 'Expired')),
+                CHECK (status IN ('Pending', 'Approved', 'Declined', 'Expired', 'Cancelled')),
     created_at  TIMESTAMPTZ DEFAULT NOW(),
     expires_at  TIMESTAMPTZ NULL,       -- set to created_at + INTERVAL '24 hours' on insert
     resolved_at TIMESTAMPTZ NULL

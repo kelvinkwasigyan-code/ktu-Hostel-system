@@ -6,6 +6,7 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import StudentSidebar from '../../components/StudentSidebar';
 import api from '../../services/api';
+import toast from 'react-hot-toast';
 
 import hero1 from '../../assets/hero-hostel-1.PNG';
 import hero2 from '../../assets/hero-hostel-2.PNG';
@@ -106,11 +107,31 @@ export default function StudentDashboard() {
 
       setStats({ total: bookings.length, approved, pending: pendingHold ? 1 : 0, reviews: reviews.length });
       if (pendingHold) setActiveHold(pendingHold);
+      else setActiveHold(null);
       setNotifications(notifs.slice(0, 5));
     } catch (err) {
       console.error('Error fetching student dashboard data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [cancellingHold, setCancellingHold] = useState(false);
+
+  const handleCancelActiveHold = async (bookingId, propertyTitle) => {
+    if (!window.confirm(`Are you sure you want to cancel your reservation hold on "${propertyTitle || 'this property'}"?`)) {
+      return;
+    }
+    try {
+      setCancellingHold(true);
+      const res = await api.post(`/bookings/${bookingId}/cancel`);
+      toast.success(res.data.message || 'Reservation hold cancelled.');
+      setActiveHold(null);
+      fetchDashboardData();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to cancel hold.');
+    } finally {
+      setCancellingHold(false);
     }
   };
 
@@ -287,10 +308,19 @@ export default function StudentDashboard() {
                       </div>
                     )}
                   </div>
-                  <div className="col-md-4 text-md-end">
+                  <div className="col-md-4 text-md-end d-flex flex-column align-items-md-end gap-2 justify-content-center mt-3 mt-md-0">
                     <Link to="/student/bookings" className="btn btn-primary">
                       Manage Hold Request <ArrowRight size={16} className="ms-1" />
                     </Link>
+                    {activeHold.status === 'Pending' && (
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleCancelActiveHold(activeHold.booking_id, activeHold.properties?.title)}
+                        disabled={cancellingHold}
+                      >
+                        {cancellingHold ? 'Cancelling...' : 'Cancel Active Hold'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

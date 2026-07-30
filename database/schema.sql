@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     selected_room_type VARCHAR(50) NULL,
     agreed_price       DECIMAL(10, 2) NULL,
     status             VARCHAR(20) DEFAULT 'Pending'
-                       CHECK (status IN ('Pending', 'Approved', 'Declined', 'Expired')),
+                       CHECK (status IN ('Pending', 'Approved', 'Declined', 'Expired', 'Cancelled')),
     created_at         TIMESTAMPTZ DEFAULT NOW(),
     expires_at         TIMESTAMPTZ NULL,       -- set to created_at + INTERVAL '24 hours' on insert
     resolved_at        TIMESTAMPTZ NULL

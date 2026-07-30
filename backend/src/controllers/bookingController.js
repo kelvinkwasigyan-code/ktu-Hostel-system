@@ -124,6 +124,118 @@ export const placeHold = async (req, res) => {
   }
 };
 
+// ─── UC-S06-Cancel: Student Cancels Reservation Hold ─────────────────────────
+export const cancelHold = async (req, res) => {
+  try {
+    const studentId = req.user.user_id;
+    const { booking_id } = req.params;
+
+    const parsedId = parseInt(booking_id, 10);
+    const idToSearch = isNaN(parsedId) ? booking_id : parsedId;
+
+    // Fetch booking record
+    let { data: booking } = await supabaseAdmin
+      .from('bookings')
+      .select('*')
+      .eq('booking_id', idToSearch)
+      .single();
+
+    if (!booking) {
+      // Fallback try string or raw ID
+      const { data: altBooking } = await supabaseAdmin
+        .from('bookings')
+        .select('*')
+        .eq('booking_id', String(booking_id))
+        .single();
+      booking = altBooking;
+    }
+
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found.' });
+    }
+
+    if (booking.student_id != studentId) {
+      return res.status(403).json({ error: 'You are not authorized to cancel this booking.' });
+    }
+
+    if (booking.status !== 'Pending' && booking.status !== 'Approved') {
+      return res.status(409).json({ error: `Cannot cancel a booking that is already ${booking.status}.` });
+    }
+
+    // Fetch property record
+    const { data: property } = await supabaseAdmin
+      .from('properties')
+      .select('*')
+      .eq('property_id', booking.property_id)
+      .single();
+
+    const now = new Date().toISOString();
+
+    // 1. Update booking status to 'Cancelled' (with fallback to 'Declined' if DB check constraint is restrictive)
+    let { error: updateErr } = await supabaseAdmin
+      .from('bookings')
+      .update({ status: 'Cancelled', resolved_at: now })
+      .eq('booking_id', booking.booking_id);
+
+    if (updateErr) {
+      console.warn('cancelHold: DB check constraint error for status Cancelled, falling back to Declined:', updateErr.message || updateErr);
+      const fallbackRes = await supabaseAdmin
+        .from('bookings')
+        .update({ status: 'Declined', resolved_at: now })
+        .eq('booking_id', booking.booking_id);
+      updateErr = fallbackRes.error;
+    }
+
+    if (updateErr) {
+      console.error('cancelHold update error:', updateErr);
+      return res.status(500).json({ error: 'Failed to cancel reservation hold.' });
+    }
+
+    // 2. Restore property availability
+    const currentRooms = property?.rooms_available !== undefined ? property.rooms_available : 0;
+    const newRooms = booking.status === 'Approved' ? currentRooms + 1 : currentRooms;
+    
+    await supabaseAdmin
+      .from('properties')
+      .update({
+        availability_status: 'Available',
+        ...(booking.status === 'Approved' ? { rooms_available: newRooms } : {})
+      })
+      .eq('property_id', booking.property_id);
+
+    // 3. Notify Landlord
+    if (property?.landlord_id) {
+      await notifyUser(
+        property.landlord_id,
+        'BookingCancelled',
+        `The reservation hold on "${property.title || 'your property'}" was cancelled by the student. The property is now available for others.`,
+        booking.property_id,
+        parseInt(booking.booking_id, 10),
+        'InApp'
+      );
+    }
+
+    // 4. Notify Student
+    await notifyUser(
+      studentId,
+      'System',
+      `Your reservation hold on "${property?.title || 'the property'}" has been cancelled successfully.`,
+      booking.property_id,
+      parseInt(booking.booking_id, 10),
+      'InApp'
+    );
+
+    res.json({
+      message: 'Reservation hold cancelled successfully.',
+      booking_id: parseInt(booking.booking_id, 10),
+      status: 'Cancelled'
+    });
+  } catch (err) {
+    console.error('cancelHold error:', err);
+    res.status(500).json({ error: 'Server error while cancelling hold.' });
+  }
+};
+
 // ─── UC-L04: Landlord Responds to Reservation Hold ───────────────────────────
 export const respondToHold = async (req, res) => {
   try {

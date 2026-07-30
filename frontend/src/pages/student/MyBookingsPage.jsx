@@ -24,6 +24,7 @@ export default function MyBookingsPage() {
   // Payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentBooking, setPaymentBooking] = useState(null);
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => { fetchBookings(); }, []);
 
@@ -41,6 +42,22 @@ export default function MyBookingsPage() {
       toast.error('Failed to load data.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelHold = async (bookingId, propertyTitle) => {
+    if (!window.confirm(`Are you sure you want to cancel your reservation hold on "${propertyTitle || 'this property'}"?`)) {
+      return;
+    }
+    try {
+      setCancellingId(bookingId);
+      const res = await api.post(`/bookings/${bookingId}/cancel`);
+      toast.success(res.data.message || 'Reservation hold cancelled.');
+      fetchBookings();
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to cancel hold.');
+    } finally {
+      setCancellingId(null);
     }
   };
 
@@ -88,10 +105,11 @@ export default function MyBookingsPage() {
   };
 
   const statusConfig = {
-    Pending:  { bg: 'rgba(245,166,35,0.15)',  text: 'var(--brand-gold)',   label: 'Pending Hold',  icon: <Clock size={13} /> },
-    Approved: { bg: 'rgba(46,204,113,0.15)',  text: 'var(--success)',      label: 'Approved',       icon: <CheckCircle size={13} /> },
-    Declined: { bg: 'rgba(231,76,60,0.15)',   text: 'var(--danger)',       label: 'Declined',       icon: <XCircle size={13} /> },
-    Expired:  { bg: 'rgba(148,163,184,0.15)', text: 'var(--text-muted)',   label: 'Expired Hold',   icon: <AlertCircle size={13} /> },
+    Pending:   { bg: 'rgba(245,166,35,0.15)',  text: 'var(--brand-gold)',   label: 'Pending Hold',  icon: <Clock size={13} /> },
+    Approved:  { bg: 'rgba(46,204,113,0.15)',  text: 'var(--success)',      label: 'Approved',       icon: <CheckCircle size={13} /> },
+    Declined:  { bg: 'rgba(231,76,60,0.15)',   text: 'var(--danger)',       label: 'Declined',       icon: <XCircle size={13} /> },
+    Cancelled: { bg: 'rgba(239,68,68,0.15)',   text: 'var(--danger)',       label: 'Cancelled',      icon: <XCircle size={13} /> },
+    Expired:   { bg: 'rgba(148,163,184,0.15)', text: 'var(--text-muted)',   label: 'Expired Hold',   icon: <AlertCircle size={13} /> },
   };
 
   const StatusBadge = ({ status }) => {
@@ -133,6 +151,15 @@ export default function MyBookingsPage() {
   };
 
   const ActionButton = ({ b }) => {
+    if (b.status === 'Pending') return (
+      <button
+        className="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1"
+        onClick={() => handleCancelHold(b.booking_id, b.properties?.title)}
+        disabled={cancellingId === b.booking_id}
+      >
+        <XCircle size={13} /> {cancellingId === b.booking_id ? 'Cancelling...' : 'Cancel Hold'}
+      </button>
+    );
     if (b.status === 'Approved') return (
       <button className="btn btn-success btn-sm text-white" onClick={() => handleOpenPaymentModal(b)}>
         <Upload size={13} className="me-1" /> Pay / Receipt
