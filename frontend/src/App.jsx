@@ -33,6 +33,7 @@ import ModerateListingsPage from './pages/admin/ModerateListingsPage';
 import ModerateReviewsPage from './pages/admin/ModerateReviewsPage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
 import ManageUsersPage from './pages/admin/ManageUsersPage';
+import AuditLogsPage from './pages/admin/AuditLogsPage';
 
 // Route guards
 const PrivateRoute = ({ children, roles }) => {
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="/admin/reviews" element={<PrivateRoute roles={['Admin']}><ModerateReviewsPage /></PrivateRoute>} />
           <Route path="/admin/analytics" element={<PrivateRoute roles={['Admin']}><AnalyticsPage /></PrivateRoute>} />
           <Route path="/admin/users" element={<PrivateRoute roles={['Admin']}><ManageUsersPage /></PrivateRoute>} />
+          <Route path="/admin/audit-logs" element={<PrivateRoute roles={['Admin']}><AuditLogsPage /></PrivateRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />

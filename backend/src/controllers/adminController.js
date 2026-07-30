@@ -5,7 +5,7 @@
 
 import { supabaseAdmin } from '../config/supabase.js';
 import { notifyUser } from './notificationController.js';
-import logAuditEvent from '../services/auditLogger.js';
+import logAuditEvent, { fetchAuditLogs } from '../services/auditLogger.js';
 
 
 // ─── UC-A01: Verify Landlord Identity ────────────────────────────────────────
@@ -485,22 +485,29 @@ export const deleteReview = async (req, res) => {
 // ─── GET Audit Logs ──────────────────────────────────────────────────────────
 export const getAuditLogs = async (req, res) => {
   try {
-    const { action, user_id, limit = 50 } = req.query;
-    let query = supabaseAdmin
-      .from('audit_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(parseInt(limit));
+    const { action, target_resource, user_id, search, page = 1, limit = 50 } = req.query;
+    
+    const result = await fetchAuditLogs({
+      action,
+      targetResource: target_resource,
+      userId: user_id,
+      search,
+      page,
+      limit
+    });
 
-    if (action) query = query.eq('action', action);
-    if (user_id) query = query.eq('user_id', user_id);
-
-    const { data, error } = await query;
-    if (error) return res.status(500).json({ error: 'Failed to fetch audit logs.' });
-    res.json(data || []);
+    res.json({
+      success: true,
+      logs: result.logs,
+      totalCount: result.totalCount,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages
+    });
   } catch (err) {
     console.error('getAuditLogs error:', err);
-    res.status(500).json({ error: 'Server error.' });
+    res.status(500).json({ error: 'Failed to fetch audit logs.' });
   }
 };
+
 

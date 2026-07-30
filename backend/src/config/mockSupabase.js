@@ -137,6 +137,24 @@ async function executeMockQuery(q) {
   // Deep copy to prevent mutating the database state directly
   tableData = JSON.parse(JSON.stringify(tableData));
 
+  // Helper for simulated DB-level audit log triggers
+  const triggerMockAuditLog = (action, table, targetId, userId, details) => {
+    if (table === 'audit_logs') return;
+    if (!db.audit_logs) db.audit_logs = [];
+    const auditId = 'audit_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    db.audit_logs.unshift({
+      id: auditId,
+      user_id: userId ? String(userId) : null,
+      action,
+      target_resource: table,
+      target_id: targetId ? String(targetId) : null,
+      details: details || {},
+      ip_address: '127.0.0.1',
+      user_agent: 'MockSupabase DB-Trigger',
+      created_at: new Date().toISOString()
+    });
+  };
+
   // If method is insert
   if (q.method === 'insert') {
     const rows = Array.isArray(q.data) ? q.data : [q.data];
@@ -157,11 +175,16 @@ async function executeMockQuery(q) {
       const maxId = db[q.table]?.reduce((max, r) => r[idFieldName] > max ? r[idFieldName] : max, 0) || 0;
       const newRow = {
         ...row,
-        [idFieldName]: maxId + 1,
+        [idFieldName]: row[idFieldName] || maxId + 1,
         created_at: row.created_at || new Date().toISOString()
       };
       db[q.table].push(newRow);
       insertedRows.push(newRow);
+
+      // Execute DB audit log trigger simulation
+      const targetId = newRow[idFieldName];
+      const userId = newRow.user_id || newRow.student_id || newRow.landlord_id || null;
+      triggerMockAuditLog('INSERT', q.table, targetId, userId, { new_data: newRow });
     }
     saveDb(db);
     return q.isSingle ? { data: insertedRows[0], error: null } : { data: insertedRows, error: null };
@@ -176,6 +199,16 @@ async function executeMockQuery(q) {
       }
     });
 
+    const idFieldName = {
+      users: 'user_id',
+      properties: 'property_id',
+      property_images: 'image_id',
+      bookings: 'booking_id',
+      reviews: 'review_id',
+      notifications: 'notification_id',
+      vacancy_alerts: 'alert_id'
+    }[q.table] || 'id';
+
     const updatedRows = [];
     for (let idx of matchingIndices) {
       const dbRow = db[q.table][idx];
@@ -186,6 +219,11 @@ async function executeMockQuery(q) {
       };
       db[q.table][idx] = updatedRow;
       updatedRows.push(updatedRow);
+
+      // Execute DB audit log trigger simulation
+      const targetId = updatedRow[idFieldName];
+      const userId = updatedRow.user_id || updatedRow.student_id || updatedRow.landlord_id || null;
+      triggerMockAuditLog('UPDATE', q.table, targetId, userId, { old_data: dbRow, new_data: updatedRow });
     }
     saveDb(db);
     return q.isSingle ? { data: updatedRows[0], error: null } : { data: updatedRows, error: null };
@@ -195,10 +233,23 @@ async function executeMockQuery(q) {
   if (q.method === 'delete') {
     const remainingRows = [];
     const deletedRows = [];
+
+    const idFieldName = {
+      users: 'user_id',
+      properties: 'property_id',
+      property_images: 'image_id',
+      bookings: 'booking_id',
+      reviews: 'review_id',
+      notifications: 'notification_id',
+      vacancy_alerts: 'alert_id'
+    }[q.table] || 'id';
     
     db[q.table].forEach((row) => {
       if (matchesFilters(row, q.filters, db)) {
         deletedRows.push(row);
+        const targetId = row[idFieldName];
+        const userId = row.user_id || row.student_id || row.landlord_id || null;
+        triggerMockAuditLog('DELETE', q.table, targetId, userId, { old_data: row });
       } else {
         remainingRows.push(row);
       }

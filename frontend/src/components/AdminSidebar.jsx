@@ -1,22 +1,23 @@
 // src/components/AdminSidebar.jsx
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShieldCheck, ListCheck, MessageSquare, BarChart2, Users } from 'lucide-react';
+import { Home, ShieldCheck, ListCheck, MessageSquare, BarChart2, Users, Database } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Dashboard',          path: '/admin',           icon: <Home size={18} /> },
-  { name: 'Verify Landlords',   path: '/admin/verify',    icon: <ShieldCheck size={18} /> },
-  { name: 'Moderate Listings',  path: '/admin/listings',  icon: <ListCheck size={18} /> },
-  { name: 'Moderate Reviews',   path: '/admin/reviews',   icon: <MessageSquare size={18} /> },
-  { name: 'Platform Analytics', path: '/admin/analytics', icon: <BarChart2 size={18} /> },
-  { name: 'Manage Users',       path: '/admin/users',     icon: <Users size={18} /> },
+  { name: 'Dashboard',          path: '/admin',            icon: <Home size={18} /> },
+  { name: 'Verify Landlords',   path: '/admin/verify',     icon: <ShieldCheck size={18} /> },
+  { name: 'Moderate Listings',  path: '/admin/listings',   icon: <ListCheck size={18} /> },
+  { name: 'Moderate Reviews',   path: '/admin/reviews',    icon: <MessageSquare size={18} /> },
+  { name: 'Platform Analytics', path: '/admin/analytics',  icon: <BarChart2 size={18} /> },
+  { name: 'Manage Users',       path: '/admin/users',      icon: <Users size={18} /> },
+  { name: 'Audit Logs',         path: '/admin/audit-logs', icon: <Database size={18} /> },
 ];
 
 const mobileTabItems = [
-  { name: 'Home',      path: '/admin',           icon: <Home size={20} /> },
-  { name: 'Verify',   path: '/admin/verify',    icon: <ShieldCheck size={20} /> },
-  { name: 'Listings', path: '/admin/listings',  icon: <ListCheck size={20} /> },
-  { name: 'Reviews',  path: '/admin/reviews',   icon: <MessageSquare size={20} /> },
-  { name: 'Users',    path: '/admin/users',     icon: <Users size={20} /> },
+  { name: 'Home',      path: '/admin',            icon: <Home size={20} /> },
+  { name: 'Verify',   path: '/admin/verify',     icon: <ShieldCheck size={20} /> },
+  { name: 'Listings', path: '/admin/listings',   icon: <ListCheck size={20} /> },
+  { name: 'Audit',    path: '/admin/audit-logs', icon: <Database size={20} /> },
+  { name: 'Users',    path: '/admin/users',      icon: <Users size={20} /> },
 ];
 
 export default function AdminSidebar() {

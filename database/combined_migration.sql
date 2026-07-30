@@ -150,6 +150,57 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 
 CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_resource ON audit_logs(target_resource);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at DESC);
+
+-- Audit triggers function
+CREATE OR REPLACE FUNCTION fn_audit_log_trigger()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_user_id UUID;
+    v_target_id VARCHAR(255);
+    v_details JSONB;
+BEGIN
+    IF (TG_OP = 'DELETE') THEN
+        v_target_id := COALESCE((to_jsonb(OLD)->>'id'), (to_jsonb(OLD)->>'user_id'), (to_jsonb(OLD)->>'property_id'), (to_jsonb(OLD)->>'booking_id'), (to_jsonb(OLD)->>'review_id'), (to_jsonb(OLD)->>'image_id'), (to_jsonb(OLD)->>'alert_id'), NULL);
+        v_details := jsonb_build_object('old_data', to_jsonb(OLD));
+    ELSIF (TG_OP = 'UPDATE') THEN
+        v_target_id := COALESCE((to_jsonb(NEW)->>'id'), (to_jsonb(NEW)->>'user_id'), (to_jsonb(NEW)->>'property_id'), (to_jsonb(NEW)->>'booking_id'), (to_jsonb(NEW)->>'review_id'), (to_jsonb(NEW)->>'image_id'), (to_jsonb(NEW)->>'alert_id'), NULL);
+        v_details := jsonb_build_object('old_data', to_jsonb(OLD), 'new_data', to_jsonb(NEW));
+    ELSE
+        v_target_id := COALESCE((to_jsonb(NEW)->>'id'), (to_jsonb(NEW)->>'user_id'), (to_jsonb(NEW)->>'property_id'), (to_jsonb(NEW)->>'booking_id'), (to_jsonb(NEW)->>'review_id'), (to_jsonb(NEW)->>'image_id'), (to_jsonb(NEW)->>'alert_id'), NULL);
+        v_details := jsonb_build_object('new_data', to_jsonb(NEW));
+    END IF;
+
+    BEGIN
+        v_user_id := nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
+    EXCEPTION WHEN OTHERS THEN
+        v_user_id := NULL;
+    END;
+
+    IF v_user_id IS NULL THEN
+        IF (TG_OP = 'DELETE') THEN
+            v_user_id := nullif(COALESCE(to_jsonb(OLD)->>'user_id', to_jsonb(OLD)->>'student_id', to_jsonb(OLD)->>'landlord_id', ''), '')::uuid;
+        ELSE
+            v_user_id := nullif(COALESCE(to_jsonb(NEW)->>'user_id', to_jsonb(NEW)->>'student_id', to_jsonb(NEW)->>'landlord_id', ''), '')::uuid;
+        END IF;
+    END IF;
+
+    INSERT INTO audit_logs (id, user_id, action, target_resource, target_id, details, created_at)
+    VALUES (gen_random_uuid(), v_user_id, TG_OP, TG_TABLE_NAME, v_target_id, v_details, NOW());
+
+    IF (TG_OP = 'DELETE') THEN RETURN OLD; END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER trg_audit_users AFTER INSERT OR UPDATE OR DELETE ON users FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
+CREATE TRIGGER trg_audit_properties AFTER INSERT OR UPDATE OR DELETE ON properties FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
+CREATE TRIGGER trg_audit_bookings AFTER INSERT OR UPDATE OR DELETE ON bookings FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
+CREATE TRIGGER trg_audit_reviews AFTER INSERT OR UPDATE OR DELETE ON reviews FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
+CREATE TRIGGER trg_audit_property_images AFTER INSERT OR UPDATE OR DELETE ON property_images FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
+CREATE TRIGGER trg_audit_vacancy_alerts AFTER INSERT OR UPDATE OR DELETE ON vacancy_alerts FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
+
 
 
 -- =============================================================================

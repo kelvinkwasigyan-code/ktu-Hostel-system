@@ -3,6 +3,7 @@
 // Matches database/seed.sql exactly — 18 properties, 12 users, reviews, bookings, notifications
 
 export const INITIAL_DB_STATE = {
+  audit_logs: [],
   users: [
     {
       user_id: 1,
