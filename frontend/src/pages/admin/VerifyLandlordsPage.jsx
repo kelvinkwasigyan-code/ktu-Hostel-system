@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ShieldCheck, UserCheck, XCircle, Clock, FileText, Phone, Mail } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 export default function VerifyLandlordsPage() {
   const [landlords, setLandlords] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Rejection modal state
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedLandlord, setSelectedLandlord] = useState(null);
@@ -47,7 +47,7 @@ export default function VerifyLandlordsPage() {
       await api.patch(`/admin/landlords/${userId}/verify`, { action });
       toast.success(`Landlord successfully approved!`);
       // Update state
-      setLandlords(prev => prev.map(l => 
+      setLandlords(prev => prev.map(l =>
         l.user_id === userId ? { ...l, verification_status: 'Approved' } : l
       ));
     } catch (err) {
@@ -97,13 +97,13 @@ export default function VerifyLandlordsPage() {
         <AdminSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Header */}
             <div className="mb-4">
               <h2 className="mb-1">Landlord Verifications</h2>
               <p className="text-muted-custom mb-0">Approve or reject landlord registration requests based on ID documentation</p>
             </div>
-            
+
             <hr className="divider-orange mb-4" />
 
             {loading ? (
@@ -151,9 +151,9 @@ export default function VerifyLandlordsPage() {
                           </td>
                           <td className="p-3" style={{ fontSize: '0.85rem' }}>
                             {l.id_document_path ? (
-                              <a 
-                                href={l.id_document_path} 
-                                target="_blank" 
+                              <a
+                                href={l.id_document_path}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="d-inline-flex align-items-center gap-1 text-decoration-none text-orange fw-bold"
                               >
@@ -195,7 +195,7 @@ export default function VerifyLandlordsPage() {
                     <button className="btn btn-close btn-close-white p-1" onClick={() => setShowRejectModal(false)}></button>
                   </div>
                   <hr className="border-custom my-2" />
-                  
+
                   <form onSubmit={handleConfirmReject}>
                     <p style={{ fontSize: '0.85rem' }} className="text-muted-custom mb-3">
                       Please state the reason for rejecting verification of landlord <strong>{selectedLandlord.full_name}</strong>.
@@ -225,9 +225,9 @@ export default function VerifyLandlordsPage() {
             )}
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

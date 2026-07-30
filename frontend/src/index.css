@@ -819,7 +819,9 @@ a:hover {
 
   .footer {
     padding: 2rem 0 80px !important;
-  }  /* Bottom clearance for fixed mobile navigation tab bar */
+  }
+
+  /* Bottom clearance for fixed mobile navigation tab bar */
 }
 
 @media (max-width: 768px) {

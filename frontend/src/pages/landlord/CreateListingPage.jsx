@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusSquare, MapPin, Upload, X, ShieldAlert, Sparkles, CreditCard, Phone } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import LandlordSidebar from '../../components/LandlordSidebar';
 import MapboxLocationPicker from '../../components/MapboxLocationPicker';
 import api from '../../services/api';
@@ -42,7 +42,7 @@ export default function CreateListingPage() {
   const [roomRates, setRoomRates] = useState([
     { room_type: 'Single', price_per_semester: '', max_occupancy: '1' }
   ]);
-  
+
   // Coordinate states
   const [lat, setLat] = useState('6.0900');
   const [lng, setLng] = useState('-0.2573');
@@ -104,7 +104,7 @@ export default function CreateListingPage() {
             if (stored && stored.startsWith('http')) {
               return { file, previewUrl, storedUrl: stored };
             }
-          } catch (_) {}
+          } catch (_) { }
           // Storage failed — keep file reference for retry at submit
           return { file, previewUrl, storedUrl: null };
         })
@@ -145,7 +145,7 @@ export default function CreateListingPage() {
     if (photos.length === 0) return toast.error('Please add at least 1 property photo.');
 
     const minPrice = Math.min(...roomRates.map(r => parseFloat(r.price_per_semester)));
-    const maxOcc  = Math.max(...roomRates.map(r => parseInt(r.max_occupancy || 1)));
+    const maxOcc = Math.max(...roomRates.map(r => parseInt(r.max_occupancy || 1)));
     const ALLOWED = ['Single', 'Shared', 'Self-contained', 'Apartment'];
     const primaryRoomType = ALLOWED.includes(roomRates[0]?.room_type) ? roomRates[0].room_type : 'Single';
 
@@ -163,14 +163,14 @@ export default function CreateListingPage() {
           try {
             const stored = await processAndUploadFile(p.file, 'properties');
             if (stored && stored.startsWith('http')) return stored;
-          } catch (_) {}
+          } catch (_) { }
 
           // Cloud upload failed — use a small compressed data URL only if it fits
           try {
             const base64 = await compressImageFile(p.file, 600, 600, 0.5);
             // Only include if reasonably sized (< 200KB base64 ≈ ~150KB image)
             if (base64.length < 200000) return base64;
-          } catch (_) {}
+          } catch (_) { }
 
           return null; // skip this photo rather than bloating the request
         })
@@ -179,7 +179,7 @@ export default function CreateListingPage() {
 
       const imageUrls = finalPhotos.filter(Boolean);
       const cloudUrls = imageUrls.filter(u => u.startsWith('http'));
-      const dataUrls  = imageUrls.filter(u => u.startsWith('data:'));
+      const dataUrls = imageUrls.filter(u => u.startsWith('data:'));
 
       // Safety check: warn if payload is large
       const dataUrlSize = dataUrls.reduce((sum, u) => sum + u.length, 0);
@@ -240,17 +240,17 @@ export default function CreateListingPage() {
         <LandlordSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0" style={{ maxWidth: '900px' }}>
-            
+
             {/* Header */}
             <div className="mb-4">
               <h2 className="mb-1">Create Property Listing</h2>
               <p className="text-muted-custom mb-0">List a new hostel room. It will require administrator verification before it is visible.</p>
             </div>
-            
+
             <hr className="divider-orange mb-4" />
 
             <form onSubmit={handleSubmit} className="row g-4">
-              
+
               {/* Column 1: Details */}
               <div className="col-md-7">
                 <div className="card p-4 border-custom bg-surface rounded-custom d-flex flex-column gap-3">
@@ -342,10 +342,10 @@ export default function CreateListingPage() {
                         <div className="row g-2 align-items-center">
                           <div className="col-md-5">
                             <label className="form-label mb-1" style={{ fontSize: '0.78rem' }}>Room Type</label>
-                            <select 
-                              className="form-select form-select-sm" 
-                              required 
-                              value={rate.room_type} 
+                            <select
+                              className="form-select form-select-sm"
+                              required
+                              value={rate.room_type}
                               onChange={e => handleRoomRateChange(idx, 'room_type', e.target.value)}
                             >
                               {ROOM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -354,33 +354,33 @@ export default function CreateListingPage() {
 
                           <div className="col-md-4 col-7">
                             <label className="form-label mb-1" style={{ fontSize: '0.78rem' }}>Price / {paymentFrequency} (GHS)</label>
-                            <input 
-                              type="number" 
-                              className="form-control form-control-sm" 
-                              required 
-                              placeholder="e.g. 1500" 
-                              value={rate.price_per_semester} 
-                              onChange={e => handleRoomRateChange(idx, 'price_per_semester', e.target.value)} 
+                            <input
+                              type="number"
+                              className="form-control form-control-sm"
+                              required
+                              placeholder="e.g. 1500"
+                              value={rate.price_per_semester}
+                              onChange={e => handleRoomRateChange(idx, 'price_per_semester', e.target.value)}
                             />
                           </div>
 
                           <div className="col-md-2 col-3">
                             <label className="form-label mb-1" style={{ fontSize: '0.78rem' }}>Max Occ.</label>
-                            <input 
-                              type="number" 
-                              className="form-control form-control-sm" 
-                              required 
-                              min="1" 
-                              value={rate.max_occupancy} 
-                              onChange={e => handleRoomRateChange(idx, 'max_occupancy', e.target.value)} 
+                            <input
+                              type="number"
+                              className="form-control form-control-sm"
+                              required
+                              min="1"
+                              value={rate.max_occupancy}
+                              onChange={e => handleRoomRateChange(idx, 'max_occupancy', e.target.value)}
                             />
                           </div>
 
                           {roomRates.length > 1 && (
                             <div className="col-md-1 col-2 text-end pt-3">
-                              <button 
-                                type="button" 
-                                className="btn btn-sm text-danger p-1" 
+                              <button
+                                type="button"
+                                className="btn btn-sm text-danger p-1"
                                 title="Remove room option"
                                 onClick={() => handleRemoveRoomRate(idx)}
                               >
@@ -402,13 +402,13 @@ export default function CreateListingPage() {
                         <p className="mb-1 fw-bold" style={{ fontSize: '0.9rem' }}>Number of Rooms Available</p>
                         <small className="text-muted-custom">Total number of rooms available for booking across this property.</small>
                       </div>
-                      <input 
-                        type="number" 
-                        className="form-control" 
-                        style={{ width: '100px' }} 
-                        min="1" 
-                        value={roomsAvailable} 
-                        onChange={(e) => setRoomsAvailable(e.target.value)} 
+                      <input
+                        type="number"
+                        className="form-control"
+                        style={{ width: '100px' }}
+                        min="1"
+                        value={roomsAvailable}
+                        onChange={(e) => setRoomsAvailable(e.target.value)}
                       />
                     </div>
                   </div>
@@ -475,7 +475,7 @@ export default function CreateListingPage() {
 
               {/* Column 2: Uploads & Amenities & Map */}
               <div className="col-md-5 d-flex flex-column gap-4">
-                
+
                 {/* Image Upload Widget */}
                 <div className="card p-4 border-custom bg-surface rounded-custom">
                   <h5 className="mb-2 d-flex align-items-center gap-2" style={{ fontFamily: 'Outfit,sans-serif' }}>
@@ -525,10 +525,10 @@ export default function CreateListingPage() {
                     {AMENITIES_LIST.map(amenity => (
                       <div key={amenity} className="col-12 col-sm-6">
                         <div className="form-check">
-                          <input 
-                            className="form-check-input" 
-                            type="checkbox" 
-                            id={amenity} 
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id={amenity}
                             checked={selectedAmenities.includes(amenity)}
                             onChange={() => handleAmenityChange(amenity)}
                           />
@@ -547,7 +547,7 @@ export default function CreateListingPage() {
                     <MapPin size={18} className="text-gold" /> Mapbox Location Pin
                   </h5>
                   <p className="text-muted-custom mb-3" style={{ fontSize: '0.8rem' }}>Click or drag pin on the map to pinpoint hostel location.</p>
-                  
+
                   <div className="mb-3">
                     <MapboxLocationPicker
                       lat={lat}
@@ -581,9 +581,9 @@ export default function CreateListingPage() {
             </form>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PlusSquare, MapPin, Upload, X, Edit3, CreditCard } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import LandlordSidebar from '../../components/LandlordSidebar';
 import MapboxLocationPicker from '../../components/MapboxLocationPicker';
 import api from '../../services/api';
@@ -81,7 +81,7 @@ export default function EditListingPage() {
         if (p.room_rates) {
           try {
             rates = typeof p.room_rates === 'string' ? JSON.parse(p.room_rates) : p.room_rates;
-          } catch (_) {}
+          } catch (_) { }
         }
         if (!rates || rates.length === 0) {
           rates = [{ room_type: p.room_type || 'Single', price_per_semester: String(p.price_per_semester || ''), max_occupancy: String(p.max_occupancy || '1') }];
@@ -106,7 +106,7 @@ export default function EditListingPage() {
         if (p.payment_contact_info) {
           try {
             pc = typeof p.payment_contact_info === 'string' ? JSON.parse(p.payment_contact_info) : p.payment_contact_info;
-          } catch (_) {}
+          } catch (_) { }
         }
         setPaymentPhone(pc.phone || '');
         setMomoNumber(pc.momo_number || '');
@@ -174,7 +174,7 @@ export default function EditListingPage() {
           try {
             const stored = await processAndUploadFile(file, 'properties');
             if (stored && stored.startsWith('http')) return { file, previewUrl, storedUrl: stored };
-          } catch (_) {}
+          } catch (_) { }
           return { file, previewUrl, storedUrl: null };
         })
       );
@@ -211,8 +211,8 @@ export default function EditListingPage() {
     if (photos.length === 0) return toast.error('Please add at least 1 property photo.');
 
     const minPrice = Math.min(...roomRates.map(r => parseFloat(r.price_per_semester)));
-    const maxOcc   = Math.max(...roomRates.map(r => parseInt(r.max_occupancy || 1)));
-    const ALLOWED  = ['Single', 'Shared', 'Self-contained', 'Apartment'];
+    const maxOcc = Math.max(...roomRates.map(r => parseInt(r.max_occupancy || 1)));
+    const ALLOWED = ['Single', 'Shared', 'Self-contained', 'Apartment'];
     const primaryRoomType = ALLOWED.includes(roomRates[0]?.room_type) ? roomRates[0].room_type : 'Single';
 
     try {
@@ -227,11 +227,11 @@ export default function EditListingPage() {
           try {
             const stored = await processAndUploadFile(p.file, 'properties');
             if (stored && stored.startsWith('http')) return stored;
-          } catch (_) {}
+          } catch (_) { }
           try {
             const base64 = await compressImageFile(p.file, 600, 600, 0.5);
             if (base64.length < 200000) return base64;
-          } catch (_) {}
+          } catch (_) { }
           return null;
         })
       );
@@ -239,7 +239,7 @@ export default function EditListingPage() {
 
       const imageUrls = finalPhotos.filter(Boolean);
       const cloudUrls = imageUrls.filter(u => u.startsWith('http'));
-      const dataUrls  = imageUrls.filter(u => u.startsWith('data:'));
+      const dataUrls = imageUrls.filter(u => u.startsWith('data:'));
 
       // Safety check: warn if payload is large
       const dataUrlSize = dataUrls.reduce((sum, u) => sum + u.length, 0);
@@ -465,13 +465,13 @@ export default function EditListingPage() {
                         <p className="mb-1 fw-bold" style={{ fontSize: '0.9rem' }}>Number of Rooms Available</p>
                         <small className="text-muted-custom">Total number of rooms available for booking across this property.</small>
                       </div>
-                      <input 
-                        type="number" 
-                        className="form-control" 
-                        style={{ width: '100px' }} 
-                        min="1" 
-                        value={roomsAvailable} 
-                        onChange={(e) => setRoomsAvailable(e.target.value)} 
+                      <input
+                        type="number"
+                        className="form-control"
+                        style={{ width: '100px' }}
+                        min="1"
+                        value={roomsAvailable}
+                        onChange={(e) => setRoomsAvailable(e.target.value)}
                       />
                     </div>
                   </div>
@@ -637,9 +637,9 @@ export default function EditListingPage() {
             </form>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

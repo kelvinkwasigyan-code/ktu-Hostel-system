@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Home, List, Inbox, AlertTriangle, ShieldCheck, Star, Users, PlusSquare, ArrowRight, User } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import LandlordSidebar from '../../components/LandlordSidebar';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -72,7 +72,7 @@ export default function LandlordDashboard() {
         <LandlordSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
               <div>
@@ -100,7 +100,7 @@ export default function LandlordDashboard() {
                   <div>
                     <h5 className="mb-1 text-danger">Identity Verification Required</h5>
                     <p className="text-muted-custom mb-0" style={{ fontSize: '0.88rem' }}>
-                      Your profile verification status is currently <strong>{user?.verification_status || 'Pending'}</strong>. 
+                      Your profile verification status is currently <strong>{user?.verification_status || 'Pending'}</strong>.
                       You can compile property listings, but they will remain hidden from student search queries until an administrator reviews and approves your account documents.
                     </p>
                   </div>
@@ -168,7 +168,7 @@ export default function LandlordDashboard() {
                     </Link>
                   </div>
                   <hr className="divider-orange my-2" />
-                  
+
                   {recentBookings.length === 0 ? (
                     <div className="text-center py-5 text-muted-custom">
                       No reservation holds requested yet.
@@ -216,7 +216,7 @@ export default function LandlordDashboard() {
                     </Link>
                   </div>
                   <hr className="divider-orange my-2" />
-                  
+
                   {properties.length === 0 ? (
                     <div className="text-center py-5 text-muted-custom">
                       <p className="mb-3">You haven't listed any properties yet.</p>
@@ -248,9 +248,9 @@ export default function LandlordDashboard() {
             </div>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

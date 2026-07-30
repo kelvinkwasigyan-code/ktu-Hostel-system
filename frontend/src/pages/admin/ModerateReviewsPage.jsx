@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, AlertTriangle, Trash2, CheckCircle, Star, Flag, ChevronDown, ChevronUp } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 function StarRating({ rating }) {
   return (
     <span className="d-inline-flex gap-1">
-      {[1,2,3,4,5].map(i => (
+      {[1, 2, 3, 4, 5].map(i => (
         <Star
           key={i}
           size={13}
@@ -23,14 +23,14 @@ function StarRating({ rating }) {
 }
 
 export default function ModerateReviewsPage() {
-  const [reviews, setReviews]     = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [filterMode, setFilter]   = useState('flagged'); // 'flagged' | 'all'
-  const [expanded, setExpanded]   = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterMode, setFilter] = useState('flagged'); // 'flagged' | 'all'
+  const [expanded, setExpanded] = useState(null);
 
   // Delete confirm modal
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting]         = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => { fetchReviews(); }, []);
 
@@ -154,8 +154,10 @@ export default function ModerateReviewsPage() {
                             {new Date(review.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
                         </div>
-                        <p className="mb-0 text-muted-custom" style={{ fontSize: '0.88rem', lineHeight: 1.6,
-                          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        <p className="mb-0 text-muted-custom" style={{
+                          fontSize: '0.88rem', lineHeight: 1.6,
+                          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+                        }}>
                           "{review.comment}"
                         </p>
                       </div>
@@ -195,6 +197,7 @@ export default function ModerateReviewsPage() {
               </div>
             )}
           </div>
+          <PortalFooter />
         </main>
       </div>
 
@@ -222,7 +225,7 @@ export default function ModerateReviewsPage() {
         </div>
       )}
 
-      <Footer />
+      
     </>
   );
 }

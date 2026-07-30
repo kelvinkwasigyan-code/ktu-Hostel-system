@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { List, ToggleLeft, ToggleRight, ShieldCheck, Clock, PlusSquare, MapPin, Pencil } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import LandlordSidebar from '../../components/LandlordSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -37,7 +37,7 @@ export default function ManageListingsPage() {
       });
       toast.success(`Property marked as ${newStatus}`);
       // Optimistic state update
-      setProperties(props => props.map(p => 
+      setProperties(props => props.map(p =>
         p.property_id === propertyId ? { ...p, availability_status: newStatus } : p
       ));
     } catch (err) {
@@ -67,7 +67,7 @@ export default function ManageListingsPage() {
         <LandlordSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
               <div>
@@ -78,7 +78,7 @@ export default function ManageListingsPage() {
                 <PlusSquare size={16} /> Create Listing
               </Link>
             </div>
-            
+
             <hr className="divider-orange mb-4" />
 
             {loading ? (
@@ -100,14 +100,14 @@ export default function ManageListingsPage() {
             ) : (
               <div className="row g-3">
                 {properties.map(p => {
-                  const heroImg = p.property_images?.sort((a,b) => a.display_order - b.display_order)[0]?.image_path 
+                  const heroImg = p.property_images?.sort((a, b) => a.display_order - b.display_order)[0]?.image_path
                     || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600';
-                  
+
                   return (
                     <div key={p.property_id} className="col-12">
                       <div className="card p-3 border-custom bg-surface rounded-custom">
                         <div className="row align-items-center g-3">
-                          
+
                           {/* Image */}
                           <div className="col-md-2">
                             <div style={{ height: '90px', borderRadius: '10px', overflow: 'hidden' }}>
@@ -187,9 +187,9 @@ export default function ManageListingsPage() {
             )}
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

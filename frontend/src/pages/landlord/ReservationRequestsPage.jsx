@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, Phone, Mail, User, ShieldCheck } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import LandlordSidebar from '../../components/LandlordSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -49,9 +49,9 @@ export default function ReservationRequestsPage() {
       const res = await api.patch(`/bookings/${bookingId}/respond`, { action });
       toast.success(res.data.message || `Hold request successfully ${action}ed!`);
       // Update list
-      setBookings(prevBookings => prevBookings.map(b => 
-        b.booking_id === bookingId 
-          ? { ...b, status: action === 'accept' ? 'Approved' : 'Declined' } 
+      setBookings(prevBookings => prevBookings.map(b =>
+        b.booking_id === bookingId
+          ? { ...b, status: action === 'accept' ? 'Approved' : 'Declined' }
           : b
       ));
     } catch (err) {
@@ -82,7 +82,7 @@ export default function ReservationRequestsPage() {
         <LandlordSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Page Header */}
             <div className="mb-4">
               <h2 className="mb-1">Student Requests & Inspections</h2>
@@ -91,14 +91,14 @@ export default function ReservationRequestsPage() {
 
             {/* Navigation Tabs */}
             <div className="d-flex gap-2 mb-4">
-              <button 
+              <button
                 className={`btn btn-sm ${activeTab === 'holds' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setActiveTab('holds')}
                 style={{ fontWeight: 600 }}
               >
                 ⏱️ Reservation Holds ({bookings.length})
               </button>
-              <button 
+              <button
                 className={`btn btn-sm ${activeTab === 'viewings' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setActiveTab('viewings')}
                 style={{ fontWeight: 600 }}
@@ -229,11 +229,10 @@ export default function ReservationRequestsPage() {
                             </td>
                             <td className="p-3 fw-bold text-orange">{v.preferred_date}</td>
                             <td className="p-3">
-                              <span className={`badge px-2 py-1 ${
-                                v.status === 'approved' ? 'bg-success text-white' :
+                              <span className={`badge px-2 py-1 ${v.status === 'approved' ? 'bg-success text-white' :
                                 v.status === 'completed' ? 'bg-info text-dark' :
-                                v.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-dark'
-                              }`} style={{ textTransform: 'capitalize' }}>
+                                  v.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-dark'
+                                }`} style={{ textTransform: 'capitalize' }}>
                                 {v.status}
                               </span>
                             </td>
@@ -265,9 +264,9 @@ export default function ReservationRequestsPage() {
             )}
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

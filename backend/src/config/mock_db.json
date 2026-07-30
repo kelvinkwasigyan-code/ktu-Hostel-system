@@ -27,6 +27,34 @@
       "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
       "created_at": "2026-07-30T07:36:12.083Z",
       "id": 2
+    },
+    {
+      "user_id": "23",
+      "action": "LANDLORD_VERIFIED",
+      "target_resource": "users",
+      "target_id": "37",
+      "details": {
+        "newStatus": "Approved",
+        "landlord_name": "Dexter Morgan"
+      },
+      "ip_address": "::1",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "created_at": "2026-07-30T08:01:09.908Z",
+      "id": 3
+    },
+    {
+      "user_id": "23",
+      "action": "LISTING_APPROVED",
+      "target_resource": "properties",
+      "target_id": "27",
+      "details": {
+        "newStatus": "Approved",
+        "title": "Hallelujah Hostel"
+      },
+      "ip_address": "::1",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "created_at": "2026-07-30T09:02:28.614Z",
+      "id": 4
     }
   ],
   "otp_verifications": [

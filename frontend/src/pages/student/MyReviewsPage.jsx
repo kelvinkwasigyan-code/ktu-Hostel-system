@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Star, AlertTriangle, ShieldCheck, MapPin } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import StudentSidebar from '../../components/StudentSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -35,13 +35,13 @@ export default function MyReviewsPage() {
         <StudentSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Page Header */}
             <div className="mb-4">
               <h2 className="mb-1">My Reviews</h2>
               <p className="text-muted-custom mb-0">Manage feedback and ratings you submitted for off-campus hostels</p>
             </div>
-            
+
             <hr className="divider-orange mb-4" />
 
             {loading ? (
@@ -107,9 +107,9 @@ export default function MyReviewsPage() {
             )}
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

@@ -5,7 +5,7 @@ import {
   ChevronLeft, ChevronRight, Eye, AlertCircle, Database, CheckCircle2, X
 } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -112,7 +112,7 @@ export default function AuditLogsPage() {
             <div className="card shadow-sm border-0 mb-4" style={{ borderRadius: '12px' }}>
               <div className="card-body p-3">
                 <form onSubmit={(e) => { setPage(1); fetchLogs(e); }} className="row g-2 align-items-center">
-                  
+
                   {/* Search Input */}
                   <div className="col-12 col-md-4">
                     <div className="input-group">
@@ -294,6 +294,7 @@ export default function AuditLogsPage() {
             </div>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
 
@@ -366,7 +367,7 @@ export default function AuditLogsPage() {
         </div>
       )}
 
-      <Footer />
+      
     </>
   );
 }

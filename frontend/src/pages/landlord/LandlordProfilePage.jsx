@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ShieldCheck, ShieldAlert, Lock, User, Phone, Image, FileText, CheckCircle, AlertCircle, Save, Sparkles } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import LandlordSidebar from '../../components/LandlordSidebar';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
@@ -48,7 +48,7 @@ export default function LandlordProfilePage() {
       setErrorMsg('');
       const res = await api.get('/auth/profile');
       const u = res.data?.user || user;
-      
+
       setProfileInfo({
         full_name: u.full_name || user?.full_name || '',
         email: u.email || user?.email || '',
@@ -111,7 +111,7 @@ export default function LandlordProfilePage() {
       });
 
       setSuccessMsg(res.data?.message || 'Profile information updated successfully!');
-      
+
       if (res.data?.user) {
         updateUser(res.data.user);
       }
@@ -147,7 +147,7 @@ export default function LandlordProfilePage() {
         <LandlordSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
               <div>
@@ -185,7 +185,7 @@ export default function LandlordProfilePage() {
                     Security & Verification Integrity Notice
                   </h5>
                   <p className="text-muted-custom mb-0" style={{ fontSize: '0.88rem', lineHeight: '1.5' }}>
-                    Primary identity credentials (<strong>Legal Name, Email Address, and Govt ID Verification Document</strong>) are permanently locked to preserve the integrity of our admin verification system and protect KTU students against identity spoofing. 
+                    Primary identity credentials (<strong>Legal Name, Email Address, and Govt ID Verification Document</strong>) are permanently locked to preserve the integrity of our admin verification system and protect KTU students against identity spoofing.
                     If you need to change your official legal name, please contact campus platform administration.
                   </p>
                 </div>
@@ -213,7 +213,7 @@ export default function LandlordProfilePage() {
                       }}
                     />
                     <span className={`position-absolute bottom-0 end-0 badge rounded-pill p-2 ${isVerified ? 'bg-success' : 'bg-warning text-dark'}`}
-                          title={`Verification Status: ${profileInfo.verification_status}`}>
+                      title={`Verification Status: ${profileInfo.verification_status}`}>
                       {isVerified ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
                     </span>
                   </div>
@@ -424,9 +424,9 @@ export default function LandlordProfilePage() {
             </div>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

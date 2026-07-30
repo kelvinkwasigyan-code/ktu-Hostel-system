@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Home, Calendar, Clock, Star, Bell, ArrowRight, ShieldCheck, PhoneCall, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import StudentSidebar from '../../components/StudentSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -82,7 +82,7 @@ export default function StudentDashboard() {
     const updateTimer = () => {
       const diff = new Date(activeHold.expires_at) - new Date();
       if (diff <= 0) { setTimeLeft('Hold Expired'); setActiveHold(null); return; }
-      const hrs  = Math.floor(diff / (1000 * 60 * 60));
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
       const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const secs = Math.floor((diff % (1000 * 60)) / 1000);
       setTimeLeft(`${hrs}h ${mins}m ${secs}s`);
@@ -96,13 +96,13 @@ export default function StudentDashboard() {
     try {
       setLoading(true);
       const bookingsRes = await api.get('/bookings/student/mine');
-      const bookings   = bookingsRes.data?.bookings || [];
+      const bookings = bookingsRes.data?.bookings || [];
       const reviewsRes = await api.get('/reviews/mine');
-      const reviews    = reviewsRes.data?.reviews || [];
-      const notifRes   = await api.get('/notifications');
-      const notifs     = notifRes.data?.notifications || [];
+      const reviews = reviewsRes.data?.reviews || [];
+      const notifRes = await api.get('/notifications');
+      const notifs = notifRes.data?.notifications || [];
 
-      const approved    = bookings.filter(b => b.status === 'Approved').length;
+      const approved = bookings.filter(b => b.status === 'Approved').length;
       const pendingHold = bookings.find(b => b.status === 'Pending');
 
       setStats({ total: bookings.length, approved, pending: pendingHold ? 1 : 0, reviews: reviews.length });
@@ -135,7 +135,7 @@ export default function StudentDashboard() {
     }
   };
 
-   if (loading) {
+  if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
         <div className="spinner-border text-primary" role="status">
@@ -467,9 +467,9 @@ export default function StudentDashboard() {
             </div>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

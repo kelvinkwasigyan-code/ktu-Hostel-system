@@ -2,22 +2,22 @@
 import { useState, useEffect } from 'react';
 import { Users, Search, Shield, UserCheck, UserX, GraduationCap, BriefcaseBusiness, Trash2, Ban, RefreshCw } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const ROLE_CONFIG = {
-  Student:  { color: 'var(--info)',         bg: 'rgba(23,162,184,0.15)',  icon: <GraduationCap size={13} /> },
-  Landlord: { color: 'var(--brand-orange)', bg: 'rgba(255,140,0,0.15)',   icon: <BriefcaseBusiness size={13} /> },
-  Admin:    { color: 'var(--brand-gold)',   bg: 'rgba(245,166,35,0.15)',  icon: <Shield size={13} /> },
+  Student: { color: 'var(--info)', bg: 'rgba(23,162,184,0.15)', icon: <GraduationCap size={13} /> },
+  Landlord: { color: 'var(--brand-orange)', bg: 'rgba(255,140,0,0.15)', icon: <BriefcaseBusiness size={13} /> },
+  Admin: { color: 'var(--brand-gold)', bg: 'rgba(245,166,35,0.15)', icon: <Shield size={13} /> },
 };
 
 const VERIF_CONFIG = {
-  Approved: { color: 'var(--success)', bg: 'rgba(46,204,113,0.15)',  label: 'Verified' },
-  Pending:  { color: 'var(--brand-gold)', bg: 'rgba(245,166,35,0.15)', label: 'Pending' },
-  Rejected: { color: 'var(--danger)', bg: 'rgba(231,76,60,0.15)',   label: 'Rejected' },
-  N_A:      { color: 'var(--text-muted)', bg: 'var(--surface-2)',    label: 'N/A' },
+  Approved: { color: 'var(--success)', bg: 'rgba(46,204,113,0.15)', label: 'Verified' },
+  Pending: { color: 'var(--brand-gold)', bg: 'rgba(245,166,35,0.15)', label: 'Pending' },
+  Rejected: { color: 'var(--danger)', bg: 'rgba(231,76,60,0.15)', label: 'Rejected' },
+  N_A: { color: 'var(--text-muted)', bg: 'var(--surface-2)', label: 'N/A' },
 };
 
 function RoleBadge({ role }) {
@@ -41,14 +41,14 @@ function VerifBadge({ status }) {
 }
 
 export default function ManageUsersPage() {
-  const [users, setUsers]           = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [searchQuery, setSearch]    = useState('');
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
 
   // Action modals
   const [deactivateTarget, setDeactivateTarget] = useState(null);
-  const [deleteTarget, setDeleteTarget]         = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionSubmitting, setActionSubmitting] = useState(false);
 
   useEffect(() => { fetchUsers(); }, []);
@@ -108,10 +108,10 @@ export default function ManageUsersPage() {
   });
 
   const counts = {
-    all:      users.length,
-    Student:  users.filter(u => u.role === 'Student').length,
+    all: users.length,
+    Student: users.filter(u => u.role === 'Student').length,
     Landlord: users.filter(u => u.role === 'Landlord').length,
-    Admin:    users.filter(u => u.role === 'Admin').length,
+    Admin: users.filter(u => u.role === 'Admin').length,
   };
 
   return (
@@ -280,6 +280,7 @@ export default function ManageUsersPage() {
             )}
 
           </div>
+          <PortalFooter />
         </main>
       </div>
 
@@ -340,7 +341,7 @@ export default function ManageUsersPage() {
         </div>
       )}
 
-      <Footer />
+      
     </>
   );
 }

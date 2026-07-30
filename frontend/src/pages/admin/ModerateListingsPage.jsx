@@ -2,30 +2,30 @@
 import { useState, useEffect } from 'react';
 import { List, CheckCircle, XCircle, Clock, MapPin, DollarSign, Home, Image, Eye } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
 const STATUS_CONFIG = {
   Approved: { bg: 'rgba(46,204,113,0.15)', color: 'var(--success)', icon: <CheckCircle size={13} /> },
-  Pending:  { bg: 'rgba(245,166,35,0.15)',  color: 'var(--brand-gold)', icon: <Clock size={13} /> },
-  Rejected: { bg: 'rgba(231,76,60,0.15)',   color: 'var(--danger)',     icon: <XCircle size={13} /> },
+  Pending: { bg: 'rgba(245,166,35,0.15)', color: 'var(--brand-gold)', icon: <Clock size={13} /> },
+  Rejected: { bg: 'rgba(231,76,60,0.15)', color: 'var(--danger)', icon: <XCircle size={13} /> },
 };
 
 export default function ModerateListingsPage() {
-  const [listings, setListings]       = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [filterStatus, setFilter]     = useState('all');
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilter] = useState('all');
 
   // Detail drawer
-  const [selected, setSelected]       = useState(null);
+  const [selected, setSelected] = useState(null);
 
   // Reject modal
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectTarget, setRejectTarget]       = useState(null);
-  const [rejectReason, setRejectReason]       = useState('');
-  const [submitting, setSubmitting]           = useState(false);
+  const [rejectTarget, setRejectTarget] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => { fetchListings(); }, []);
 
@@ -96,7 +96,7 @@ export default function ModerateListingsPage() {
 
   const counts = {
     all: listings.length,
-    Pending:  listings.filter(l => l.verification_status === 'Pending').length,
+    Pending: listings.filter(l => l.verification_status === 'Pending').length,
     Approved: listings.filter(l => l.verification_status === 'Approved').length,
     Rejected: listings.filter(l => l.verification_status === 'Rejected').length,
   };
@@ -241,6 +241,7 @@ export default function ModerateListingsPage() {
               </div>
             )}
           </div>
+          <PortalFooter />
         </main>
       </div>
 
@@ -281,7 +282,7 @@ export default function ModerateListingsPage() {
         </div>
       )}
 
-      <Footer />
+      
     </>
   );
 }

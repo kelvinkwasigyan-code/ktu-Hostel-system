@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart2, Users, Home, Calendar, Star, TrendingUp, DollarSign, Activity } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -78,7 +78,7 @@ function RingMetric({ value, max, label, color }) {
 
 export default function AnalyticsPage() {
   const [analytics, setAnalytics] = useState(null);
-  const [loading, setLoading]     = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchAnalytics(); }, []);
 
@@ -222,18 +222,18 @@ export default function AnalyticsPage() {
                         <table className="table mb-0" style={{ color: 'var(--text-primary)', fontSize: '0.88rem' }}>
                           <tbody>
                             {[
-                              { label: 'Total Users',              value: analytics.users?.total || 0 },
-                              { label: 'Student Users',            value: analytics.users?.students || 0 },
-                              { label: 'Landlord Users',           value: analytics.users?.landlords || 0 },
-                              { label: 'Verified Landlords',       value: analytics.users?.verified_landlords || 0 },
-                              { label: 'Total Listings',           value: analytics.properties?.total || analytics.properties?.approved || 0 },
-                              { label: 'Pending Listings',         value: analytics.properties?.pending || 0 },
-                              { label: 'Approved Listings',        value: analytics.properties?.approved || 0 },
-                              { label: 'Total Booking Holds',      value: analytics.bookings?.total || 0 },
-                              { label: 'Active / Pending Holds',   value: analytics.bookings?.active || analytics.bookings?.pending || 0 },
-                              { label: 'Total Reviews',            value: analytics.reviews?.total || 0 },
-                              { label: 'Flagged Reviews',          value: analytics.reviews?.flagged || 0 },
-                              { label: 'Average Rating',           value: analytics.reviews?.avg_rating ? `★ ${Number(analytics.reviews.avg_rating).toFixed(2)}` : '—' },
+                              { label: 'Total Users', value: analytics.users?.total || 0 },
+                              { label: 'Student Users', value: analytics.users?.students || 0 },
+                              { label: 'Landlord Users', value: analytics.users?.landlords || 0 },
+                              { label: 'Verified Landlords', value: analytics.users?.verified_landlords || 0 },
+                              { label: 'Total Listings', value: analytics.properties?.total || analytics.properties?.approved || 0 },
+                              { label: 'Pending Listings', value: analytics.properties?.pending || 0 },
+                              { label: 'Approved Listings', value: analytics.properties?.approved || 0 },
+                              { label: 'Total Booking Holds', value: analytics.bookings?.total || 0 },
+                              { label: 'Active / Pending Holds', value: analytics.bookings?.active || analytics.bookings?.pending || 0 },
+                              { label: 'Total Reviews', value: analytics.reviews?.total || 0 },
+                              { label: 'Flagged Reviews', value: analytics.reviews?.flagged || 0 },
+                              { label: 'Average Rating', value: analytics.reviews?.avg_rating ? `★ ${Number(analytics.reviews.avg_rating).toFixed(2)}` : '—' },
                             ].map((row, i) => (
                               <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                                 <td className="py-2 text-muted-custom">{row.label}</td>
@@ -249,9 +249,9 @@ export default function AnalyticsPage() {
               </>
             )}
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

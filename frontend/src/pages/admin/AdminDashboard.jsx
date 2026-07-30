@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Users, List, Inbox, MessageSquare, AlertTriangle, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import AdminSidebar from '../../components/AdminSidebar';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
         <AdminSidebar />
         <main className="main-content flex-grow-1">
           <div className="container-fluid p-0">
-            
+
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
               <div>
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
 
             {/* Moderation Queues split grid */}
             <div className="row g-4">
-              
+
               {/* Landlord Queue */}
               <div className="col-lg-6">
                 <div className="card p-4 border-custom bg-surface rounded-custom h-100">
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
                     </Link>
                   </div>
                   <hr className="divider-orange my-2" />
-                  
+
                   {pendingLandlords.length === 0 ? (
                     <div className="text-center py-5 text-muted-custom" style={{ fontSize: '0.9rem' }}>
                       No landlords currently pending verification.
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
                     </Link>
                   </div>
                   <hr className="divider-orange my-2" />
-                  
+
                   {pendingListings.length === 0 ? (
                     <div className="text-center py-5 text-muted-custom" style={{ fontSize: '0.9rem' }}>
                       No listings currently pending approval.
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
                     </Link>
                   </div>
                   <hr className="divider-orange my-2" />
-                  
+
                   {flaggedReviews.length === 0 ? (
                     <div className="text-center py-4 text-muted-custom" style={{ fontSize: '0.9rem' }}>
                       No reviews currently flagged.
@@ -261,9 +261,9 @@ export default function AdminDashboard() {
             </div>
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }

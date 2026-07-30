@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, Phone, Mail, Star, Calendar, MapPin, Upload } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import PortalFooter from '../../components/PortalFooter';
 import StudentSidebar from '../../components/StudentSidebar';
 import SubmitPayment from '../../components/SubmitPayment';
 import api from '../../services/api';
@@ -105,18 +105,18 @@ export default function MyBookingsPage() {
   };
 
   const statusConfig = {
-    Pending:   { bg: 'rgba(245,166,35,0.15)',  text: 'var(--brand-gold)',   label: 'Pending Hold',  icon: <Clock size={13} /> },
-    Approved:  { bg: 'rgba(46,204,113,0.15)',  text: 'var(--success)',      label: 'Approved',       icon: <CheckCircle size={13} /> },
-    Declined:  { bg: 'rgba(231,76,60,0.15)',   text: 'var(--danger)',       label: 'Declined',       icon: <XCircle size={13} /> },
-    Cancelled: { bg: 'rgba(239,68,68,0.15)',   text: 'var(--danger)',       label: 'Cancelled',      icon: <XCircle size={13} /> },
-    Expired:   { bg: 'rgba(148,163,184,0.15)', text: 'var(--text-muted)',   label: 'Expired Hold',   icon: <AlertCircle size={13} /> },
+    Pending: { bg: 'rgba(245,166,35,0.15)', text: 'var(--brand-gold)', label: 'Pending Hold', icon: <Clock size={13} /> },
+    Approved: { bg: 'rgba(46,204,113,0.15)', text: 'var(--success)', label: 'Approved', icon: <CheckCircle size={13} /> },
+    Declined: { bg: 'rgba(231,76,60,0.15)', text: 'var(--danger)', label: 'Declined', icon: <XCircle size={13} /> },
+    Cancelled: { bg: 'rgba(239,68,68,0.15)', text: 'var(--danger)', label: 'Cancelled', icon: <XCircle size={13} /> },
+    Expired: { bg: 'rgba(148,163,184,0.15)', text: 'var(--text-muted)', label: 'Expired Hold', icon: <AlertCircle size={13} /> },
   };
 
   const StatusBadge = ({ status }) => {
     const c = statusConfig[status] || { bg: 'var(--surface-2)', text: 'var(--text-primary)', label: status, icon: null };
     return (
       <span className="badge d-inline-flex align-items-center gap-1 px-2 py-1"
-            style={{ background: c.bg, color: c.text, fontSize: '0.78rem', fontWeight: 600, borderRadius: '6px' }}>
+        style={{ background: c.bg, color: c.text, fontSize: '0.78rem', fontWeight: 600, borderRadius: '6px' }}>
         {c.icon} {c.label}
       </span>
     );
@@ -190,14 +190,14 @@ export default function MyBookingsPage() {
 
             {/* Tab Navigation */}
             <div className="d-flex gap-2 mb-4">
-              <button 
+              <button
                 className={`btn btn-sm ${activeTab === 'holds' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setActiveTab('holds')}
                 style={{ fontWeight: 600 }}
               >
                 ⏱️ Reservation Holds ({bookings.length})
               </button>
-              <button 
+              <button
                 className={`btn btn-sm ${activeTab === 'viewings' ? 'btn-primary' : 'btn-outline-secondary'}`}
                 onClick={() => setActiveTab('viewings')}
                 style={{ fontWeight: 600 }}
@@ -349,11 +349,10 @@ export default function MyBookingsPage() {
                             </td>
                             <td className="p-3 fw-bold text-orange">{v.preferred_date}</td>
                             <td className="p-3">
-                              <span className={`badge px-2 py-1 ${
-                                v.status === 'approved' ? 'bg-success text-white' :
+                              <span className={`badge px-2 py-1 ${v.status === 'approved' ? 'bg-success text-white' :
                                 v.status === 'completed' ? 'bg-info text-dark' :
-                                v.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-dark'
-                              }`} style={{ textTransform: 'capitalize' }}>
+                                  v.status === 'rejected' ? 'bg-danger text-white' : 'bg-warning text-dark'
+                                }`} style={{ textTransform: 'capitalize' }}>
                                 {v.status}
                               </span>
                             </td>
@@ -372,9 +371,9 @@ export default function MyBookingsPage() {
             {/* ── Review Modal ─────────────────────────────────────────────── */}
             {showModal && selectedBooking && (
               <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3"
-                   style={{ background: 'rgba(0,0,0,0.6)', zIndex: 3000 }}>
+                style={{ background: 'rgba(0,0,0,0.6)', zIndex: 3000 }}>
                 <div className="card p-4 border-custom bg-surface rounded-custom w-100"
-                     style={{ maxWidth: '480px', animation: 'slideDown 0.2s ease' }}>
+                  style={{ maxWidth: '480px', animation: 'slideDown 0.2s ease' }}>
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h5 className="mb-0" style={{ fontFamily: 'Outfit,sans-serif' }}>Submit Review</h5>
                     <button className="btn btn-close btn-close-white p-1" onClick={handleCloseReviewModal} />
@@ -391,8 +390,8 @@ export default function MyBookingsPage() {
                       <div className="stars-interactive">
                         {[1, 2, 3, 4, 5].map(star => (
                           <button key={star} type="button"
-                                  className={`star-btn ${star <= rating ? 'filled' : ''}`}
-                                  onClick={() => setRating(star)}>★</button>
+                            className={`star-btn ${star <= rating ? 'filled' : ''}`}
+                            onClick={() => setRating(star)}>★</button>
                         ))}
                       </div>
                     </div>
@@ -400,9 +399,9 @@ export default function MyBookingsPage() {
                     <div className="mb-3">
                       <label className="form-label">Review Comment</label>
                       <textarea className="form-control" rows="4"
-                                placeholder="Write your stay experience..."
-                                required value={comment}
-                                onChange={e => setComment(e.target.value)} />
+                        placeholder="Write your stay experience..."
+                        required value={comment}
+                        onChange={e => setComment(e.target.value)} />
                     </div>
 
                     <div className="d-flex gap-2 justify-content-end">
@@ -418,21 +417,21 @@ export default function MyBookingsPage() {
             {/* Payment Modal */}
             {showPaymentModal && paymentBooking && (
               <div className="position-fixed inset-0 d-flex align-items-center justify-content-center p-3"
-                   style={{ background: 'rgba(0,0,0,0.6)', zIndex: 3000, top: 0, left: 0, width: '100vw', height: '100vh' }}>
+                style={{ background: 'rgba(0,0,0,0.6)', zIndex: 3000, top: 0, left: 0, width: '100vw', height: '100vh' }}>
                 <div className="card p-4 border-custom bg-surface rounded-custom w-100"
-                     style={{ maxWidth: '480px', animation: 'slideDown 0.2s ease' }}>
+                  style={{ maxWidth: '480px', animation: 'slideDown 0.2s ease' }}>
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h5 className="mb-0" style={{ fontFamily: 'Outfit,sans-serif' }}>Upload Payment Receipt</h5>
                     <button className="btn btn-close btn-close-white p-1" onClick={handleClosePaymentModal} />
                   </div>
                   <hr className="border-custom my-2" />
-                  
+
                   <p style={{ fontSize: '0.85rem' }} className="text-muted-custom mb-3">
-                    Paying for: <strong>{paymentBooking.properties?.title}</strong><br/>
+                    Paying for: <strong>{paymentBooking.properties?.title}</strong><br />
                     Amount Due: GHS {Number(paymentBooking.properties?.price_per_semester).toLocaleString()}
                   </p>
 
-                  <SubmitPayment 
+                  <SubmitPayment
                     hostelId={paymentBooking.property_id}
                     landlordId={paymentBooking.properties?.landlord_id}
                     amount={paymentBooking.properties?.price_per_semester}
@@ -442,7 +441,7 @@ export default function MyBookingsPage() {
                       fetchBookings();
                     }}
                   />
-                  
+
                   <div className="d-flex justify-content-end mt-2">
                     <button type="button" className="btn btn-secondary btn-sm" onClick={handleClosePaymentModal}>Close</button>
                   </div>
@@ -451,9 +450,9 @@ export default function MyBookingsPage() {
             )}
 
           </div>
+          <PortalFooter />
         </main>
       </div>
-      <Footer />
     </>
   );
 }
