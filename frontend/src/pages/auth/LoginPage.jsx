@@ -6,8 +6,9 @@ import toast from 'react-hot-toast';
 import api from '../../services/api';
 import { Eye, EyeOff, LogIn, X } from 'lucide-react';
 
+import supabase from '../../services/supabaseClient';
+
 export default function LoginPage() {
-  const { login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPw, setShowPw] = useState(false);
@@ -21,15 +22,23 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await api.post('/auth/login', form);
-      login(res.data.user, res.data.token);
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+
+      if (authError) throw authError;
+
+      // Fetch profile to determine role for navigation
+      const res = await api.get('/auth/profile');
+      
       toast.success(`Welcome back, ${res.data.user.full_name.split(' ')[0]}!`);
       const role = (res.data.user.role || '').toLowerCase();
       if (role === 'admin')    navigate('/admin');
       else if (role === 'landlord') navigate('/landlord');
       else navigate('/student');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Invalid email or password. Please try again.');
+      toast.error(err.message || err.response?.data?.error || 'Invalid email or password. Please try again.');
       setForm(f => ({ ...f, password: '' }));
     } finally {
       setLoading(false);

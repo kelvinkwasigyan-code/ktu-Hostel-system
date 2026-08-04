@@ -3,12 +3,14 @@
 // Every protected route uses these guards — enforced server-side, not just UI.
 
 import jwt from 'jsonwebtoken';
+import { supabaseAdmin } from '../config/supabase.js';
 
 /**
- * Verifies JWT token from Authorization header.
+ * Verifies Supabase JWT token from Authorization header.
+ * Looks up the corresponding integer user_id from public.users table.
  * Attaches decoded user payload to req.user.
  */
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,8 +20,21 @@ export const authenticate = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_development_secret_key_12345');
-    req.user = decoded; // { user_id, email, role, full_name }
+    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET);
+    
+    // Look up the user in our custom public.users table
+    // We can match by email since Supabase JWT contains it
+    const { data: user, error } = await supabaseAdmin
+      .from('users')
+      .select('user_id, email, role, full_name, verification_status')
+      .eq('email', decoded.email)
+      .single();
+
+    if (error || !user) {
+      return res.status(401).json({ error: 'User record not found.' });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
@@ -56,14 +71,22 @@ export const verifyToken = authenticate;
  * Decodes the JWT token from the Authorization header if present.
  * Does NOT throw a 401 error if the token is missing or invalid.
  */
-export const optionalAuthenticate = (req, res, next) => {
+export const optionalAuthenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_development_secret_key_12345');
-      req.user = decoded;
+      const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET);
+      const { data: user } = await supabaseAdmin
+        .from('users')
+        .select('user_id, email, role, full_name, verification_status')
+        .eq('email', decoded.email)
+        .single();
+      
+      if (user) {
+        req.user = user;
+      }
     } catch (err) {
       // Ignore token errors for optional authentication (e.g. expired or invalid)
     }

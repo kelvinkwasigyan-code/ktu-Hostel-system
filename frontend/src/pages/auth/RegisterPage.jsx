@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 import toast from 'react-hot-toast';
 import api from '../../services/api';
+import supabase from '../../services/supabaseClient';
 import { Eye, EyeOff, UserPlus, X } from 'lucide-react';
 import SecureIDUpload from '../../components/SecureIDUpload';
 import { uploadLandlordID } from '../../utils/idUploader';
@@ -41,14 +42,24 @@ export default function RegisterPage() {
         }
       }
 
-      const payload = {
-        ...form,
-        id_document_path,
-        id_type: idType
-      };
+      const { data, error: authError } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: {
+          data: {
+            role: form.role,
+            full_name: form.full_name,
+            phone: form.phone,
+            id_document_path: id_document_path,
+            id_type: idType
+          }
+        }
+      });
 
-      const res = await api.post('/auth/register', payload);
-      login(res.data.user, res.data.token);
+      if (authError) throw authError;
+
+      // Ensure profile is fetched for role routing
+      const res = await api.get('/auth/profile');
 
       if (form.role === 'Landlord') {
         toast.success(`Account submitted for verification! Welcome, ${res.data.user.full_name.split(' ')[0]}`);
@@ -61,7 +72,7 @@ export default function RegisterPage() {
       else if (role === 'Landlord') navigate('/landlord');
       else navigate('/student');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Registration failed. Please try again.');
+      toast.error(err.message || err.response?.data?.error || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

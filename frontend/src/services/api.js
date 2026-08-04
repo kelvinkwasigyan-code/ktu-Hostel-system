@@ -9,23 +9,28 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
 
+import supabase from './supabaseClient';
+
 // Attach JWT token to every request
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('hostel_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(async (config) => {
+  if (supabase) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      config.headers.Authorization = `Bearer ${session.access_token}`;
+    }
+  }
   return config;
 });
 
 // Global response interceptor — handle 401 (session expired)
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const url = error.config?.url || '';
     const isAuthEndpoint = url.includes('/auth/');
     // Only redirect to login on 401 for non-auth endpoints (session expiry)
     if (error.response?.status === 401 && !isAuthEndpoint) {
-      localStorage.removeItem('hostel_token');
-      localStorage.removeItem('hostel_user');
+      if (supabase) await supabase.auth.signOut();
       window.location.href = '/login';
     }
     return Promise.reject(error);

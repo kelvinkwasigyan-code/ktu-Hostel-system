@@ -127,7 +127,7 @@ async function main() {
     });
 
     if (authError) {
-      if (authError.message.includes('already exists')) {
+      if (authError.message?.includes('already exists') || authError.message?.includes('already been registered')) {
         // If they already exist in auth.users, fetch their UUID
         const { data: existingList } = await supabase.auth.admin.listUsers();
         const existingUser = existingList.users.find(x => x.email === u.email);
@@ -177,7 +177,7 @@ async function main() {
       result = await supabase
         .from('users')
         .insert({
-          user_id:             userId,
+          auth_id:             userId,
           full_name:           u.full_name,
           email:               u.email,
           phone:               u.phone,

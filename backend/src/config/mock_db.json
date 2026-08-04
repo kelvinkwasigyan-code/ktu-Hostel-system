@@ -55,6 +55,20 @@
       "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
       "created_at": "2026-07-30T09:02:28.614Z",
       "id": 4
+    },
+    {
+      "user_id": "23",
+      "action": "LANDLORD_VERIFIED",
+      "target_resource": "users",
+      "target_id": "40",
+      "details": {
+        "newStatus": "Approved",
+        "landlord_name": "Godfred Agyenim Boateng"
+      },
+      "ip_address": "::1",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+      "created_at": "2026-08-04T15:52:34.538Z",
+      "id": 5
     }
   ],
   "otp_verifications": [
