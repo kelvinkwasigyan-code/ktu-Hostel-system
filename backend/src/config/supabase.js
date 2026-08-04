@@ -39,9 +39,9 @@ mockAdmin = createMockSupabase();
 const isFallbackError = (err) => {
   if (!err) return false;
   const code = err.code || err.statusCode;
-  // Only fallback to mock when the table itself doesn't exist in the remote DB.
-  // Do NOT fallback for column errors (PGRST204) — the controller has its own fallback logic.
-  return code === '42P01';
+  // 42P01  — PostgreSQL: table doesn't exist
+  // PGRST205 — PostgREST: table not found in schema cache (table never created in remote DB)
+  return code === '42P01' || code === 'PGRST205';
 };
 
 export const supabaseAdmin = new Proxy({}, {

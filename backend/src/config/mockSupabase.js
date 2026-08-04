@@ -98,6 +98,14 @@ function resolveRelationships(row, table, db) {
     result.properties = property ? resolveRelationships(property, 'properties', db) : null;
   }
 
+  if (targetTable === 'viewing_requests') {
+    // Join properties via hostel_id
+    const property = db.properties.find(p => p.property_id === row.hostel_id);
+    result.properties = property
+      ? { property_id: property.property_id, title: property.title, address: property.address, neighborhood: property.neighborhood, payment_contact_info: property.payment_contact_info }
+      : null;
+  }
+
   return result;
 }
 
@@ -159,6 +167,8 @@ async function executeMockQuery(q) {
   if (q.method === 'insert') {
     const rows = Array.isArray(q.data) ? q.data : [q.data];
     const insertedRows = [];
+    // Initialise table if it doesn't exist in the DB yet
+    if (!db[q.table]) db[q.table] = [];
     
     // Identify auto-increment ID field name
     const idFieldName = {

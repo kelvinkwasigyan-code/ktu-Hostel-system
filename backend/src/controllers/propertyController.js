@@ -774,3 +774,31 @@ export const deleteVacancyAlert = async (req, res) => {
   }
 };
 
+// ─── GET /api/properties/neighborhoods ───────────────────────────────────────
+// Returns a sorted list of distinct neighborhood values from approved properties.
+export const getNeighborhoods = async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('properties')
+      .select('neighborhood')
+      .eq('verification_status', 'Approved');
+
+    if (error) {
+      console.error('getNeighborhoods error:', error);
+      return res.status(500).json({ error: 'Failed to fetch neighborhoods.' });
+    }
+
+    const neighborhoods = [
+      ...new Set(
+        (data || [])
+          .map(p => (p.neighborhood || '').trim())
+          .filter(Boolean)
+      )
+    ].sort();
+
+    res.json({ neighborhoods });
+  } catch (err) {
+    console.error('getNeighborhoods error:', err);
+    res.status(500).json({ error: 'Server error.' });
+  }
+};

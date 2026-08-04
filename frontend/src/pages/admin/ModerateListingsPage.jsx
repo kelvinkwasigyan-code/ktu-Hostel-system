@@ -165,13 +165,19 @@ export default function ModerateListingsPage() {
                         {/* Photo thumbnail */}
                         <div style={{ width: '120px', minHeight: '90px', background: 'var(--surface-2)', flexShrink: 0 }}
                           className="d-flex align-items-center justify-content-center">
-                          {listing.photos?.[0] ? (
-                            <img src={listing.photos[0]} alt={listing.title}
-                              style={{ width: '120px', height: '90px', objectFit: 'cover' }} />
-                          ) : (
-                            <Image size={28} style={{ opacity: 0.3, color: 'var(--text-muted)' }} />
-                          )}
+                          {(() => {
+                            const imgs = listing.property_images || [];
+                            const sorted = [...imgs].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+                            const src = sorted[0]?.image_path;
+                            return src ? (
+                              <img src={src} alt={listing.title}
+                                style={{ width: '120px', height: '90px', objectFit: 'cover' }} />
+                            ) : (
+                              <Image size={28} style={{ opacity: 0.3, color: 'var(--text-muted)' }} />
+                            );
+                          })()}
                         </div>
+
 
                         {/* Info */}
                         <div className="flex-grow-1 p-3">

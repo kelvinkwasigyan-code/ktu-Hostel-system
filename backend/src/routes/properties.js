@@ -3,7 +3,7 @@ import express from 'express';
 import {
   createProperty, updateProperty, searchProperties, getPropertyDetail,
   updateAvailability, getLandlordDashboard, getMapProperties, getMyProperties,
-  createVacancyAlert, getMyVacancyAlerts, deleteVacancyAlert
+  createVacancyAlert, getMyVacancyAlerts, deleteVacancyAlert, getNeighborhoods
 } from '../controllers/propertyController.js';
 import { authenticate, optionalAuthenticate, requireLandlord, requireStudent } from '../middleware/auth.js';
 
@@ -14,6 +14,7 @@ const router = express.Router();
 // Public routes
 router.get('/search', searchProperties);                      // UC-S03
 router.get('/map', getMapProperties);                         // UC-S05
+router.get('/neighborhoods', getNeighborhoods);               // Dynamic neighborhood list
 
 // Student vacancy alert routes
 router.post('/alerts', authenticate, requireStudent, createVacancyAlert);      // UC-S08

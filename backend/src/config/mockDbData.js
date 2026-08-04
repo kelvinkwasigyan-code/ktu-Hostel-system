@@ -673,6 +673,7 @@ export const INITIAL_DB_STATE = {
     }
   ],
   vacancy_alerts: [],
+  viewing_requests: [],
   audit_logs: []
 };
 

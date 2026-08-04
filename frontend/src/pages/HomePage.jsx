@@ -13,7 +13,7 @@ const FEATURES = [
   { icon: <Star size={28} />, color: '#F5A623', title: 'Verified Reviews', desc: 'Only students who actually stayed can review — no fake ratings.' },
 ];
 
-const NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase'];
+const FALLBACK_NEIGHBORHOODS = ['Adweso', 'Nsukwao', 'Effiduase', 'Oyoko', 'Ashanti Nkwanta', 'Akwadum', 'Okorase'];
 
 const STATS = [
   { value: '200+', label: 'Listed Properties' },
@@ -30,6 +30,8 @@ export default function HomePage() {
   const [listings, setListings] = useState([]);
   const [listingsLoading, setListingsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+  const [neighborhoods, setNeighborhoods] = useState(FALLBACK_NEIGHBORHOODS);
+  const [neighborhoodsLoading, setNeighborhoodsLoading] = useState(true);
   const listingsSectionRef = useRef(null);
 
   const LISTING_TABS = [
@@ -39,6 +41,23 @@ export default function HomePage() {
     { key: 'Self-contained', label: 'Self-contained' },
     { key: 'Apartment',      label: 'Apartment' },
   ];
+
+  // Fetch neighborhoods dynamically on mount
+  useEffect(() => {
+    const fetchNeighborhoods = async () => {
+      try {
+        setNeighborhoodsLoading(true);
+        const res = await api.get('/properties/neighborhoods');
+        const list = res.data.neighborhoods || [];
+        if (list.length > 0) setNeighborhoods(list);
+      } catch {
+        // silently fall back to hardcoded list
+      } finally {
+        setNeighborhoodsLoading(false);
+      }
+    };
+    fetchNeighborhoods();
+  }, []);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -161,8 +180,8 @@ export default function HomePage() {
                       <label className="form-label" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.9)' }}>Neighborhood</label>
                       <select className="form-select" value={filters.neighborhood}
                         onChange={e => setFilters(f => ({ ...f, neighborhood: e.target.value }))}>
-                        <option value="">All Areas</option>
-                        {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
+                        <option value="">{neighborhoodsLoading ? 'Loading...' : 'All Areas'}</option>
+                        {neighborhoods.map(n => <option key={n} value={n}>{n}</option>)}
                       </select>
                     </div>
                     <div className="col-12 col-md-6">

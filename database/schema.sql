@@ -240,3 +240,26 @@ CREATE TRIGGER trg_audit_property_images AFTER INSERT OR UPDATE OR DELETE ON pro
 CREATE TRIGGER trg_audit_vacancy_alerts AFTER INSERT OR UPDATE OR DELETE ON vacancy_alerts FOR EACH ROW EXECUTE FUNCTION fn_audit_log_trigger();
 
 
+-- =============================================================================
+-- TABLE: viewing_requests
+-- Student requests to visit / inspect a property before booking.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS viewing_requests (
+    id              SERIAL PRIMARY KEY,
+    student_id      INT          NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    landlord_id     INT          NULL     REFERENCES users(user_id) ON DELETE SET NULL,
+    hostel_id       INT          NOT NULL REFERENCES properties(property_id) ON DELETE CASCADE,
+    student_name    VARCHAR(150),
+    student_phone   VARCHAR(30),
+    preferred_date  DATE         NOT NULL,
+    status          VARCHAR(20)  NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending', 'approved', 'completed', 'rejected')),
+    created_at      TIMESTAMPTZ  DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_viewing_requests_student_id  ON viewing_requests(student_id);
+CREATE INDEX IF NOT EXISTS idx_viewing_requests_landlord_id ON viewing_requests(landlord_id);
+CREATE INDEX IF NOT EXISTS idx_viewing_requests_hostel_id   ON viewing_requests(hostel_id);
+
+
+
