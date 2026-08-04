@@ -129,11 +129,11 @@ export default function HomePage() {
               </div>
 
               <h1 className="hero-title" style={{ color: '#ffffff', textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>
-                Find Your Perfect
+                Secure Comfortable
                 <br />
-                <span style={{ color: 'var(--brand-orange)', textShadow: '0 0 30px rgba(255,107,53,0.5)' }}>Student Home</span>
+                <span style={{ color: '#f59e0b', textShadow: '0 0 30px rgba(245,158,11,0.5)' }}>Student Rooms</span>
                 <br />
-                Near KTU Campus
+                Around KTU Campus
               </h1>
 
               <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'clamp(0.88rem, 2.5vw, 1rem)', marginBottom: '1.5rem', maxWidth: 500 }}>
