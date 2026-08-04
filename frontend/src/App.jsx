@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import BottomNav from './components/BottomNav';
+import InstallPWA from './components/InstallPWA';
 
 // Public pages
 import HomePage from './pages/HomePage';
@@ -101,6 +102,8 @@ export default function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
+        {/* Global PWA Install Banner */}
+        <InstallPWA />
         {/* Mobile bottom nav — hidden on desktop via CSS */}
         <BottomNav />
       </BrowserRouter>

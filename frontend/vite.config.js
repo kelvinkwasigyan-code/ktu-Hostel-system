@@ -1,9 +1,35 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'KTU Housing Portal',
+        short_name: 'KTU Housing',
+        description: 'Official Student Housing Platform for Koforidua Technical University',
+        theme_color: '#0a0e1a',
+        background_color: '#0a0e1a',
+        display: 'standalone',
+        icons: [
+          {
+            src: '/ktu-logo.png', // Assuming logo exists
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/ktu-logo.png', // Assuming logo exists
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ],
   server: {
     port: 5173,
     proxy: {
