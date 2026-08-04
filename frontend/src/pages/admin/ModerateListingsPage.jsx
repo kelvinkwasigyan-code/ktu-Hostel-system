@@ -160,24 +160,38 @@ export default function ModerateListingsPage() {
                       style={{ transition: 'box-shadow 0.2s' }}
                       onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 24px rgba(255,140,0,0.09)'}
                       onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
-                      <div className="d-flex flex-wrap align-items-center gap-0">
+                      <div className="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-0">
 
                         {/* Photo thumbnail */}
-                        <div style={{ width: '120px', minHeight: '90px', background: 'var(--surface-2)', flexShrink: 0 }}
-                          className="d-flex align-items-center justify-content-center">
+                        <div style={{ width: '120px', minHeight: '100px', background: 'var(--surface-2)', flexShrink: 0 }}
+                          className="d-flex align-items-center justify-content-center d-none d-sm-flex">
                           {(() => {
                             const imgs = listing.property_images || [];
                             const sorted = [...imgs].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
                             const src = sorted[0]?.image_path;
                             return src ? (
                               <img src={src} alt={listing.title}
-                                style={{ width: '120px', height: '90px', objectFit: 'cover' }} />
+                                style={{ width: '120px', height: '100px', objectFit: 'cover' }} />
                             ) : (
                               <Image size={28} style={{ opacity: 0.3, color: 'var(--text-muted)' }} />
                             );
                           })()}
                         </div>
-
+                        {/* Mobile Photo thumbnail (full width) */}
+                        <div style={{ width: '100%', height: '180px', background: 'var(--surface-2)', flexShrink: 0 }}
+                          className="d-flex align-items-center justify-content-center d-sm-none">
+                          {(() => {
+                            const imgs = listing.property_images || [];
+                            const sorted = [...imgs].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+                            const src = sorted[0]?.image_path;
+                            return src ? (
+                              <img src={src} alt={listing.title}
+                                style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+                            ) : (
+                              <Image size={36} style={{ opacity: 0.3, color: 'var(--text-muted)' }} />
+                            );
+                          })()}
+                        </div>
 
                         {/* Info */}
                         <div className="flex-grow-1 p-3">
@@ -194,14 +208,18 @@ export default function ModerateListingsPage() {
                                 &nbsp;·&nbsp;Submitted: {new Date(listing.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                               </div>
                             </div>
-                            <div>{getStatusBadge(listing.verification_status)}</div>
+                            <div className="d-none d-md-block">{getStatusBadge(listing.verification_status)}</div>
+                          </div>
+                          {/* Mobile status badge */}
+                          <div className="d-md-none mt-2">
+                            {getStatusBadge(listing.verification_status)}
                           </div>
                         </div>
 
                         {/* Actions */}
-                        <div className="d-flex gap-2 align-items-center p-3" style={{ borderLeft: '1px solid var(--border)' }}>
+                        <div className="d-flex gap-2 align-items-center p-3 flex-wrap flex-sm-nowrap border-top border-sm-top-0" style={{ borderLeft: '1px solid var(--border)' }}>
                           <button
-                            className="btn btn-sm"
+                            className="btn btn-sm w-100"
                             style={{ background: 'var(--surface-2)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}
                             onClick={() => setSelected(selected?.property_id === listing.property_id ? null : listing)}
                           >
@@ -209,8 +227,8 @@ export default function ModerateListingsPage() {
                           </button>
                           {listing.verification_status === 'Pending' && (
                             <>
-                              <button className="btn btn-success btn-sm px-3" onClick={() => handleApprove(listing.property_id)}>Approve</button>
-                              <button className="btn btn-danger btn-sm px-3" onClick={() => openRejectModal(listing)}>Reject</button>
+                              <button className="btn btn-success btn-sm flex-grow-1 px-3" onClick={() => handleApprove(listing.property_id)}>Approve</button>
+                              <button className="btn btn-danger btn-sm flex-grow-1 px-3" onClick={() => openRejectModal(listing)}>Reject</button>
                             </>
                           )}
                         </div>
