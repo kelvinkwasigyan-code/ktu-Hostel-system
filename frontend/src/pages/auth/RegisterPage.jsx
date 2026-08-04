@@ -58,8 +58,11 @@ export default function RegisterPage() {
 
       if (authError) throw authError;
 
-      // Ensure profile is fetched for role routing
-      const res = await api.get('/auth/profile');
+      // Use the token directly from the sign-up response to avoid race conditions
+      const accessToken = data?.session?.access_token;
+      const res = await api.get('/auth/profile', {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+      });
 
       if (form.role === 'Landlord') {
         toast.success(`Account submitted for verification! Welcome, ${res.data.user.full_name.split(' ')[0]}`);
@@ -72,8 +75,14 @@ export default function RegisterPage() {
       else if (role === 'Landlord') navigate('/landlord');
       else navigate('/student');
     } catch (err) {
-      toast.error(err.message || err.response?.data?.error || 'Registration failed. Please try again.');
-    } finally {
+      console.error("Registration error:", err);
+      let errorMsg = 'Registration failed. Please try again.';
+      if (err?.response?.data?.error) {
+        errorMsg = typeof err.response.data.error === 'string' ? err.response.data.error : JSON.stringify(err.response.data.error);
+      } else if (err?.message) {
+        errorMsg = typeof err.message === 'string' ? err.message : JSON.stringify(err.message);
+      }
+      toast.error(errorMsg);
       setLoading(false);
     }
   };

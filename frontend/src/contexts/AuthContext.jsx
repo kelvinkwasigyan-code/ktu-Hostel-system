@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          await fetchBackendProfile();
+          await fetchBackendProfile(session.access_token);
         }
       } catch (error) {
         console.error('Error fetching auth session:', error);
@@ -27,12 +27,10 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    // 2. Listen for auth changes
+    // 2. Listen for auth changes — always use the session from the event
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (!user) { // only fetch if we don't have it, to avoid infinite loops on refresh
-          await fetchBackendProfile();
-        }
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
+        await fetchBackendProfile(session.access_token);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
       }
@@ -45,10 +43,13 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const fetchBackendProfile = async () => {
+  const fetchBackendProfile = async (accessToken) => {
     try {
-      // The API interceptor will automatically attach the Supabase session token
-      const res = await api.get('/auth/profile');
+      // If a token is passed directly (avoids race condition with localStorage), use it
+      const config = accessToken
+        ? { headers: { Authorization: `Bearer ${accessToken}` } }
+        : {};
+      const res = await api.get('/auth/profile', config);
       setUser(res.data.user);
     } catch (error) {
       console.error('Failed to fetch user profile from backend', error);

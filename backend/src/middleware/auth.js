@@ -1,14 +1,14 @@
 // middleware/auth.js
 // JWT authentication + role-based access control middleware
 // Every protected route uses these guards — enforced server-side, not just UI.
+// Uses supabase.auth.getUser() for token verification — no need to manage JWT secrets manually.
 
-import jwt from 'jsonwebtoken';
 import { supabaseAdmin } from '../config/supabase.js';
 
 /**
- * Verifies Supabase JWT token from Authorization header.
- * Looks up the corresponding integer user_id from public.users table.
- * Attaches decoded user payload to req.user.
+ * Verifies Supabase JWT token from Authorization header using Supabase's own getUser().
+ * Looks up the corresponding user record from public.users table.
+ * Attaches user payload to req.user.
  */
 export const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -20,27 +20,28 @@ export const authenticate = async (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET);
-    
-    // Look up the user in our custom public.users table
-    // We can match by email since Supabase JWT contains it
-    const { data: user, error } = await supabaseAdmin
+    // Let Supabase verify the JWT and extract the auth user — no secret decoding needed
+    const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !authUser) {
+      return res.status(401).json({ error: 'Invalid or expired token.' });
+    }
+
+    // Look up the user in our custom public.users table by email
+    const { data: user, error: dbError } = await supabaseAdmin
       .from('users')
       .select('user_id, email, role, full_name, verification_status')
-      .eq('email', decoded.email)
+      .eq('email', authUser.email)
       .single();
 
-    if (error || !user) {
+    if (dbError || !user) {
       return res.status(401).json({ error: 'User record not found.' });
     }
 
     req.user = user;
     next();
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Session expired. Please log in again.' });
-    }
-    return res.status(401).json({ error: 'Invalid token.' });
+    return res.status(401).json({ error: 'Authentication failed.' });
   }
 };
 
@@ -77,18 +78,20 @@ export const optionalAuthenticate = async (req, res, next) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET);
-      const { data: user } = await supabaseAdmin
-        .from('users')
-        .select('user_id, email, role, full_name, verification_status')
-        .eq('email', decoded.email)
-        .single();
-      
-      if (user) {
-        req.user = user;
+      const { data: { user: authUser } } = await supabaseAdmin.auth.getUser(token);
+      if (authUser) {
+        const { data: user } = await supabaseAdmin
+          .from('users')
+          .select('user_id, email, role, full_name, verification_status')
+          .eq('email', authUser.email)
+          .single();
+        
+        if (user) {
+          req.user = user;
+        }
       }
     } catch (err) {
-      // Ignore token errors for optional authentication (e.g. expired or invalid)
+      // Ignore token errors for optional authentication
     }
   }
   next();

@@ -218,9 +218,9 @@ BEGIN
 
     IF v_user_id IS NULL THEN
         IF (TG_OP = 'DELETE') THEN
-            v_user_id := nullif(COALESCE(to_jsonb(OLD)->>'user_id', to_jsonb(OLD)->>'student_id', to_jsonb(OLD)->>'landlord_id', ''), '')::uuid;
+            v_user_id := nullif(COALESCE(to_jsonb(OLD)->>'auth_id', ''), '')::uuid;
         ELSE
-            v_user_id := nullif(COALESCE(to_jsonb(NEW)->>'user_id', to_jsonb(NEW)->>'student_id', to_jsonb(NEW)->>'landlord_id', ''), '')::uuid;
+            v_user_id := nullif(COALESCE(to_jsonb(NEW)->>'auth_id', ''), '')::uuid;
         END IF;
     END IF;
 

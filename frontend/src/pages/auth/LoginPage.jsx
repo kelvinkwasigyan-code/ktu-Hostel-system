@@ -22,15 +22,18 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: authError } = await supabase.auth.signInWithPassword({
         email: form.email,
         password: form.password,
       });
 
       if (authError) throw authError;
 
-      // Fetch profile to determine role for navigation
-      const res = await api.get('/auth/profile');
+      // Use the token directly from the sign-in response to avoid race conditions
+      const accessToken = signInData.session?.access_token;
+      const res = await api.get('/auth/profile', {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+      });
       
       toast.success(`Welcome back, ${res.data.user.full_name.split(' ')[0]}!`);
       const role = (res.data.user.role || '').toLowerCase();
@@ -173,7 +176,7 @@ export default function LoginPage() {
                 Demo Quick Logins (DEV ONLY)
               </p>
               <div className="d-flex gap-2 justify-content-center flex-wrap">
-                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'admin@ktu.edu.gh', password: 'Admin123!' })}>Admin</button>
+                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'admin@ktu.edu.gh', password: 'Admin@123' })}>Admin</button>
                 <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'esi.quaye@ktu.edu.gh', password: 'Student@1' })}>Student</button>
                 <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'kwame.asante@gmail.com', password: 'Landlord@1' })}>Landlord</button>
               </div>
