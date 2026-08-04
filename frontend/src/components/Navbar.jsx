@@ -229,14 +229,18 @@ export default function Navbar() {
                   background: 'none', border: 'none', cursor: 'pointer'
                 }}
               >
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  backgroundColor: 'var(--brand-orange)', color: '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, fontSize: '0.85rem',
-                }}>
-                  {(user.full_name || 'U')[0].toUpperCase()}
-                </div>
+                {user.profile_picture ? (
+                  <img src={user.profile_picture} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    backgroundColor: 'var(--brand-orange)', color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700, fontSize: '0.85rem',
+                  }}>
+                    {(user.full_name || 'U')[0].toUpperCase()}
+                  </div>
+                )}
               </button>
 
               {showUserMenu && (
@@ -315,14 +319,18 @@ export default function Navbar() {
               border: '1px solid var(--border, #e2e8f0)',
               marginBottom: '0.2rem'
             }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: '50%',
-                backgroundColor: 'var(--brand-orange)', color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, fontSize: '0.95rem', flexShrink: 0
-              }}>
-                {(user.full_name || 'U')[0].toUpperCase()}
-              </div>
+              {user.profile_picture ? (
+                <img src={user.profile_picture} alt="Avatar" style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+              ) : (
+                <div style={{
+                  width: 38, height: 38, borderRadius: '50%',
+                  backgroundColor: 'var(--brand-orange)', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, fontSize: '0.95rem', flexShrink: 0
+                }}>
+                  {(user.full_name || 'U')[0].toUpperCase()}
+                </div>
+              )}
               <div style={{ overflow: 'hidden' }}>
                 <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {user.full_name}
