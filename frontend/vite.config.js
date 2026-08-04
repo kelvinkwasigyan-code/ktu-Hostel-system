@@ -17,14 +17,9 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: '/ktu-logo.png', // Assuming logo exists
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: '/ktu-logo.png', // Assuming logo exists
-            sizes: '512x512',
-            type: 'image/png'
+            src: '/favicon.svg',
+            sizes: '192x192 512x512',
+            type: 'image/svg+xml'
           }
         ]
       }

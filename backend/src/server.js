@@ -39,6 +39,7 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 const allowedOrigins = [
   'https://ktu-hostel-system-frontend-psi.vercel.app',
+  'https://ktu-hostel-system.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000'
 ];
