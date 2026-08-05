@@ -63,7 +63,7 @@ export default function HomePage() {
     const fetchFeatured = async () => {
       try {
         setListingsLoading(true);
-        const params = { limit: 6, page: 1 };
+        const params = { limit: 9, page: 1 };
         if (activeTab !== 'all') params.room_type = activeTab;
         const res = await api.get('/properties/search', { params });
         setListings(res.data.properties || []);
