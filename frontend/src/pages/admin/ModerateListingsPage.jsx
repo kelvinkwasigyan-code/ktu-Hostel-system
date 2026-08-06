@@ -244,11 +244,23 @@ export default function ModerateListingsPage() {
                             </div>
                             <div className="col-md-3">
                               <p className="mb-1"><strong style={{ color: 'var(--text-primary)' }}>Amenities:</strong></p>
-                              {listing.amenities?.length > 0 ? (
-                                <ul className="mb-0 ps-3" style={{ fontSize: '0.82rem' }}>
-                                  {listing.amenities.map((a, i) => <li key={i}>{a}</li>)}
-                                </ul>
-                              ) : <span>None specified</span>}
+                              {(() => {
+                                let am = [];
+                                try {
+                                  am = Array.isArray(listing.amenities) 
+                                    ? listing.amenities 
+                                    : (typeof listing.amenities === 'string' && listing.amenities.trim().startsWith('[') 
+                                        ? JSON.parse(listing.amenities) 
+                                        : (typeof listing.amenities === 'string' ? listing.amenities.split(',').map(s=>s.trim()) : []));
+                                } catch (e) {
+                                  am = [];
+                                }
+                                return am.length > 0 ? (
+                                  <ul className="mb-0 ps-3" style={{ fontSize: '0.82rem' }}>
+                                    {am.map((a, i) => <li key={i}>{a}</li>)}
+                                  </ul>
+                                ) : <span>None specified</span>;
+                              })()}
                             </div>
                             <div className="col-md-3">
                               <p className="mb-1"><strong style={{ color: 'var(--text-primary)' }}>Capacity / Rooms:</strong></p>

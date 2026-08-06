@@ -60,8 +60,15 @@ export default function RegisterPage() {
 
       // Use the token directly from the sign-up response to avoid race conditions
       const accessToken = data?.session?.access_token;
+
+      if (!accessToken) {
+        toast.success("Account created successfully! Please sign in.");
+        navigate('/login');
+        return;
+      }
+
       const res = await api.get('/auth/profile', {
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+        headers: { Authorization: `Bearer ${accessToken}` }
       });
 
       if (form.role === 'Landlord') {

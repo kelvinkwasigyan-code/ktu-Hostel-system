@@ -170,18 +170,7 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-          {import.meta.env.DEV && (
-            <div className="mt-4 p-3 rounded" style={{ backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1' }}>
-              <p className="text-center mb-2" style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Demo Quick Logins (DEV ONLY)
-              </p>
-              <div className="d-flex gap-2 justify-content-center flex-wrap">
-                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'admin@ktu.edu.gh', password: 'Admin@123' })}>Admin</button>
-                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'esi.quaye@ktu.edu.gh', password: 'Student@1' })}>Student</button>
-                <button type="button" className="btn btn-sm" style={{ backgroundColor: '#e2e8f0', fontSize: '0.75rem', fontWeight: 600, color: '#0f172a', border: 'none' }} onClick={() => setForm({ email: 'kwame.asante@gmail.com', password: 'Landlord@1' })}>Landlord</button>
-              </div>
-            </div>
-          )}
+
           <p className="text-center mt-3 mb-0" style={{ color: '#64748b', fontSize: '0.82rem' }}>
             Don't have an account?{' '}
             <Link to="/register" style={{ color: 'var(--brand-orange, #d97706)', fontWeight: 600 }}>Register here</Link>

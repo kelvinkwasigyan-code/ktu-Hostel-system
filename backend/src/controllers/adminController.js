@@ -312,7 +312,7 @@ export const getAnalytics = async (req, res) => {
   try {
     const [usersRes, propertiesRes, bookingsRes, reviewsRes] = await Promise.all([
       supabaseAdmin.from('users').select('role, is_active, verification_status, created_at'),
-      supabaseAdmin.from('properties').select('verification_status, availability_status, room_type, created_at'),
+      supabaseAdmin.from('properties').select('verification_status, availability_status, room_type, neighborhood, created_at'),
       supabaseAdmin.from('bookings').select('status, created_at'),
       supabaseAdmin.from('reviews').select('rating, is_flagged, created_at')
     ]);
@@ -322,11 +322,31 @@ export const getAnalytics = async (req, res) => {
     const bookings = bookingsRes.data || [];
     const reviews = reviewsRes.data || [];
 
+    const by_city = Object.entries(
+      properties.reduce((acc, p) => {
+        if (p.neighborhood) {
+          acc[p.neighborhood] = (acc[p.neighborhood] || 0) + 1;
+        }
+        return acc;
+      }, {})
+    ).map(([neighborhood, count]) => ({ neighborhood, count })).sort((a, b) => b.count - a.count);
+
+    const by_month = Object.entries(
+      bookings.reduce((acc, b) => {
+        const d = new Date(b.created_at);
+        const month = d.toLocaleString('en-US', { month: 'short' });
+        // Optionally include year for accurate sorting/grouping, but 'short' month matches UI expectation
+        acc[month] = (acc[month] || 0) + 1;
+        return acc;
+      }, {})
+    ).map(([month, count]) => ({ month, count }));
+
     const analytics = {
       users: {
         total: users.length,
         students: users.filter(u => u.role === 'Student').length,
         landlords: users.filter(u => u.role === 'Landlord').length,
+        verified_landlords: users.filter(u => u.role === 'Landlord' && u.verification_status === 'Approved').length,
         active: users.filter(u => u.is_active).length,
         pending_verification: users.filter(u => u.role === 'Landlord' && u.verification_status === 'Pending').length
       },
@@ -336,14 +356,16 @@ export const getAnalytics = async (req, res) => {
         pending: properties.filter(p => p.verification_status === 'Pending').length,
         rejected: properties.filter(p => p.verification_status === 'Rejected').length,
         available: properties.filter(p => p.availability_status === 'Available').length,
-        occupied: properties.filter(p => p.availability_status === 'Occupied').length
+        occupied: properties.filter(p => p.availability_status === 'Occupied').length,
+        by_city
       },
       bookings: {
         total: bookings.length,
         pending: bookings.filter(b => b.status === 'Pending').length,
         approved: bookings.filter(b => b.status === 'Approved').length,
         declined: bookings.filter(b => b.status === 'Declined').length,
-        expired: bookings.filter(b => b.status === 'Expired').length
+        expired: bookings.filter(b => b.status === 'Expired').length,
+        by_month
       },
       reviews: {
         total: reviews.length,
